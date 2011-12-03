@@ -1,0 +1,24 @@
+Introduction
+============
+This is a Java library that ...
+
+Downloads
+=========
+The library can be downloaded as a binary or source package from [https://github.com/gemstonetiger/trickl-matrix/downloads](https://github.com/gemstonetiger/trickl-matrix/downloads "Distribution download page").
+
+The source can be also retrieved straight from the Git repository: `git clone git@github.com:gemstonetiger/trickl-matrix.git`.
+
+Features
+========
+
+Requirements
+------------
+
+License and conditions of use
+=============================
+
+The wrapper program is available under GNU General Public License (see file `license-gpl.txt` in the distribution package for the text of the license).
+
+Example usage
+=============
+
