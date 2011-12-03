@@ -1,8 +1,23 @@
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE_1_0.txt or copy at
-//          http://www.boost.org/LICENSE_1_0.txt)
-//
-// Implementation based on the BOOST C++ library
+/*
+ * This file is part of the Trickl Open Source Libraries.
+ *
+ * Trickl Open Source Libraries - http://open.trickl.com/
+ *
+ * Copyright (C) 2011 Tim Gee.
+ *
+ * Trickl Open Source Libraries are free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Trickl Open Source Libraries are distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this project.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.trickl.graph.planar;
 
 import com.trickl.graph.edges.DirectedEdge;
@@ -10,7 +25,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 public class ChrobakPayneLayout<V, E> implements PlanarLayout<V> {
 
@@ -62,7 +77,7 @@ public class ChrobakPayneLayout<V, E> implements PlanarLayout<V> {
       DirectedEdge<V> boundary = graph.getBoundary();
       List<V> order = ordering.getOrder(graph, boundary.getSource());
 
-      Map<V, VertexDetail<V>> vertexDetails = new Hashtable<V, VertexDetail<V>>();
+      Map<V, VertexDetail<V>> vertexDetails = new HashMap<V, VertexDetail<V>>();
       for (V vertex : graph.vertexSet()) {
          vertexDetails.put(vertex, new VertexDetail<V>());
       }
@@ -189,7 +204,7 @@ public class ChrobakPayneLayout<V, E> implements PlanarLayout<V> {
 
       accumulateOffsets(order.iterator().next(), 0, vertexDetails);
 
-      drawing = new Hashtable<V, Coordinate>();
+      drawing = new HashMap<V, Coordinate>();
       for (V vi : graph.vertexSet()) {
          VertexDetail<V> drawdetail = vertexDetails.get(vi);
          drawing.put(vi, new Coordinate(drawdetail.x * scale, drawdetail.y * scale));

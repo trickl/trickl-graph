@@ -1,12 +1,23 @@
-//                 Copyright Trickl 2010
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE_1_0.txt or copy at
-//          http://www.boost.org/LICENSE_1_0.txt)
-//
-// Implementation based on the BOOST C++ library
-
-/**
- * INCOMPLETE AND UNTESTED
+/*
+ * This file is part of the Trickl Open Source Libraries.
+ *
+ * Trickl Open Source Libraries - http://open.trickl.com/
+ *
+ * Copyright (C) 2007 Aaron Windsor (part of the C++ Boost Graph Library)
+ * Copyright (C) 2011 Tim Gee (ported to Java).
+ *
+ * Trickl Open Source Libraries are free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Trickl Open Source Libraries are distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.trickl.graph.planar;
 
@@ -19,7 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -27,6 +38,9 @@ import java.util.Vector;
 
 import org.jgrapht.Graph;
 
+/*
+ * NOTE : This class is still to be tested and is very likely to have errors.
+ */
 public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
 
    private enum Case {
@@ -97,11 +111,11 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
       this.oldHandles = oldHandles;
       this.currentMergePoints = new Vector<V>();
       depthFirstSearch = new DepthFirstSearch<V, E>(graph);
-      vertexDetails = new Hashtable<V, Detail<V, E>>();
+      vertexDetails = new HashMap<V, Detail<V, E>>();
       for (V v : graph.vertexSet()) {
          vertexDetails.put(v, new Detail<V, E>());
       }
-      faceHandles = new Hashtable<V, FaceHandle<V, E>>();
+      faceHandles = new HashMap<V, FaceHandle<V, E>>();
 
       embed();
    }
@@ -895,8 +909,8 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
 
 
 
-      Map<E, Boolean> isInSubgraph = new Hashtable<E, Boolean>();
-      Map<E, Boolean> isEmbedded = new Hashtable<E, Boolean>();
+      Map<E, Boolean> isInSubgraph = new HashMap<E, Boolean>();
+      Map<E, Boolean> isEmbedded = new HashMap<E, Boolean>();
 
       for (E edge : graph.edgeSet()) {
          isInSubgraph.put(edge, false);
@@ -909,8 +923,8 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
 
       // upper_face_vertex is true for x,y, and all vertices above x and y in 
       // the bicomp
-      Map<V, Boolean> isUpperFaceVertex = new Hashtable<V, Boolean>();
-      Map<V, Boolean> isLowerFaceVertex = new Hashtable<V, Boolean>();
+      Map<V, Boolean> isUpperFaceVertex = new HashMap<V, Boolean>();
+      Map<V, Boolean> isLowerFaceVertex = new HashMap<V, Boolean>();
 
       for (V vertex : graph.vertexSet()) {
          isUpperFaceVertex.put(vertex, false);
@@ -1010,7 +1024,7 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
          }
       }
 
-      Map<E, Boolean> isOuterFaceEdge = new Hashtable<E, Boolean>();
+      Map<E, Boolean> isOuterFaceEdge = new HashMap<E, Boolean>();
       for (E e : graph.edgeSet()) {
          isOuterFaceEdge.put(e, false);
       }
@@ -1044,8 +1058,8 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
          isInSubgraph.put(walkupItr.getEdge(), true);
       }
 
-      Map<E, Boolean> isForbiddenEdge = new Hashtable<E, Boolean>();
-      Map<E, Boolean> isGoalEdge = new Hashtable<E, Boolean>();
+      Map<E, Boolean> isForbiddenEdge = new HashMap<E, Boolean>();
+      Map<E, Boolean> isGoalEdge = new HashMap<E, Boolean>();
 
       //Find external path to x and to y
       for (E e : graph.edgeSet()) {
@@ -1255,7 +1269,7 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
          oldFaceIterators.add(firstOldFaceItr);
          oldFaceIterators.add(secondOldFaceItr);
 
-         Map<V, Boolean> isXYPathVertex = new Hashtable<V, Boolean>();
+         Map<V, Boolean> isXYPathVertex = new HashMap<V, Boolean>();
          for (V vertex : graph.vertexSet()) {
             isXYPathVertex.put(vertex, false);
          }

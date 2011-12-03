@@ -1,37 +1,24 @@
-//                 Copyright Trickl 2010
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE_1_0.txt or copy at
-//          http://www.boost.org/LICENSE_1_0.txt)
-//
-// Implementation based on the BOOST C++ library
-//
-// A "face handle" is an optimization meant to serve two purposes in
-// the implementation of the Boyer-Myrvold planarity test: (1) it holds
-// the partial planar embedding of a particular vertex as it's being
-// constructed, and (2) it allows for efficient traversal around the
-// outer face of the partial embedding at that particular vertex. A face
-// handle is lightweight, just a shared pointer to the actual implementation,
-// since it is passed around/copied liberally in the algorithm. It consists
-// of an "anchor" (the actual vertex it's associated with) as well as a
-// sequence of edges. The functions first_vertex/second_vertex and
-// first_edge/second_edge allow fast access to the beginning and end of the
-// stored sequence, which allows one to traverse the outer face of the partial
-// planar embedding as it's being created. 
-//
-// There are some policies below that define the contents of the face handles:
-// in the case no embedding is needed (for example, if one just wants to use
-// the Boyer-Myrvold algorithm as a true/false test for planarity, the
-// no_embedding class can be passed as the StoreEmbedding policy. Otherwise,
-// either std_list (which uses as std::list) or recursive_lazy_list can be
-// passed as this policy. recursive_lazy_list has the best theoretical
-// performance (O(n) for a sequence of interleaved concatenations and reversals
-// of the underlying list), but I've noticed little difference between std_list
-// and recursive_lazy_list in my tests, even though using std_list changes
-// the worst-case complexity of the planarity test to O(n^2)
-//
-// Another policy is StoreOldHandlesPolicy, which specifies whether or not
-// to keep a record of the previous first/second vertex/edge - this is needed
-// if a Kuratowski subgraph needs to be isolated.
+/*
+ * This file is part of the Trickl Open Source Libraries.
+ *
+ * Trickl Open Source Libraries - http://open.trickl.com/
+ *
+ * Copyright (C) 2007 Aaron Windsor (part of the C++ Boost Graph Library)
+ * Copyright (C) 2011 Tim Gee.
+ *
+ * Trickl Open Source Libraries are free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Trickl Open Source Libraries are distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this project.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.trickl.graph.planar;
 
 import java.util.List;

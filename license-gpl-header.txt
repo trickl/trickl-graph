@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--
 This file is part of the Trickl Open Source Libraries.
 
 Trickl Open Source Libraries - http://open.trickl.com/
@@ -17,14 +15,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this project.  If not, see &lt;http://www.gnu.org/licenses/>.
-
--->
-
-<root xmlns="http://trickl.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <vertices>
-        <vertex xsi:type="id-vertex" id="id-vertex-1"/>
-        <vertex xsi:type="id-vertex" id="id-vertex-2"/>
-        <vertex xsi:type="id-vertex" id="id-vertex-3"/>
-    </vertices>
-</root>
+along with this project.  If not, see <http://www.gnu.org/licenses/>.
