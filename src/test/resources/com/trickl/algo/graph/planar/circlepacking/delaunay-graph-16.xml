@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root xmlns="http://trickl.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dcel>
+        <vertices>
+            <vertex xsi:type="circle-vertex" radius="50.7259999999999990905052982270717620849609375" x="0" y="0" id="circle-vertex-15"/>
+            <vertex xsi:type="circle-vertex" radius="59.8539999999999992041921359486877918243408203125" x="110.5799999999999982946974341757595539093017578125" y="0" id="circle-vertex-14"/>
+            <vertex xsi:type="circle-vertex" radius="99.7099999999999937472239253111183643341064453125" x="-122.7476546595124347049932111985981464385986328125" y="86.9710825696009948160281055606901645660400390625" id="circle-vertex-13"/>
+            <vertex xsi:type="circle-vertex" radius="69.83640595805576367638423107564449310302734375" x="44.96124404426542042756409500725567340850830078125" y="111.8650091153933914256413117982447147369384765625" id="circle-vertex-12"/>
+            <vertex xsi:type="circle-vertex" radius="61.85600000000000164845914696343243122100830078125" x="-162.801088338760877149979933165013790130615234375" y="243.4933947703829062447766773402690887451171875" id="circle-vertex-11"/>
+            <vertex xsi:type="circle-vertex" radius="79.243999999999999772626324556767940521240234375" x="360.17015998964910750146373175084590911865234375" y="224.282369796717858889678609557449817657470703125" id="circle-vertex-10"/>
+            <vertex xsi:type="circle-vertex" radius="99.54099999999999681676854379475116729736328125" x="214.0799579772789229537011124193668365478515625" y="121.220785852067109544805134646594524383544921875" id="circle-vertex-9"/>
+            <vertex xsi:type="circle-vertex" radius="70.9384254113638093031113385222852230072021484375" x="-30.631947765522806292892710189335048198699951171875" y="230.621827786809006965995649807155132293701171875" id="circle-vertex-8"/>
+            <vertex xsi:type="circle-vertex" radius="87.91100000000000136424205265939235687255859375" x="366.94134048402025882751331664621829986572265625" y="391.30001146082867080622236244380474090576171875" id="circle-vertex-7"/>
+            <vertex xsi:type="circle-vertex" radius="58.00730128330923918156258878298103809356689453125" x="98.2881504290213143804066930897533893585205078125" y="228.055523171728992792850476689636707305908203125" id="circle-vertex-6"/>
+            <vertex xsi:type="circle-vertex" radius="56.62599999999999766941982670687139034271240234375" x="-95.075848176423761515252408571541309356689453125" y="340.71102974620799841432017274200916290283203125" id="circle-vertex-5"/>
+            <vertex xsi:type="circle-vertex" radius="84.2632511129422852036441327072679996490478515625" x="217.966654969443453637722996063530445098876953125" y="304.983760599031256788293831050395965576171875" id="circle-vertex-4"/>
+            <vertex xsi:type="circle-vertex" radius="92.54099999999999681676854379475116729736328125" x="-94.4814647174154060849105007946491241455078125" y="489.8767260762957675979123450815677642822265625" id="circle-vertex-3"/>
+            <vertex xsi:type="circle-vertex" radius="94.819284353362689898858661763370037078857421875" x="52.683803047768606120371259748935699462890625" y="373.91900584573210153394029475748538970947265625" id="circle-vertex-2"/>
+            <vertex xsi:type="circle-vertex" radius="62.93500000000000227373675443232059478759765625" x="55.27714711360116695004762732423841953277587890625" y="531.6518442218374502772348932921886444091796875" id="circle-vertex-1"/>
+            <vertex xsi:type="circle-vertex" radius="96.769000000000005456968210637569427490234375" x="208.243692034377346544715692289173603057861328125" y="485.7545528218806794029660522937774658203125" id="circle-vertex-0"/>
+        </vertices>
+        <edges>
+            <edge xsi:type="id-edge" id="id-edge-20" source-vertex-id="circle-vertex-8" target-vertex-id="circle-vertex-2"/>
+            <edge xsi:type="id-edge" id="id-edge-19" source-vertex-id="circle-vertex-5" target-vertex-id="circle-vertex-8"/>
+            <edge xsi:type="id-edge" id="id-edge-17" source-vertex-id="circle-vertex-7" target-vertex-id="circle-vertex-0"/>
+            <edge xsi:type="id-edge" id="id-edge-16" source-vertex-id="circle-vertex-4" target-vertex-id="circle-vertex-7"/>
+            <edge xsi:type="id-edge" id="id-edge-14" source-vertex-id="circle-vertex-6" target-vertex-id="circle-vertex-4"/>
+            <edge xsi:type="id-edge" id="id-edge-13" source-vertex-id="circle-vertex-2" target-vertex-id="circle-vertex-6"/>
+            <edge xsi:type="id-edge" id="id-edge-11" source-vertex-id="circle-vertex-5" target-vertex-id="circle-vertex-2"/>
+            <edge xsi:type="id-edge" id="id-edge-10" source-vertex-id="circle-vertex-3" target-vertex-id="circle-vertex-5"/>
+            <edge xsi:type="id-edge" id="id-edge-56" source-vertex-id="circle-vertex-15" target-vertex-id="circle-vertex-14"/>
+            <edge xsi:type="id-edge" id="id-edge-8" source-vertex-id="circle-vertex-4" target-vertex-id="circle-vertex-0"/>
+            <edge xsi:type="id-edge" id="id-edge-7" source-vertex-id="circle-vertex-2" target-vertex-id="circle-vertex-4"/>
+            <edge xsi:type="id-edge" id="id-edge-53" source-vertex-id="circle-vertex-15" target-vertex-id="circle-vertex-12"/>
+            <edge xsi:type="id-edge" id="id-edge-52" source-vertex-id="circle-vertex-13" target-vertex-id="circle-vertex-15"/>
+            <edge xsi:type="id-edge" id="id-edge-5" source-vertex-id="circle-vertex-3" target-vertex-id="circle-vertex-2"/>
+            <edge xsi:type="id-edge" id="id-edge-4" source-vertex-id="circle-vertex-1" target-vertex-id="circle-vertex-3"/>
+            <edge xsi:type="id-edge" id="id-edge-50" source-vertex-id="circle-vertex-14" target-vertex-id="circle-vertex-9"/>
+            <edge xsi:type="id-edge" id="id-edge-49" source-vertex-id="circle-vertex-12" target-vertex-id="circle-vertex-14"/>
+            <edge xsi:type="id-edge" id="id-edge-2" source-vertex-id="circle-vertex-2" target-vertex-id="circle-vertex-0"/>
+            <edge xsi:type="id-edge" id="id-edge-1" source-vertex-id="circle-vertex-1" target-vertex-id="circle-vertex-2"/>
+            <edge xsi:type="id-edge" id="id-edge-0" source-vertex-id="circle-vertex-0" target-vertex-id="circle-vertex-1"/>
+            <edge xsi:type="id-edge" id="id-edge-47" source-vertex-id="circle-vertex-13" target-vertex-id="circle-vertex-12"/>
+            <edge xsi:type="id-edge" id="id-edge-44" source-vertex-id="circle-vertex-13" target-vertex-id="circle-vertex-8"/>
+            <edge xsi:type="id-edge" id="id-edge-43" source-vertex-id="circle-vertex-11" target-vertex-id="circle-vertex-13"/>
+            <edge xsi:type="id-edge" id="id-edge-40" source-vertex-id="circle-vertex-9" target-vertex-id="circle-vertex-10"/>
+            <edge xsi:type="id-edge" id="id-edge-38" source-vertex-id="circle-vertex-12" target-vertex-id="circle-vertex-9"/>
+            <edge xsi:type="id-edge" id="id-edge-35" source-vertex-id="circle-vertex-12" target-vertex-id="circle-vertex-6"/>
+            <edge xsi:type="id-edge" id="id-edge-34" source-vertex-id="circle-vertex-8" target-vertex-id="circle-vertex-12"/>
+            <edge xsi:type="id-edge" id="id-edge-32" source-vertex-id="circle-vertex-11" target-vertex-id="circle-vertex-8"/>
+            <edge xsi:type="id-edge" id="id-edge-31" source-vertex-id="circle-vertex-5" target-vertex-id="circle-vertex-11"/>
+            <edge xsi:type="id-edge" id="id-edge-29" source-vertex-id="circle-vertex-10" target-vertex-id="circle-vertex-7"/>
+            <edge xsi:type="id-edge" id="id-edge-28" source-vertex-id="circle-vertex-4" target-vertex-id="circle-vertex-10"/>
+            <edge xsi:type="id-edge" id="id-edge-26" source-vertex-id="circle-vertex-9" target-vertex-id="circle-vertex-4"/>
+            <edge xsi:type="id-edge" id="id-edge-25" source-vertex-id="circle-vertex-6" target-vertex-id="circle-vertex-9"/>
+            <edge xsi:type="id-edge" id="id-edge-23" source-vertex-id="circle-vertex-8" target-vertex-id="circle-vertex-6"/>
+        </edges>
+        <faces>
+            <face xsi:type="id-face" id="id-face-8"/>
+            <face xsi:type="id-face" id="id-face-0"/>
+            <face xsi:type="id-face" id="id-face-7"/>
+            <face xsi:type="id-face" id="id-face-4"/>
+            <face xsi:type="id-face" id="id-face-5"/>
+            <face xsi:type="id-face" id="id-face-15"/>
+            <face xsi:type="id-face" id="id-face-18"/>
+            <face xsi:type="id-face" id="id-face-17"/>
+            <face xsi:type="id-face" id="id-face-10"/>
+            <face xsi:type="id-face" id="id-face-16"/>
+            <face xsi:type="id-face" id="id-face-9"/>
+            <face xsi:type="id-face" id="id-face-14"/>
+            <face xsi:type="id-face" id="id-face-1"/>
+            <face xsi:type="id-face" id="id-face-3"/>
+            <face xsi:type="id-face" id="id-face-11"/>
+            <face xsi:type="id-face" id="id-face-6"/>
+            <face xsi:type="id-face" id="id-face-13"/>
+            <face xsi:type="id-face" id="id-face-12"/>
+            <face xsi:type="id-face" id="id-face-19"/>
+            <face xsi:type="id-face" id="id-face-2"/>
+        </faces>
+        <dcel-vertices>
+            <dcel-vertex id="dcel-15" leaving-half-edge-id="dcel-15-14" data-id="circle-vertex-15"/>
+            <dcel-vertex id="dcel-14" leaving-half-edge-id="dcel-14-15" data-id="circle-vertex-14"/>
+            <dcel-vertex id="dcel-13" leaving-half-edge-id="dcel-13-15" data-id="circle-vertex-13"/>
+            <dcel-vertex id="dcel-12" leaving-half-edge-id="dcel-12-14" data-id="circle-vertex-12"/>
+            <dcel-vertex id="dcel-11" leaving-half-edge-id="dcel-11-13" data-id="circle-vertex-11"/>
+            <dcel-vertex id="dcel-10" leaving-half-edge-id="dcel-10-7" data-id="circle-vertex-10"/>
+            <dcel-vertex id="dcel-9" leaving-half-edge-id="dcel-9-10" data-id="circle-vertex-9"/>
+            <dcel-vertex id="dcel-8" leaving-half-edge-id="dcel-8-11" data-id="circle-vertex-8"/>
+            <dcel-vertex id="dcel-7" leaving-half-edge-id="dcel-7-10" data-id="circle-vertex-7"/>
+            <dcel-vertex id="dcel-6" leaving-half-edge-id="dcel-6-9" data-id="circle-vertex-6"/>
+            <dcel-vertex id="dcel-5" leaving-half-edge-id="dcel-5-11" data-id="circle-vertex-5"/>
+            <dcel-vertex id="dcel-4" leaving-half-edge-id="dcel-4-7" data-id="circle-vertex-4"/>
+            <dcel-vertex id="dcel-3" leaving-half-edge-id="dcel-3-1" data-id="circle-vertex-3"/>
+            <dcel-vertex id="dcel-2" leaving-half-edge-id="dcel-2-1" data-id="circle-vertex-2"/>
+            <dcel-vertex id="dcel-1" leaving-half-edge-id="dcel-1-3" data-id="circle-vertex-1"/>
+            <dcel-vertex id="dcel-0" leaving-half-edge-id="dcel-0-1" data-id="circle-vertex-0"/>
+        </dcel-vertices>
+        <dcel-half-edges>
+            <dcel-half-edge data-id="id-edge-20" face-id="dcel-f-1" id="dcel-2-8" next-half-edge-id="dcel-8-6" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-8-2"/>
+            <dcel-half-edge data-id="id-edge-20" face-id="dcel-f-4" id="dcel-8-2" next-half-edge-id="dcel-2-5" origin-vertex-id="dcel-8" twin-half-edge-id="dcel-2-8"/>
+            <dcel-half-edge data-id="id-edge-19" face-id="dcel-f-4" id="dcel-5-8" next-half-edge-id="dcel-8-2" origin-vertex-id="dcel-5" twin-half-edge-id="dcel-8-5"/>
+            <dcel-half-edge data-id="id-edge-19" face-id="dcel-f-10" id="dcel-8-5" next-half-edge-id="dcel-5-11" origin-vertex-id="dcel-8" twin-half-edge-id="dcel-5-8"/>
+            <dcel-half-edge data-id="id-edge-17" face-id="dcel-f-15" id="dcel-7-0" next-half-edge-id="dcel-0-4" origin-vertex-id="dcel-7" twin-half-edge-id="dcel-0-7"/>
+            <dcel-half-edge data-id="id-edge-17" face-id="dcel-f-0" id="dcel-0-7" next-half-edge-id="dcel-7-10" origin-vertex-id="dcel-0" twin-half-edge-id="dcel-7-0"/>
+            <dcel-half-edge data-id="id-edge-16" face-id="dcel-f-15" id="dcel-4-7" next-half-edge-id="dcel-7-0" origin-vertex-id="dcel-4" twin-half-edge-id="dcel-7-4"/>
+            <dcel-half-edge data-id="id-edge-16" face-id="dcel-f-19" id="dcel-7-4" next-half-edge-id="dcel-4-10" origin-vertex-id="dcel-7" twin-half-edge-id="dcel-4-7"/>
+            <dcel-half-edge data-id="id-edge-14" face-id="dcel-f-3" id="dcel-6-4" next-half-edge-id="dcel-4-2" origin-vertex-id="dcel-6" twin-half-edge-id="dcel-4-6"/>
+            <dcel-half-edge data-id="id-edge-14" face-id="dcel-f-7" id="dcel-4-6" next-half-edge-id="dcel-6-9" origin-vertex-id="dcel-4" twin-half-edge-id="dcel-6-4"/>
+            <dcel-half-edge data-id="id-edge-13" face-id="dcel-f-1" id="dcel-6-2" next-half-edge-id="dcel-2-8" origin-vertex-id="dcel-6" twin-half-edge-id="dcel-2-6"/>
+            <dcel-half-edge data-id="id-edge-13" face-id="dcel-f-3" id="dcel-2-6" next-half-edge-id="dcel-6-4" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-6-2"/>
+            <dcel-half-edge data-id="id-edge-11" face-id="dcel-f-4" id="dcel-2-5" next-half-edge-id="dcel-5-8" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-5-2"/>
+            <dcel-half-edge data-id="id-edge-11" face-id="dcel-f-9" id="dcel-5-2" next-half-edge-id="dcel-2-3" origin-vertex-id="dcel-5" twin-half-edge-id="dcel-2-5"/>
+            <dcel-half-edge data-id="id-edge-10" face-id="dcel-f-9" id="dcel-3-5" next-half-edge-id="dcel-5-2" origin-vertex-id="dcel-3" twin-half-edge-id="dcel-5-3"/>
+            <dcel-half-edge data-id="id-edge-10" face-id="dcel-f-0" id="dcel-5-3" next-half-edge-id="dcel-3-1" origin-vertex-id="dcel-5" twin-half-edge-id="dcel-3-5"/>
+            <dcel-half-edge data-id="id-edge-56" face-id="dcel-f-18" id="dcel-15-14" next-half-edge-id="dcel-14-12" origin-vertex-id="dcel-15" twin-half-edge-id="dcel-14-15"/>
+            <dcel-half-edge data-id="id-edge-56" face-id="dcel-f-0" id="dcel-14-15" next-half-edge-id="dcel-15-13" origin-vertex-id="dcel-14" twin-half-edge-id="dcel-15-14"/>
+            <dcel-half-edge data-id="id-edge-8" face-id="dcel-f-8" id="dcel-4-0" next-half-edge-id="dcel-0-2" origin-vertex-id="dcel-4" twin-half-edge-id="dcel-0-4"/>
+            <dcel-half-edge data-id="id-edge-8" face-id="dcel-f-15" id="dcel-0-4" next-half-edge-id="dcel-4-7" origin-vertex-id="dcel-0" twin-half-edge-id="dcel-4-0"/>
+            <dcel-half-edge data-id="id-edge-7" face-id="dcel-f-3" id="dcel-4-2" next-half-edge-id="dcel-2-6" origin-vertex-id="dcel-4" twin-half-edge-id="dcel-2-4"/>
+            <dcel-half-edge data-id="id-edge-7" face-id="dcel-f-8" id="dcel-2-4" next-half-edge-id="dcel-4-0" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-4-2"/>
+            <dcel-half-edge data-id="id-edge-53" face-id="dcel-f-12" id="dcel-15-12" next-half-edge-id="dcel-12-13" origin-vertex-id="dcel-15" twin-half-edge-id="dcel-12-15"/>
+            <dcel-half-edge data-id="id-edge-53" face-id="dcel-f-18" id="dcel-12-15" next-half-edge-id="dcel-15-14" origin-vertex-id="dcel-12" twin-half-edge-id="dcel-15-12"/>
+            <dcel-half-edge data-id="id-edge-52" face-id="dcel-f-12" id="dcel-13-15" next-half-edge-id="dcel-15-12" origin-vertex-id="dcel-13" twin-half-edge-id="dcel-15-13"/>
+            <dcel-half-edge data-id="id-edge-52" face-id="dcel-f-0" id="dcel-15-13" next-half-edge-id="dcel-13-11" origin-vertex-id="dcel-15" twin-half-edge-id="dcel-13-15"/>
+            <dcel-half-edge data-id="id-edge-5" face-id="dcel-f-9" id="dcel-2-3" next-half-edge-id="dcel-3-5" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-3-2"/>
+            <dcel-half-edge data-id="id-edge-5" face-id="dcel-f-17" id="dcel-3-2" next-half-edge-id="dcel-2-1" origin-vertex-id="dcel-3" twin-half-edge-id="dcel-2-3"/>
+            <dcel-half-edge data-id="id-edge-4" face-id="dcel-f-17" id="dcel-1-3" next-half-edge-id="dcel-3-2" origin-vertex-id="dcel-1" twin-half-edge-id="dcel-3-1"/>
+            <dcel-half-edge data-id="id-edge-4" face-id="dcel-f-0" id="dcel-3-1" next-half-edge-id="dcel-1-0" origin-vertex-id="dcel-3" twin-half-edge-id="dcel-1-3"/>
+            <dcel-half-edge data-id="id-edge-50" face-id="dcel-f-13" id="dcel-14-9" next-half-edge-id="dcel-9-12" origin-vertex-id="dcel-14" twin-half-edge-id="dcel-9-14"/>
+            <dcel-half-edge data-id="id-edge-50" face-id="dcel-f-0" id="dcel-9-14" next-half-edge-id="dcel-14-15" origin-vertex-id="dcel-9" twin-half-edge-id="dcel-14-9"/>
+            <dcel-half-edge data-id="id-edge-49" face-id="dcel-f-13" id="dcel-12-14" next-half-edge-id="dcel-14-9" origin-vertex-id="dcel-12" twin-half-edge-id="dcel-14-12"/>
+            <dcel-half-edge data-id="id-edge-49" face-id="dcel-f-18" id="dcel-14-12" next-half-edge-id="dcel-12-15" origin-vertex-id="dcel-14" twin-half-edge-id="dcel-12-14"/>
+            <dcel-half-edge data-id="id-edge-2" face-id="dcel-f-8" id="dcel-0-2" next-half-edge-id="dcel-2-4" origin-vertex-id="dcel-0" twin-half-edge-id="dcel-2-0"/>
+            <dcel-half-edge data-id="id-edge-2" face-id="dcel-f-16" id="dcel-2-0" next-half-edge-id="dcel-0-1" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-0-2"/>
+            <dcel-half-edge data-id="id-edge-1" face-id="dcel-f-16" id="dcel-1-2" next-half-edge-id="dcel-2-0" origin-vertex-id="dcel-1" twin-half-edge-id="dcel-2-1"/>
+            <dcel-half-edge data-id="id-edge-1" face-id="dcel-f-17" id="dcel-2-1" next-half-edge-id="dcel-1-3" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-1-2"/>
+            <dcel-half-edge data-id="id-edge-0" face-id="dcel-f-16" id="dcel-0-1" next-half-edge-id="dcel-1-2" origin-vertex-id="dcel-0" twin-half-edge-id="dcel-1-0"/>
+            <dcel-half-edge data-id="id-edge-0" face-id="dcel-f-0" id="dcel-1-0" next-half-edge-id="dcel-0-7" origin-vertex-id="dcel-1" twin-half-edge-id="dcel-0-1"/>
+            <dcel-half-edge data-id="id-edge-47" face-id="dcel-f-5" id="dcel-13-12" next-half-edge-id="dcel-12-8" origin-vertex-id="dcel-13" twin-half-edge-id="dcel-12-13"/>
+            <dcel-half-edge data-id="id-edge-47" face-id="dcel-f-12" id="dcel-12-13" next-half-edge-id="dcel-13-15" origin-vertex-id="dcel-12" twin-half-edge-id="dcel-13-12"/>
+            <dcel-half-edge data-id="id-edge-44" face-id="dcel-f-5" id="dcel-8-13" next-half-edge-id="dcel-13-12" origin-vertex-id="dcel-8" twin-half-edge-id="dcel-13-8"/>
+            <dcel-half-edge data-id="id-edge-44" face-id="dcel-f-11" id="dcel-13-8" next-half-edge-id="dcel-8-11" origin-vertex-id="dcel-13" twin-half-edge-id="dcel-8-13"/>
+            <dcel-half-edge data-id="id-edge-43" face-id="dcel-f-11" id="dcel-11-13" next-half-edge-id="dcel-13-8" origin-vertex-id="dcel-11" twin-half-edge-id="dcel-13-11"/>
+            <dcel-half-edge data-id="id-edge-43" face-id="dcel-f-0" id="dcel-13-11" next-half-edge-id="dcel-11-5" origin-vertex-id="dcel-13" twin-half-edge-id="dcel-11-13"/>
+            <dcel-half-edge data-id="id-edge-40" face-id="dcel-f-14" id="dcel-9-10" next-half-edge-id="dcel-10-4" origin-vertex-id="dcel-9" twin-half-edge-id="dcel-10-9"/>
+            <dcel-half-edge data-id="id-edge-40" face-id="dcel-f-0" id="dcel-10-9" next-half-edge-id="dcel-9-14" origin-vertex-id="dcel-10" twin-half-edge-id="dcel-9-10"/>
+            <dcel-half-edge data-id="id-edge-38" face-id="dcel-f-6" id="dcel-12-9" next-half-edge-id="dcel-9-6" origin-vertex-id="dcel-12" twin-half-edge-id="dcel-9-12"/>
+            <dcel-half-edge data-id="id-edge-38" face-id="dcel-f-13" id="dcel-9-12" next-half-edge-id="dcel-12-14" origin-vertex-id="dcel-9" twin-half-edge-id="dcel-12-9"/>
+            <dcel-half-edge data-id="id-edge-35" face-id="dcel-f-2" id="dcel-12-6" next-half-edge-id="dcel-6-8" origin-vertex-id="dcel-12" twin-half-edge-id="dcel-6-12"/>
+            <dcel-half-edge data-id="id-edge-35" face-id="dcel-f-6" id="dcel-6-12" next-half-edge-id="dcel-12-9" origin-vertex-id="dcel-6" twin-half-edge-id="dcel-12-6"/>
+            <dcel-half-edge data-id="id-edge-34" face-id="dcel-f-2" id="dcel-8-12" next-half-edge-id="dcel-12-6" origin-vertex-id="dcel-8" twin-half-edge-id="dcel-12-8"/>
+            <dcel-half-edge data-id="id-edge-34" face-id="dcel-f-5" id="dcel-12-8" next-half-edge-id="dcel-8-13" origin-vertex-id="dcel-12" twin-half-edge-id="dcel-8-12"/>
+            <dcel-half-edge data-id="id-edge-32" face-id="dcel-f-10" id="dcel-11-8" next-half-edge-id="dcel-8-5" origin-vertex-id="dcel-11" twin-half-edge-id="dcel-8-11"/>
+            <dcel-half-edge data-id="id-edge-32" face-id="dcel-f-11" id="dcel-8-11" next-half-edge-id="dcel-11-13" origin-vertex-id="dcel-8" twin-half-edge-id="dcel-11-8"/>
+            <dcel-half-edge data-id="id-edge-31" face-id="dcel-f-10" id="dcel-5-11" next-half-edge-id="dcel-11-8" origin-vertex-id="dcel-5" twin-half-edge-id="dcel-11-5"/>
+            <dcel-half-edge data-id="id-edge-31" face-id="dcel-f-0" id="dcel-11-5" next-half-edge-id="dcel-5-3" origin-vertex-id="dcel-11" twin-half-edge-id="dcel-5-11"/>
+            <dcel-half-edge data-id="id-edge-29" face-id="dcel-f-19" id="dcel-10-7" next-half-edge-id="dcel-7-4" origin-vertex-id="dcel-10" twin-half-edge-id="dcel-7-10"/>
+            <dcel-half-edge data-id="id-edge-29" face-id="dcel-f-0" id="dcel-7-10" next-half-edge-id="dcel-10-9" origin-vertex-id="dcel-7" twin-half-edge-id="dcel-10-7"/>
+            <dcel-half-edge data-id="id-edge-28" face-id="dcel-f-14" id="dcel-10-4" next-half-edge-id="dcel-4-9" origin-vertex-id="dcel-10" twin-half-edge-id="dcel-4-10"/>
+            <dcel-half-edge data-id="id-edge-28" face-id="dcel-f-19" id="dcel-4-10" next-half-edge-id="dcel-10-7" origin-vertex-id="dcel-4" twin-half-edge-id="dcel-10-4"/>
+            <dcel-half-edge data-id="id-edge-26" face-id="dcel-f-7" id="dcel-9-4" next-half-edge-id="dcel-4-6" origin-vertex-id="dcel-9" twin-half-edge-id="dcel-4-9"/>
+            <dcel-half-edge data-id="id-edge-26" face-id="dcel-f-14" id="dcel-4-9" next-half-edge-id="dcel-9-10" origin-vertex-id="dcel-4" twin-half-edge-id="dcel-9-4"/>
+            <dcel-half-edge data-id="id-edge-25" face-id="dcel-f-6" id="dcel-9-6" next-half-edge-id="dcel-6-12" origin-vertex-id="dcel-9" twin-half-edge-id="dcel-6-9"/>
+            <dcel-half-edge data-id="id-edge-25" face-id="dcel-f-7" id="dcel-6-9" next-half-edge-id="dcel-9-4" origin-vertex-id="dcel-6" twin-half-edge-id="dcel-9-6"/>
+            <dcel-half-edge data-id="id-edge-23" face-id="dcel-f-1" id="dcel-8-6" next-half-edge-id="dcel-6-2" origin-vertex-id="dcel-8" twin-half-edge-id="dcel-6-8"/>
+            <dcel-half-edge data-id="id-edge-23" face-id="dcel-f-2" id="dcel-6-8" next-half-edge-id="dcel-8-12" origin-vertex-id="dcel-6" twin-half-edge-id="dcel-8-6"/>
+        </dcel-half-edges>
+        <dcel-faces>
+            <dcel-face adjacent-edge-id="dcel-4-0" is-boundary="false" data-id="id-face-8" id="dcel-f-8"/>
+            <dcel-face adjacent-edge-id="dcel-7-10" is-boundary="true" data-id="id-face-0" id="dcel-f-0"/>
+            <dcel-face adjacent-edge-id="dcel-6-9" is-boundary="false" data-id="id-face-7" id="dcel-f-7"/>
+            <dcel-face adjacent-edge-id="dcel-2-5" is-boundary="false" data-id="id-face-4" id="dcel-f-4"/>
+            <dcel-face adjacent-edge-id="dcel-8-13" is-boundary="false" data-id="id-face-5" id="dcel-f-5"/>
+            <dcel-face adjacent-edge-id="dcel-4-7" is-boundary="false" data-id="id-face-15" id="dcel-f-15"/>
+            <dcel-face adjacent-edge-id="dcel-12-15" is-boundary="false" data-id="id-face-18" id="dcel-f-18"/>
+            <dcel-face adjacent-edge-id="dcel-2-1" is-boundary="false" data-id="id-face-17" id="dcel-f-17"/>
+            <dcel-face adjacent-edge-id="dcel-5-11" is-boundary="false" data-id="id-face-10" id="dcel-f-10"/>
+            <dcel-face adjacent-edge-id="dcel-0-1" is-boundary="false" data-id="id-face-16" id="dcel-f-16"/>
+            <dcel-face adjacent-edge-id="dcel-2-3" is-boundary="false" data-id="id-face-9" id="dcel-f-9"/>
+            <dcel-face adjacent-edge-id="dcel-9-10" is-boundary="false" data-id="id-face-14" id="dcel-f-14"/>
+            <dcel-face adjacent-edge-id="dcel-6-2" is-boundary="false" data-id="id-face-1" id="dcel-f-1"/>
+            <dcel-face adjacent-edge-id="dcel-6-4" is-boundary="false" data-id="id-face-3" id="dcel-f-3"/>
+            <dcel-face adjacent-edge-id="dcel-8-11" is-boundary="false" data-id="id-face-11" id="dcel-f-11"/>
+            <dcel-face adjacent-edge-id="dcel-12-9" is-boundary="false" data-id="id-face-6" id="dcel-f-6"/>
+            <dcel-face adjacent-edge-id="dcel-12-14" is-boundary="false" data-id="id-face-13" id="dcel-f-13"/>
+            <dcel-face adjacent-edge-id="dcel-13-15" is-boundary="false" data-id="id-face-12" id="dcel-f-12"/>
+            <dcel-face adjacent-edge-id="dcel-4-10" is-boundary="false" data-id="id-face-19" id="dcel-f-19"/>
+            <dcel-face adjacent-edge-id="dcel-8-12" is-boundary="false" data-id="id-face-2" id="dcel-f-2"/>
+        </dcel-faces>
+        <dcel-boundary-face-id>dcel-f-0</dcel-boundary-face-id>
+        <edge-factory>
+            <undirected-id-edge-factory next-id="68"/>
+        </edge-factory>
+        <face-factory>
+            <id-face-factory next-id="20"/>
+        </face-factory>
+    </dcel>
+</root>

@@ -1,0 +1,8 @@
+# This resource file is used by the JAXBContext class
+# See http:/.sun.comse/6/docs/apix/xml/bind/JAXBContext.html
+CircleVertexFactory
+IdCoordinateVertexFactory
+IdVertexFactory
+CircleVertex
+IdCoordinateVertex
+IdVertex

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root xmlns="http://trickl.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <vertices>
+        <vertex xsi:type="id-vertex" id="id-vertex-1"/>
+        <vertex xsi:type="id-vertex" id="id-vertex-2"/>
+        <vertex xsi:type="id-vertex" id="id-vertex-3"/>
+    </vertices>
+</root>

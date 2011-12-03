@@ -1,0 +1,7 @@
+# This resource file is used by the JAXBContext class
+# See http:/.sun.comse/6/docs/apix/xml/bind/JAXBContext.html
+XmlAnyWrapper
+XmlDoublyConnectedEdgeListAdapter
+XmlAnyWrapperAdapter
+XmlDcelDocument
+XmlDoublyConnectedEdgeList
