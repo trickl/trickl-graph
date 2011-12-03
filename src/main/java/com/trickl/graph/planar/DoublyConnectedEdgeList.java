@@ -1,19 +1,13 @@
 package com.trickl.graph.planar;
 
-import com.trickl.graph.planar.xml.XmlDoublyConnectedEdgeListAdapter;
 import com.trickl.graph.edges.DirectedEdge;
+import com.trickl.graph.planar.xml.XmlDoublyConnectedEdgeListAdapter;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.jgrapht.EdgeFactory;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.ClassBasedEdgeFactory;
-import org.jgrapht.EdgeFactory;
 
 @XmlJavaTypeAdapter(value = XmlDoublyConnectedEdgeListAdapter.class)
 public class DoublyConnectedEdgeList<V, E, F>
