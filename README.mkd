@@ -1,24 +1,33 @@
 Introduction
 ============
-This is a Java library that ...
+This is a Java library that provides several graph algorithms, including many specialized for planar graphs.
 
 Downloads
 =========
-The library can be downloaded as a binary or source package from [https://github.com/gemstonetiger/trickl-matrix/downloads](https://github.com/gemstonetiger/trickl-matrix/downloads "Distribution download page").
+The library can be downloaded as a binary or source package from [https://github.com/gemstonetiger/trickl-graph/downloads](https://github.com/gemstonetiger/trickl-graph/downloads "Distribution download page").
 
-The source can be also retrieved straight from the Git repository: `git clone git@github.com:gemstonetiger/trickl-matrix.git`.
+The source can be also retrieved straight from the Git repository: `git clone git@github.com:gemstonetiger/trickl-graph.git`.
 
 Features
 ========
+An implementation for a Doubly Connected Edge List (an efficient mesh representation), along with XML representation.
+Connectivity Tests.
+Traversal visitors (breadth first, depth first) for use with other algorithms.
+Graph partitioning.
+Delaunay - Voronoi generators and conversion.
+Some basic planar graph generators.
+Planar graph layout (Chrobak Payne, Fold Free).
+Canonical Ordering.
+Planar sub-graphs.
 
 Requirements
 ------------
+Depends on the JGraphT library.
 
 License and conditions of use
 =============================
-
-The wrapper program is available under GNU General Public License (see file `license-gpl.txt` in the distribution package for the text of the license).
+The program is available under GNU General Public License (see file `license-gpl.txt` in the distribution package for the text of the license).
 
 Example usage
 =============
-
+Some Junit tests are provided and should be used to consult usage.
