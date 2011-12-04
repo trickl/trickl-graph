@@ -101,7 +101,7 @@ public class PlanarCanonicalOrderTest {
    @Test
    public void testLarge() throws Exception {
       
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = loadGraphFromFile("circlepacking/delaunay-graph-1000.xml");
+      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = loadGraphFromFile("delaunay-graph-1000.xml");
       MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
       maximalPlanar.makeMaximalPlanar(graph);
 
