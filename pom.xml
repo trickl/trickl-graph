@@ -91,7 +91,7 @@
   </reporting>
   <scm>
     <url>https://github.com/trickl/trickl-graph</url>
-    <connection>scm:git:ssh://git@github.com/trickl/trickl-graph.git</connection>
+    <connection>scm:git://github.com/trickl/trickl-graph.git</connection>
   </scm>
   <dependencies>
     <dependency>
