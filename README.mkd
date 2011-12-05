@@ -22,7 +22,11 @@ Planar sub-graphs.
 
 Requirements
 ------------
-Depends on the JGraphT library.
+Depends on the JGraphT library. At the time of writing, the latest jgrapht library is not available in Maven central. It should be downloaded manually from www.jgrapht.org and manually installed into the local Maven repository using the command:
+
+mvn install:install-file -DgroupId=org.jgrapht -DartifactId=jgrapht-jdk1.6 -Dversion=0.8.2 -Dpackaging=jar -Dfile=/path/to/file
+
+Where the artifactId and version should be changed if necessary.
 
 License and conditions of use
 =============================
