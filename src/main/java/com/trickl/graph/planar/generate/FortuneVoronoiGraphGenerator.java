@@ -54,14 +54,11 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       static class BreakPoint<V> extends Node<V> {
 
          Node<V> right;
-         Node<V> left;         
-         
+         Node<V> left;
          // Twin the the break in the opposite direction caused by the same two sites
          BreakPoint<V> twin;
-         
          // The next break which is clockwise from the same source
          BreakPoint<V> sourcePrev;
-         
          V prevVertex;
          V sourceVertex;
          // TODO: Not necessary, can derive from tree
@@ -85,11 +82,11 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          @Override
          public String toString() {
             return "L: " + leftSite
-                + ",R: " + rightSite
-                //+  "LP: " + (sourcePrev == null ? "*" : sourcePrev.leftSite)
-                //+ ",RP: " + (sourcePrev == null ? "*" : sourcePrev.rightSite)
-                + ",Prev: " + prevVertex   
-                + ",Source: " + sourceVertex;                 
+                    + ",R: " + rightSite
+                    //+  "LP: " + (sourcePrev == null ? "*" : sourcePrev.leftSite)
+                    //+ ",RP: " + (sourcePrev == null ? "*" : sourcePrev.rightSite)
+                    + ",Prev: " + prevVertex
+                    + ",Source: " + sourceVertex;
          }
       };
 
@@ -372,48 +369,40 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
                Coordinate sourceSite = vertexToCoordinate.get(sourceVertex);
 
                if (sourceVertex == null) {
-                  // TODO: Handle the infinite line case
-                  throw new UnsupportedOperationException("Infinite line case not handled.");
-               } else {
-                  // TODO: Remove code duplication with Delaunay Voronoi Visitor
-                  LineSegment perpendicularBisector = new LineSegment(
-                          sourceSite,
-                          new Coordinate(sourceSite.x - (brk.rightSite.y - brk.leftSite.y),
-                          sourceSite.y - (brk.leftSite.x - brk.rightSite.x)));
+                  if (brk.twin != null) {
+                     // The midline between two sites, terminated at both ends by the boundary
+                     Coordinate midSite = new Coordinate((brk.leftSite.x + brk.rightSite.x) / 2.,
+                           (brk.leftSite.y + brk.rightSite.y) / 2.);
 
-                  // Check each segment in the boundary for intersection with the
-                  // bisector            
-                  // TODO: O(boundary size), can we do this more efficiently?
-                  double minDistance = Double.POSITIVE_INFINITY;
-                  int segmentIndex = -1;
-                  for (int itr = 0; itr < boundaryVertices.size(); ++itr) {
-                     LineSegment boundarySegment = getLinearRingSegment(itr, boundaryVertices, this);
-                     Coordinate intersection = getHalfLineIntersection(perpendicularBisector, boundarySegment);
-                     if (intersection != null) {
-                        // Find the nearest boundary intersection (allows a concave boundary)
-                        double distance = sourceSite.distance(intersection);
-                        if (distance < minDistance) {
-                           minDistance = distance;
-                           segmentIndex = itr;
-                        }
-                     }
+                     // Create a vertex at each boundary interception
+                     V firstBoundaryVertex = getVertexAtBoundaryInterception(midSite,
+                           new Coordinate(brk.rightSite.y - brk.leftSite.y,
+                           brk.leftSite.x - brk.rightSite.x),
+                           boundaryVertices,
+                           vertexFactory);
+
+                     V secondBoundaryVertex = getVertexAtBoundaryInterception(midSite,
+                           new Coordinate(brk.leftSite.y - brk.rightSite.y,
+                           brk.rightSite.x - brk.leftSite.x),
+                           boundaryVertices,
+                           vertexFactory);
+
+                     // Create the edge 
+                     E edge = graph.getEdgeFactory().createEdge(firstBoundaryVertex, secondBoundaryVertex);
+                     graph.addEdge(firstBoundaryVertex, secondBoundaryVertex, null, null, edge);
+
+                     // Prevent the twin from causing a duplicate edge
+                     brk.twin.twin = null;
+                     brk.twin = null;
                   }
-
-                  if (segmentIndex >= 0) {
-                     int nextItr = (segmentIndex + 1) % boundaryVertices.size();
-                     LineSegment boundarySegment = getLinearRingSegment(segmentIndex, boundaryVertices, this);
-                     Coordinate intersection = getHalfLineIntersection(perpendicularBisector, boundarySegment);
-                     V boundaryVertex;
-                     if (intersection.equals(boundarySegment.p0)) {
-                        boundaryVertex = boundaryVertices.get(segmentIndex);
-                     } else if (intersection.equals(boundarySegment.p1)) {
-                        boundaryVertex = boundaryVertices.get(nextItr);
-                     } else {
-                        boundaryVertex = vertexFactory.createVertex();
-                        vertexToCoordinate.put(boundaryVertex, intersection);
-                        boundaryVertices.add(nextItr, boundaryVertex);
-                     }
-
+               } else {
+                  // TODO: Remove code duplication with Delaunay Voronoi Visitor                                    
+                  V boundaryVertex = getVertexAtBoundaryInterception(sourceSite,
+                          new Coordinate(brk.rightSite.y - brk.leftSite.y,
+                          brk.leftSite.x - brk.rightSite.x),
+                          boundaryVertices,
+                          vertexFactory);
+                  if (boundaryVertex != null) {
                      // Create the new edge to this boundary intercept
                      E edge = graph.getEdgeFactory().createEdge(sourceVertex, boundaryVertex);
                      graph.addEdge(sourceVertex, boundaryVertex, beforeVertex, null, edge);
@@ -444,6 +433,50 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          E edge = graph.getEdgeFactory().createEdge(boundarySource, boundaryTarget);
          graph.addEdge(boundarySource, boundaryTarget, boundaryBefore, null, edge);
       }
+   }
+
+   private V getVertexAtBoundaryInterception(Coordinate origin, Coordinate direction, List<V> boundaryVertices, VertexFactory<V> vertexFactory) {
+      LineSegment perpendicularBisector = new LineSegment(
+              origin,
+              new Coordinate(origin.x - direction.x,
+              origin.y - direction.y));
+
+      // Check each segment in the boundary for intersection with the
+      // bisector            
+      // TODO: O(boundary size), can we do this more efficiently?
+      double minDistance = Double.POSITIVE_INFINITY;
+      int segmentIndex = -1;
+      for (int itr = 0; itr < boundaryVertices.size(); ++itr) {
+         LineSegment boundarySegment = getLinearRingSegment(itr, boundaryVertices, this);
+         Coordinate intersection = getHalfLineIntersection(perpendicularBisector, boundarySegment);
+         if (intersection != null) {
+            // Find the nearest boundary intersection (allows a concave boundary)
+            double distance = origin.distance(intersection);
+            if (distance < minDistance) {
+               minDistance = distance;
+               segmentIndex = itr;
+            }
+         }
+      }
+
+      V boundaryVertex = null;
+      if (segmentIndex >= 0) {
+         int nextItr = (segmentIndex + 1) % boundaryVertices.size();
+         LineSegment boundarySegment = getLinearRingSegment(segmentIndex, boundaryVertices, this);
+         Coordinate intersection = getHalfLineIntersection(perpendicularBisector, boundarySegment);
+
+         if (intersection.equals(boundarySegment.p0)) {
+            boundaryVertex = boundaryVertices.get(segmentIndex);
+         } else if (intersection.equals(boundarySegment.p1)) {
+            boundaryVertex = boundaryVertices.get(nextItr);
+         } else {
+            boundaryVertex = vertexFactory.createVertex();
+            vertexToCoordinate.put(boundaryVertex, intersection);
+            boundaryVertices.add(nextItr, boundaryVertex);
+         }
+      }
+
+      return boundaryVertex;
    }
 
    private void handleSiteEvent(SiteEvent siteEvent, Queue<SweepEvent> eventQueue, BeachLineTree<V> beachLineTree) {
@@ -483,7 +516,7 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
                  rightBreak, intersectArc.site, site);
          rightBreak.twin = leftBreak;
          leftBreak.twin = rightBreak;
-         
+
          //rightBreak.next = leftBreak;
          //leftBreak.next = rightBreak;
 
@@ -533,13 +566,13 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
             leftBreak.twin.twin = null;
             leftBreak.twin.sourcePrev = rightBreak.twin;
          }
-         
+
          V rightBreakSourceVertex = rightBreak.sourceVertex;
          BeachLineTree.BreakPoint<V> rightBreakTwin = rightBreak.twin;
          if (rightBreak.twin != null) {
             rightBreak.twin.sourceVertex = circleEventVertex;
             rightBreak.twin.sourcePrev = leftBreak.twin;
-            rightBreak.twin.twin = null;  
+            rightBreak.twin.twin = null;
          }
          if (rightBreak.sourcePrev != null && rightBreak.sourcePrev.sourceVertex == rightBreak.sourceVertex) {
             rightBreak.sourcePrev.prevVertex = circleEventVertex;
@@ -547,7 +580,7 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          if (leftBreak.sourcePrev != null && leftBreak.sourcePrev.sourceVertex == leftBreak.sourceVertex) {
             leftBreak.sourcePrev.prevVertex = circleEventVertex;
          }
-         
+
          BeachLineTree.delete(circleEvent.arc);
 
          BeachLineTree.BreakPoint<V> newBreak = beachLineTree.getRightBreak(leftArc);
@@ -555,13 +588,13 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          newBreak.prevVertex = leftBreakSourceVertex;
          newBreak.rightSite = rightArc.site;
          newBreak.leftSite = leftArc.site;
-         newBreak.twin = null;         
+         newBreak.twin = null;
          newBreak.sourcePrev = rightBreakTwin;
-         
+
          if (leftBreakTwin != null) {
             leftBreakTwin.sourcePrev = newBreak;
          }
-         
+
          // Check the new arc triples for circle events
          BeachLineTree.Arc<V> leftLeftArc = beachLineTree.getNextLeftArc(leftArc);
          BeachLineTree.Arc<V> rightRightArc = beachLineTree.getNextRightArc(rightArc);
