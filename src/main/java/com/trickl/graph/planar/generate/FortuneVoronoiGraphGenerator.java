@@ -209,6 +209,33 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
 
          return (BreakPoint<V>) node;
       }
+      
+      List<BeachLineTree.BreakPoint<V>> getInorderBreaks() {
+         List<BeachLineTree.BreakPoint<V>> breaks = new LinkedList<BeachLineTree.BreakPoint<V>>();
+
+         // Get an inorder traversal of the BeachLineTree
+         Stack<BeachLineTree.BreakPoint<V>> breakStack = new Stack<BeachLineTree.BreakPoint<V>>();
+         BeachLineTree.Node<V> current = head.left;
+         boolean done = false;
+         while (!done) {
+            if (current instanceof BeachLineTree.BreakPoint) {
+               BeachLineTree.BreakPoint<V> brk = (BeachLineTree.BreakPoint<V>) current;
+               breakStack.push(brk);
+               current = brk.left;
+            } else {
+               if (!breakStack.isEmpty()) {
+                  BeachLineTree.BreakPoint<V> brk = breakStack.pop();
+                  current = brk;
+                  breaks.add(brk);
+                  current = brk.right;
+               } else {
+                  done = true;
+               }
+            }
+         }
+         
+         return breaks;
+      }
    }
 
    static interface SweepEvent {
@@ -352,86 +379,71 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       // The breakpoints still present in the beachLineTree represent half-infinite edges in the Voronoi diagram
       // Connect these to the boundary, if specified
       if (boundary != null) {
-         LinkedList<BeachLineTree.Node<V>> nodes = new LinkedList<BeachLineTree.Node<V>>();
-         if (beachLineTree.head.left != null) {
-            nodes.add(beachLineTree.head.left);
-         }
+         for (BeachLineTree.BreakPoint<V> brk : beachLineTree.getInorderBreaks()) {
+            V sourceVertex = brk.sourceVertex;
+            V beforeVertex = brk.prevVertex;
+            Coordinate sourceSite = vertexToCoordinate.get(sourceVertex);
 
-         while (!nodes.isEmpty()) {
+            if (sourceVertex == null) {
+               if (brk.twin != null) {
+                  // The midline between two sites, terminated at both ends by the boundary
+                  Coordinate midSite = new Coordinate((brk.leftSite.x + brk.rightSite.x) / 2.,
+                          (brk.leftSite.y + brk.rightSite.y) / 2.);
 
-            BeachLineTree.Node<V> node = nodes.pollFirst();
-
-            if (node instanceof BeachLineTree.BreakPoint) {
-               BeachLineTree.BreakPoint<V> brk = (BeachLineTree.BreakPoint<V>) node;
-
-               V sourceVertex = brk.sourceVertex;
-               V beforeVertex = brk.prevVertex;
-               Coordinate sourceSite = vertexToCoordinate.get(sourceVertex);
-
-               if (sourceVertex == null) {
-                  if (brk.twin != null) {
-                     // The midline between two sites, terminated at both ends by the boundary
-                     Coordinate midSite = new Coordinate((brk.leftSite.x + brk.rightSite.x) / 2.,
-                           (brk.leftSite.y + brk.rightSite.y) / 2.);
-
-                     // Create a vertex at each boundary interception
-                     V firstBoundaryVertex = getVertexAtBoundaryInterception(midSite,
-                           new Coordinate(brk.rightSite.y - brk.leftSite.y,
-                           brk.leftSite.x - brk.rightSite.x),
-                           boundaryVertices,
-                           vertexFactory);
-
-                     V secondBoundaryVertex = getVertexAtBoundaryInterception(midSite,
-                           new Coordinate(brk.leftSite.y - brk.rightSite.y,
-                           brk.rightSite.x - brk.leftSite.x),
-                           boundaryVertices,
-                           vertexFactory);
-
-                     // Create the edge 
-                     E edge = graph.getEdgeFactory().createEdge(firstBoundaryVertex, secondBoundaryVertex);
-                     graph.addEdge(firstBoundaryVertex, secondBoundaryVertex, null, null, edge);
-
-                     // Prevent the twin from causing a duplicate edge
-                     brk.twin.twin = null;
-                     brk.twin = null;
-                  }
-               } else {
-                  // TODO: Remove code duplication with Delaunay Voronoi Visitor                                    
-                  V boundaryVertex = getVertexAtBoundaryInterception(sourceSite,
+                  // Create a vertex at each boundary interception
+                  V firstBoundaryVertex = getVertexAtBoundaryInterception(midSite,
                           new Coordinate(brk.rightSite.y - brk.leftSite.y,
                           brk.leftSite.x - brk.rightSite.x),
                           boundaryVertices,
                           vertexFactory);
-                  if (boundaryVertex != null) {
-                     // Create the new edge to this boundary intercept
-                     E edge = graph.getEdgeFactory().createEdge(sourceVertex, boundaryVertex);
-                     graph.addEdge(sourceVertex, boundaryVertex, beforeVertex, null, edge);
-                  }
-               }
 
-               nodes.add(brk.left);
-               nodes.add(brk.right);
+                  V secondBoundaryVertex = getVertexAtBoundaryInterception(midSite,
+                          new Coordinate(brk.leftSite.y - brk.rightSite.y,
+                          brk.rightSite.x - brk.leftSite.x),
+                          boundaryVertices,
+                          vertexFactory);
+
+                  // Create the edge 
+                  E edge = graph.getEdgeFactory().createEdge(firstBoundaryVertex, secondBoundaryVertex);
+                  graph.addEdge(firstBoundaryVertex, secondBoundaryVertex, null, null, edge);
+
+                  // Prevent the twin from causing a duplicate edge
+                  brk.twin.twin = null;
+                  brk.twin = null;
+               }
+            } else {
+               // TODO: Remove code duplication with Delaunay Voronoi Visitor                                    
+               V boundaryVertex = getVertexAtBoundaryInterception(sourceSite,
+                       new Coordinate(brk.rightSite.y - brk.leftSite.y,
+                       brk.leftSite.x - brk.rightSite.x),
+                       boundaryVertices,
+                       vertexFactory);
+               if (boundaryVertex != null) {
+                  // Create the new edge to this boundary intercept
+                  E edge = graph.getEdgeFactory().createEdge(sourceVertex, boundaryVertex);
+                  graph.addEdge(sourceVertex, boundaryVertex, beforeVertex, null, edge);
+               }
             }
          }
-      }
 
-      Collections.reverse(boundaryVertices);
-      for (int prevItr = 0; prevItr < boundaryVertices.size(); ++prevItr) {
-         int itr = (prevItr + 1) % boundaryVertices.size();
-         int nextItr = (prevItr + 2) % boundaryVertices.size();
-         V boundaryPrevious = boundaryVertices.get(prevItr);
-         V boundarySource = boundaryVertices.get(itr);
-         V boundaryTarget = boundaryVertices.get(nextItr);
-         V boundaryBefore = null;
+         Collections.reverse(boundaryVertices);
+         for (int prevItr = 0; prevItr < boundaryVertices.size(); ++prevItr) {
+            int itr = (prevItr + 1) % boundaryVertices.size();
+            int nextItr = (prevItr + 2) % boundaryVertices.size();
+            V boundaryPrevious = boundaryVertices.get(prevItr);
+            V boundarySource = boundaryVertices.get(itr);
+            V boundaryTarget = boundaryVertices.get(nextItr);
+            V boundaryBefore = null;
 
-         if (graph.containsEdge(boundarySource, boundaryPrevious)) {
-            boundaryBefore = graph.getPrevVertex(boundarySource, boundaryPrevious);
-         } else if (PlanarGraphs.isVertexBoundary(graph, boundarySource)) {
-            boundaryBefore = PlanarGraphs.getPrevVertexOnBoundary(graph, boundarySource);
+            if (graph.containsEdge(boundarySource, boundaryPrevious)) {
+               boundaryBefore = graph.getPrevVertex(boundarySource, boundaryPrevious);
+            } else if (PlanarGraphs.isVertexBoundary(graph, boundarySource)) {
+               boundaryBefore = PlanarGraphs.getPrevVertexOnBoundary(graph, boundarySource);
+            }
+
+            E edge = graph.getEdgeFactory().createEdge(boundarySource, boundaryTarget);
+            graph.addEdge(boundarySource, boundaryTarget, boundaryBefore, null, edge);
          }
-
-         E edge = graph.getEdgeFactory().createEdge(boundarySource, boundaryTarget);
-         graph.addEdge(boundarySource, boundaryTarget, boundaryBefore, null, edge);
       }
    }
 
