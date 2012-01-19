@@ -58,9 +58,49 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class FortuneVoronoiGraphGeneratorTest {
+   
+   @Test
+   public void producesCorrectLayoutForTwoPointsWithBoundary() throws Exception {
+
+      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
+      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> siteGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
+      
+      Map<IdVertex, Coordinate> siteCoordinates = new HashMap<IdVertex, Coordinate>();
+      IdVertexFactory siteVertexFactory = new IdVertexFactory();      
+      CoordinateList coordList = new CoordinateList();
+      coordList.add(new Coordinate(0, 0));
+      coordList.add(new Coordinate(1, 0));
+
+      for (Coordinate coord : coordList.toCoordinateArray()) {
+         IdVertex siteVertex = siteVertexFactory.createVertex();
+         siteGraph.addVertex(siteVertex);
+         siteCoordinates.put(siteVertex, coord);            
+      }
+
+      // Note the points on the boundary must be closed (end with the first point)
+      CoordinateList boundaryCoords = new CoordinateList();
+      boundaryCoords.add(new Coordinate(0.5, 1.0));
+      boundaryCoords.add(new Coordinate(1.5, -0.5));
+      boundaryCoords.add(new Coordinate(-0.5, -0.5));
+      boundaryCoords.add(new Coordinate(0.5, 1.0));
+      LinearRing boundary = new LinearRing(new CoordinateArraySequence(boundaryCoords.toCoordinateArray()),
+              new GeometryFactory());
+
+      VertexFactory<IdVertex> voronoiVertexFactory = new IdVertexFactory();
+      FortuneVoronoiGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraphGenerator =
+              new FortuneVoronoiGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(siteCoordinates.values(), boundary);
+      voronoiGraphGenerator.generateGraph(voronoiGraph, voronoiVertexFactory, null);
+
+      // Compare to a model graph
+      writeGraph(voronoiGraph, "voronoi-twopointswithboundary.xml");
+      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> modelGraph = readGraph("voronoi-twopointswithboundary.xml");
+      assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
+      
+      // Visual check     
+      displayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+   }
 
    @Test
-   @Ignore
    public void producesCorrectLayoutForThreePointsNoBoundary() throws Exception {
 
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
@@ -94,7 +134,6 @@ public class FortuneVoronoiGraphGeneratorTest {
    }
 
    @Test
-   @Ignore
    public void producesCorrectLayoutForThreePointsWithBoundary() throws Exception {
 
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
@@ -127,9 +166,6 @@ public class FortuneVoronoiGraphGeneratorTest {
               new FortuneVoronoiGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(siteCoordinates.values(), boundary);
       voronoiGraphGenerator.generateGraph(voronoiGraph, voronoiVertexFactory, null);
 
-      assertEquals(7, voronoiGraph.vertexSet().size());
-      assertEquals(9, voronoiGraph.edgeSet().size());
-
       // Compare to a model graph
       //writeGraph(graph, "voronoi-threepointswithboundary.xml");
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> modelGraph = readGraph("voronoi-threepointswithboundary.xml");
@@ -140,7 +176,6 @@ public class FortuneVoronoiGraphGeneratorTest {
    }
 
    @Test
-   @Ignore
    public void producesCorrectLayoutForFourPointsNoBoundary() throws Exception {
 
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
@@ -175,7 +210,6 @@ public class FortuneVoronoiGraphGeneratorTest {
    }   
    
    @Test
-   @Ignore
    public void producesCorrectLayoutForFourPointsWithBoundary() throws Exception {
 
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
@@ -253,17 +287,16 @@ public class FortuneVoronoiGraphGeneratorTest {
       boundaryCoords.add(new Coordinate(-2, -2));
       LinearRing boundary = new LinearRing(new CoordinateArraySequence(boundaryCoords.toCoordinateArray()),
               new GeometryFactory());
-      //boundary = null;
-
+      
       VertexFactory<IdVertex> voronoiVertexFactory = new IdVertexFactory();
       FortuneVoronoiGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraphGenerator =
               new FortuneVoronoiGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(siteCoordinates.values(), boundary);
       voronoiGraphGenerator.generateGraph(voronoiGraph, voronoiVertexFactory, null);
       
       // Compare to a model graph
-      writeGraph(voronoiGraph, "voronoi-manypointswithboundary.xml");
+      //writeGraph(voronoiGraph, "voronoi-manypointswithboundary.xml");
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> modelGraph = readGraph("voronoi-manypointswithboundary.xml");
-      //assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
+      assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
       displayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
