@@ -340,16 +340,15 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
 
       // Initialize with an empty beach tree line and just site events
       BeachLineTree<V> beachLineTree = new BeachLineTree<V>();
-      Queue<SweepEvent> eventQueue = new PriorityQueue<SweepEvent>(sites.size() * 2, new SweepEventComparator(geometryFactory.getPrecisionModel()));
-      for (Coordinate site : sites) {
-         eventQueue.add(new SiteEvent(site));
-      }
+      if (!sites.isEmpty()) {
+         Queue<SweepEvent> eventQueue = new PriorityQueue<SweepEvent>(sites.size() * 2, new SweepEventComparator(geometryFactory.getPrecisionModel()));
+         for (Coordinate site : sites) {
+            eventQueue.add(new SiteEvent(site));
+         }
 
-      while (!eventQueue.isEmpty()) {
-         processEventQueue(eventQueue, beachLineTree, graph, vertexFactory);
-         //System.out.println("------------ Beach Line ---------------");
-         //printBeachLineTree(beachLineTree.head.left, System.out);
-         //System.out.println();
+         while (!eventQueue.isEmpty()) {
+            processEventQueue(eventQueue, beachLineTree, graph, vertexFactory);        
+         }
       }
       postProcessingEventQueue(beachLineTree, boundaryVertices, graph, vertexFactory);
    }
