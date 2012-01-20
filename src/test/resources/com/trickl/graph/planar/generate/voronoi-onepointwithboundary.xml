@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root xmlns="http://trickl.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dcel>
+        <vertices>
+            <vertex xsi:type="id-vertex" id="id-vertex-0"/>
+            <vertex xsi:type="id-vertex" id="id-vertex-2"/>
+            <vertex xsi:type="id-vertex" id="id-vertex-1"/>
+        </vertices>
+        <edges>
+            <edge xsi:type="id-edge" id="id-edge-0" source-vertex-id="id-vertex-1" target-vertex-id="id-vertex-0"/>
+            <edge xsi:type="id-edge" id="id-edge-1" source-vertex-id="id-vertex-0" target-vertex-id="id-vertex-2"/>
+            <edge xsi:type="id-edge" id="id-edge-2" source-vertex-id="id-vertex-2" target-vertex-id="id-vertex-1"/>
+        </edges>
+        <faces>
+            <face xsi:type="id-face" id="id-face-0"/>
+            <face xsi:type="id-face" id="id-face-1"/>
+        </faces>
+        <dcel-vertices>
+            <dcel-vertex id="dcel-0" leaving-half-edge-id="dcel-0-2" data-id="id-vertex-0"/>
+            <dcel-vertex id="dcel-2" leaving-half-edge-id="dcel-2-1" data-id="id-vertex-2"/>
+            <dcel-vertex id="dcel-1" leaving-half-edge-id="dcel-1-2" data-id="id-vertex-1"/>
+        </dcel-vertices>
+        <dcel-half-edges>
+            <dcel-half-edge data-id="id-edge-0" face-id="dcel-f-1" id="dcel-1-0" next-half-edge-id="dcel-0-2" origin-vertex-id="dcel-1" twin-half-edge-id="dcel-0-1"/>
+            <dcel-half-edge data-id="id-edge-0" face-id="dcel-f-0" id="dcel-0-1" next-half-edge-id="dcel-1-2" origin-vertex-id="dcel-0" twin-half-edge-id="dcel-1-0"/>
+            <dcel-half-edge data-id="id-edge-1" face-id="dcel-f-1" id="dcel-0-2" next-half-edge-id="dcel-2-1" origin-vertex-id="dcel-0" twin-half-edge-id="dcel-2-0"/>
+            <dcel-half-edge data-id="id-edge-1" face-id="dcel-f-0" id="dcel-2-0" next-half-edge-id="dcel-0-1" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-0-2"/>
+            <dcel-half-edge data-id="id-edge-2" face-id="dcel-f-1" id="dcel-2-1" next-half-edge-id="dcel-1-0" origin-vertex-id="dcel-2" twin-half-edge-id="dcel-1-2"/>
+            <dcel-half-edge data-id="id-edge-2" face-id="dcel-f-0" id="dcel-1-2" next-half-edge-id="dcel-2-0" origin-vertex-id="dcel-1" twin-half-edge-id="dcel-2-1"/>
+        </dcel-half-edges>
+        <dcel-faces>
+            <dcel-face adjacent-edge-id="dcel-1-2" is-boundary="true" data-id="id-face-0" id="dcel-f-0"/>
+            <dcel-face adjacent-edge-id="dcel-0-2" is-boundary="false" data-id="id-face-1" id="dcel-f-1"/>
+        </dcel-faces>
+        <dcel-boundary-face-id>dcel-f-0</dcel-boundary-face-id>
+        <edge-factory>
+            <undirected-id-edge-factory next-id="3"/>
+        </edge-factory>
+        <face-factory>
+            <id-face-factory next-id="2"/>
+        </face-factory>
+    </dcel>
+</root>
