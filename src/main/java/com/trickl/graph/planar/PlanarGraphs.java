@@ -26,6 +26,7 @@ import com.trickl.graph.EdgeVisitor;
 import com.trickl.graph.edges.DirectedEdge;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LinearRing;
 import java.util.*;
 import org.jgrapht.Graphs;
@@ -345,6 +346,10 @@ public final class PlanarGraphs {
    }
 
    static public <V, E> V getNextVertexOnBoundary(PlanarGraph<V, E> graph, V vertex) {
+      if (graph.edgeSet().size() < 2 && graph.containsVertex(vertex)) {
+         // Special case where the graph has less than two edges
+         return vertex;
+      }
       for (E edge : graph.edgesOf(vertex)) {
          V target = Graphs.getOppositeVertex(graph, edge, vertex);
          if (graph.isBoundary(vertex, target)) {
@@ -354,7 +359,11 @@ public final class PlanarGraphs {
       throw new NoSuchElementException("Vertex not on boundary.");
    }
 
-   static public <V, E> V getPrevVertexOnBoundary(PlanarGraph<V, E> graph, V vertex) {
+   static public <V, E> V getPrevVertexOnBoundary(PlanarGraph<V, E> graph, V vertex) {   
+      if (graph.edgesOf(vertex).isEmpty() && graph.containsVertex(vertex)) {
+         // Special case where the vertex is isolated
+         return vertex;
+      }
       for (E edge : graph.edgesOf(vertex)) {
          V target = Graphs.getOppositeVertex(graph, edge, vertex);
          if (graph.isBoundary(target, vertex)) {
@@ -409,5 +418,118 @@ public final class PlanarGraphs {
       }
 
       return isConvex;
+   }
+   
+   static public <V, E> V getNextVertex(PlanarGraph<V, E> graph, V source, V target)
+   {
+      Set<E> edges = graph.edgesOf(target);
+      boolean foundEdge = false;
+      Iterator<E> itr = edges.iterator();
+      while (itr.hasNext()) {
+         E edge = itr.next();
+         V opposite = Graphs.getOppositeVertex(graph, edge, target);
+         if (opposite == source) {
+            foundEdge = true;
+            break;        
+         }
+      }
+      if (!foundEdge) {
+         throw new NoSuchElementException("Graph does not contain supplied edge.");
+      }
+      
+      if (!itr.hasNext()) {
+         itr = edges.iterator();
+      }
+      E nextEdge = itr.next();
+      return Graphs.getOppositeVertex(graph, nextEdge, target);
+   }
+   
+   static public <V, E> V getPrevVertex(PlanarGraph<V, E> graph, V source, V target)
+   {
+      Set<E> edges = graph.edgesOf(target);
+      boolean foundEdge = false;
+      E priorEdge = null;
+      Iterator<E> itr = edges.iterator();
+      while (itr.hasNext()) {
+         E edge = itr.next();         
+         V opposite = Graphs.getOppositeVertex(graph, edge, source);
+         if (opposite == target) {
+            foundEdge = true;
+            break;        
+         }
+         priorEdge = edge;
+      }
+      if (!foundEdge) {
+         throw new NoSuchElementException("Graph does not contain supplied edge.");
+      }
+      if (priorEdge == null) {
+         priorEdge = edges.iterator().next();
+      }
+      return Graphs.getOppositeVertex(graph, priorEdge, source);
+   }
+   
+   static public <V1, V2, E1, E2> boolean isIsomorphic(PlanarGraph<V1, E1> dataGraph, PlanarGraph<V2, E2> modelGraph) {
+      boolean isIsomorphic = true;
+                  
+      // First some simple checks
+      if (dataGraph.vertexSet().size() != modelGraph.vertexSet().size() ||
+          dataGraph.edgeSet().size() != modelGraph.edgeSet().size()) {
+         isIsomorphic = false;
+      }
+      
+      // Use KuklukHolderCook codes to test for isomorphism
+      KuklukHolderCookCodeGenerator codeGenerator = new KuklukHolderCookCodeGenerator();
+      if (!codeGenerator.getCode(dataGraph).equals(codeGenerator.getCode(modelGraph))) {
+         isIsomorphic = false;
+      }
+      
+      return isIsomorphic;
+   }
+   
+   static public <V> int getNearestInterceptingLineSegment(LineSegment halfLine, List<V> boundaryVertices, PlanarLayout<V> layout) {
+      
+      // Check each segment in the boundary for intersection with the
+      // bisector            
+      // TODO: O(boundary size), can we do this more efficiently?
+      double minDistance = Double.POSITIVE_INFINITY;
+      int segmentIndex = -1;
+      for (int itr = 0; itr < boundaryVertices.size(); ++itr) {
+         LineSegment boundarySegment = getLineSegment(itr, boundaryVertices, layout);
+         Coordinate intersection = getHalfLineIntersection(halfLine, boundarySegment);
+         if (intersection != null) {
+            // Find the nearest boundary intersection (allows a concave boundary)
+            double distance = halfLine.p0.distance(intersection);
+            if (distance < minDistance) {
+               minDistance = distance;
+               segmentIndex = itr;
+            }
+         }
+      }
+      
+      return segmentIndex;
+   }
+   
+   static public <V> LineSegment getLineSegment(int segmentIndex, List<V> vertices, PlanarLayout<V> layout) {
+      int nextItr = (segmentIndex + 1) % vertices.size();
+      V boundarySource = vertices.get(segmentIndex);
+      V boundaryTarget = vertices.get(nextItr);
+      return new LineSegment(
+              layout.getCoordinate(boundarySource),
+              layout.getCoordinate(boundaryTarget));
+   }
+
+   // TODO: This has no graph dependency, it really belongs in a geometry package
+   static public Coordinate getHalfLineIntersection(LineSegment halfLine, LineSegment segment) {
+
+      // The half line can be extended forwards (factor must be positive)
+      double factor = Math.max(0, Math.max(halfLine.projectionFactor(segment.p0),
+              halfLine.projectionFactor(segment.p1)));
+
+      LineSegment extendedBisector =
+              new LineSegment(halfLine.p0, halfLine.pointAlong(factor));
+
+      // Check for intersection with this boundary segment
+      Coordinate boundaryIntersection = extendedBisector.intersection(segment);
+      return boundaryIntersection;
    }
 }
