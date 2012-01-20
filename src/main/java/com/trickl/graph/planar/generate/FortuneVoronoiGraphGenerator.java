@@ -413,7 +413,6 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
                   brk.twin = null;
                }
             } else {
-               // TODO: Remove code duplication with Delaunay Voronoi Visitor                                    
                V boundaryVertex = createVertexAtBoundaryInterception(new LineSegment(sourceSite,
                        new Coordinate(sourceSite.x + brk.leftSite.y - brk.rightSite.y,
                        sourceSite.y + brk.rightSite.x - brk.leftSite.x)),
@@ -634,14 +633,13 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       return (BeachLineTree.Arc<V>) node;
    }
       
-   // TODO: Remove code duplication with Delaunay Voronoi Visitor
    private V createVertexAtBoundaryInterception(LineSegment halfLine, List<V> boundaryVertices, VertexFactory<V> vertexFactory, PlanarLayout<V> layout) {
       V boundaryVertex = null;
-      int segmentIndex = getNearestInterceptingLineSegment(halfLine, boundaryVertices, layout);      
+      int segmentIndex = PlanarGraphs.getNearestInterceptingLineSegment(halfLine, boundaryVertices, layout);      
       if (segmentIndex >= 0) {
          int nextItr = (segmentIndex + 1) % boundaryVertices.size();
-         LineSegment boundarySegment = getLineSegment(segmentIndex, boundaryVertices, layout);
-         Coordinate intersection = getHalfLineIntersection(halfLine, boundarySegment);
+         LineSegment boundarySegment = PlanarGraphs.getLineSegment(segmentIndex, boundaryVertices, layout);
+         Coordinate intersection = PlanarGraphs.getHalfLineIntersection(halfLine, boundarySegment);
 
          if (intersection.equals(boundarySegment.p0)) {
             boundaryVertex = boundaryVertices.get(segmentIndex);
@@ -655,56 +653,6 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       }
 
       return boundaryVertex;
-   }
-   
-   
-   // TODO: Remove code duplication with Delaunay Voronoi Visitor   
-   private static <V> int getNearestInterceptingLineSegment(LineSegment halfLine, List<V> boundaryVertices, PlanarLayout<V> layout) {
-      
-      // Check each segment in the boundary for intersection with the
-      // bisector            
-      // TODO: O(boundary size), can we do this more efficiently?
-      double minDistance = Double.POSITIVE_INFINITY;
-      int segmentIndex = -1;
-      for (int itr = 0; itr < boundaryVertices.size(); ++itr) {
-         LineSegment boundarySegment = getLineSegment(itr, boundaryVertices, layout);
-         Coordinate intersection = getHalfLineIntersection(halfLine, boundarySegment);
-         if (intersection != null) {
-            // Find the nearest boundary intersection (allows a concave boundary)
-            double distance = halfLine.p0.distance(intersection);
-            if (distance < minDistance) {
-               minDistance = distance;
-               segmentIndex = itr;
-            }
-         }
-      }
-      
-      return segmentIndex;
-   }
-
-   // TODO: Remove code duplication with Delaunay Voronoi Visitor
-   private static <V> LineSegment getLineSegment(int segmentIndex, List<V> vertices, PlanarLayout<V> layout) {
-      int nextItr = (segmentIndex + 1) % vertices.size();
-      V boundarySource = vertices.get(segmentIndex);
-      V boundaryTarget = vertices.get(nextItr);
-      return new LineSegment(
-              layout.getCoordinate(boundarySource),
-              layout.getCoordinate(boundaryTarget));
-   }
-
-   // TODO: Remove code duplication with Delaunay Voronoi Visitor
-   private static Coordinate getHalfLineIntersection(LineSegment halfLine, LineSegment segment) {
-
-      // The half line can be extended forwards (factor must be positive)
-      double factor = Math.max(0, Math.max(halfLine.projectionFactor(segment.p0),
-              halfLine.projectionFactor(segment.p1)));
-
-      LineSegment extendedBisector =
-              new LineSegment(halfLine.p0, halfLine.pointAlong(factor));
-
-      // Check for intersection with this boundary segment
-      Coordinate boundaryIntersection = extendedBisector.intersection(segment);
-      return boundaryIntersection;
    }
 
    // For debug purposes, should delete
