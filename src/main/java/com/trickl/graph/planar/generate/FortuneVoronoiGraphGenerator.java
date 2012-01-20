@@ -66,11 +66,9 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          //Coordinate rightSite;
          //Coordinate leftSite;
 
-         BreakPoint(Node<V> left, Node<V> right, Coordinate leftSite, Coordinate rightSite) {
+         BreakPoint(Node<V> left, Node<V> right) {
             this.left = left;
             this.right = right;
-            //this.leftSite = leftSite;
-            //this.rightSite = rightSite;
 
             if (right != null) {
                right.parent = this;
@@ -111,7 +109,7 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       };
 
       BeachLineTree() {
-         head = new BreakPoint<V>(null, null, null, null);
+         head = new BreakPoint<V>(null, null);
       }
 
       static <V> void delete(Arc<V> arc) {
@@ -135,28 +133,58 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       }
 
       Arc<V> getLeftArc(Node<V> start) {
-         Node<V> node = getLeftBreak(start);
-
-         if (node instanceof BreakPoint) {
+         Node<V> node = start;
+         if (node instanceof Arc) {            
+            if (node.parent.right == node) {
+               node = node.parent;
+            }
+            else {
+               while (node.parent != head && node.parent.left == node) {
+                  node = node.parent;
+               }     
+               node = node.parent;
+            }
+         }
+         
+         if (node == head) {
+            node = null;
+         }
+         else {
             node = ((BreakPoint<V>) node).left;
          }
 
          while (node instanceof BreakPoint) {
-            node = ((BreakPoint<V>) node).right;
+            BreakPoint<V> brk = (BreakPoint<V>) node;
+            node = brk.right;
          }
 
          return (Arc<V>) node;
       }
 
       Arc<V> getRightArc(Node<V> start) {
-         Node<V> node = getRightBreak(start);
-
-         if (node instanceof BreakPoint) {
+         Node<V> node = start;
+         if (node instanceof Arc) {     
+            if (node.parent.left == node) {
+               node = node.parent;
+            }
+            else {
+               while (node.parent != head && node.parent.right == node) {
+                  node = node.parent;
+               }
+               node = node.parent;
+            }
+         }
+         
+         if (node == head) {
+            node = null;
+         }
+         else {
             node = ((BreakPoint<V>) node).right;
          }
-
+         
          while (node instanceof BreakPoint) {
-            node = ((BreakPoint<V>) node).left;
+            BreakPoint<V> brk = (BreakPoint<V>) node;
+            node = brk.left;
          }
 
          return (Arc<V>) node;
@@ -164,7 +192,7 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
 
       BreakPoint<V> getLeftBreak(Node<V> start) {
          Node<V> node = start;
-         while (node != head && node.parent.left == node) {
+         while (node.parent != head && node.parent.left == node) {
             node = node.parent;
          }
          node = node.parent;
@@ -178,7 +206,7 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
 
       BreakPoint<V> getRightBreak(Node<V> start) {
          Node<V> node = start;
-         while (node != head && node.parent.right == node) {
+         while (node.parent != head && node.parent.right == node) {
             node = node.parent;
          }
 
@@ -377,12 +405,13 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
     */
    private void postProcessingEventQueue(BeachLineTree<V> beachLineTree, List<V> boundaryVertices, PlanarGraph<V, E> graph, VertexFactory<V> vertexFactory) {
       // The breakpoints still present in the beachLineTree represent half-infinite edges in the Voronoi diagram
-      // Connect these to the boundary, if specified
+      // Connect these to the boundary, if specified      
       if (boundary != null) {
          for (BeachLineTree.BreakPoint<V> brk : beachLineTree.getInorderBreaks()) {
             V sourceVertex = brk.sourceVertex;
             V beforeVertex = brk.prevVertex;
             Coordinate sourceSite = vertexToCoordinate.get(sourceVertex);
+            
             BeachLineTree.Arc<V> leftArc = beachLineTree.getLeftArc(brk);
             BeachLineTree.Arc<V> rightArc = beachLineTree.getRightArc(brk);
 
@@ -479,22 +508,18 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          // Replace the intersected arc with the three new arcs and two break points
          BeachLineTree.BreakPoint<V> rightBreak = new BeachLineTree.BreakPoint<V>(
                  newArc,
-                 rightIntersectArc,
-                 site, intersectArc.site);
+                 rightIntersectArc);
 
          BeachLineTree.BreakPoint<V> leftBreak =
                  new BeachLineTree.BreakPoint<V>(
                  leftIntersectArc,
-                 rightBreak, intersectArc.site, site);
+                 rightBreak);
          rightBreak.twin = leftBreak;
          leftBreak.twin = rightBreak;
 
-         //rightBreak.next = leftBreak;
-         //leftBreak.next = rightBreak;
-
          BeachLineTree.replace(intersectArc, leftBreak);
 
-         // Check the two triples of consecutive arcs for converging break lines
+         // Check the two triples of consecutive arcs for converging break lines         
          checkForCircleEvent(leftArc, leftIntersectArc, newArc, eventQueue);
          checkForCircleEvent(newArc, rightIntersectArc, rightArc, eventQueue);
       }
@@ -504,11 +529,12 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
 
       // The circle event may have been marked as a false alarm
       if (circleEvent.arc != null) {
-         // Remove the circle events for the two neightbouring arcs
+         // Remove the circle events for the two neightbouring arcs         
          BeachLineTree.Arc<V> leftArc = beachLineTree.getLeftArc(circleEvent.arc);
          BeachLineTree.Arc<V> rightArc = beachLineTree.getRightArc(circleEvent.arc);
          BeachLineTree.BreakPoint<V> leftBreak = beachLineTree.getLeftBreak(circleEvent.arc);
          BeachLineTree.BreakPoint<V> rightBreak = beachLineTree.getRightBreak(circleEvent.arc);
+         
          for (BeachLineTree.Arc arc : new BeachLineTree.Arc[]{leftArc, rightArc}) {
             if (arc.circleEvent != null) {
                arc.circleEvent.arc = null;
@@ -604,9 +630,9 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
    private BeachLineTree.Arc<V> findIntersectionArc(final Coordinate site, final BeachLineTree.Node<V> start, final BeachLineTree<V> beachLineTree) {
       BeachLineTree.Node<V> node = start;
       while (node instanceof BeachLineTree.BreakPoint) {
-         BeachLineTree.BreakPoint<V> branch = (BeachLineTree.BreakPoint<V>) (node);
-         BeachLineTree.Arc<V> leftArc = beachLineTree.getLeftArc(branch);
-         BeachLineTree.Arc<V> rightArc = beachLineTree.getRightArc(branch);
+         BeachLineTree.BreakPoint<V> brk = (BeachLineTree.BreakPoint<V>) (node);
+         BeachLineTree.Arc<V> leftArc = beachLineTree.getLeftArc(brk);
+         BeachLineTree.Arc<V> rightArc = beachLineTree.getRightArc(brk);
 
          double x0 = site.x;
          double directixY = site.y;
@@ -629,9 +655,9 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
          PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
          if (precisionModel.makePrecise(r1)
                  > precisionModel.makePrecise(directixY)) {
-            node = branch.right;
+            node = brk.right;
          } else {
-            node = branch.left;
+            node = brk.left;
          }
       }
 
