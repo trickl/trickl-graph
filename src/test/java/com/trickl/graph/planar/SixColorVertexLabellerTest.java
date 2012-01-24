@@ -7,15 +7,13 @@ package com.trickl.graph.planar;
 import com.jgraph.components.labels.MultiLineVertexView;
 import com.trickl.graph.Labeller;
 import com.trickl.graph.edges.IntegerEdgeFactory;
-import com.trickl.graph.edges.UndirectedEdge;
-import com.trickl.graph.edges.UndirectedIdEdge;
-import com.trickl.graph.edges.UndirectedIdEdgeFactory;
 import com.trickl.graph.ext.FixedAttributeProvider;
 import com.trickl.graph.ext.JComponentWindow;
 import com.trickl.graph.ext.JGraphModelAdapterExt;
 import com.trickl.graph.ext.VertexLabellerAttributeProvider;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
+import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import com.trickl.graph.vertices.IntegerVertexFactory;
 import java.awt.geom.AffineTransform;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +27,8 @@ import org.jgraph.graph.DefaultCellViewFactory;
 import org.jgraph.graph.GraphLayoutCache;
 import org.jgraph.graph.VertexView;
 import org.jgrapht.ext.ComponentAttributeProvider;
+import org.jgrapht.ext.StringNameProvider;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -130,6 +130,29 @@ public class SixColorVertexLabellerTest {
       //window.showAndWait();
    }
    
+   @Test
+   public void testMediumRegularGraphLabelling() throws InterruptedException, InvocationTargetException {
+      DoublyConnectedEdgeList<Integer, Integer, Object> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarCircleGraphGenerator<Integer, Integer> generator = new PlanarCircleGraphGenerator<Integer, Integer>(37, 0.2);
+      
+      generator.generateGraph(graph, new IntegerVertexFactory(), null);            
+      SixColorVertexLabeller labeller = new SixColorVertexLabeller(graph);
+      int labelCount = labeller.getLabelCount();
+      
+      // Check that no adjacent vertices have the same color
+      Assert.assertTrue(labelCount < 6);
+      for (Integer edge : graph.edgeSet()) {
+         int sourceLabel = labeller.getLabel(graph.getEdgeSource(edge));
+         int targetLabel = labeller.getLabel(graph.getEdgeTarget(edge));
+         Assert.assertNotSame(sourceLabel, targetLabel);
+      }
+      
+      // Visual Check
+      //JGraph jGraph = getDisplayGraph(graph, generator, labeller);
+      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+      //window.showAndWait();
+   }
+   
    private JGraph getDisplayGraph(PlanarGraph<Integer, Integer> graph, PlanarLayout<Integer> layout, Labeller<Integer> labeller)
            throws InterruptedException, InvocationTargetException {
       
@@ -148,12 +171,12 @@ public class SixColorVertexLabellerTest {
       }
       
       // Color vertices according to the label
-      labelAttributes[0].put("fillcolor", "#FF0000");
-      labelAttributes[1].put("fillcolor", "#00FF00");
-      labelAttributes[2].put("fillcolor", "#0000FF");
-      labelAttributes[3].put("fillcolor", "#FFFF00");
-      labelAttributes[4].put("fillcolor", "#00FFFF");
-      labelAttributes[5].put("fillcolor", "#FF00FF");
+      labelAttributes[0].put("fillcolor", "#CC0000");
+      labelAttributes[1].put("fillcolor", "#00CC00");
+      labelAttributes[2].put("fillcolor", "#0000CC");
+      labelAttributes[3].put("fillcolor", "#AAAA00");
+      labelAttributes[4].put("fillcolor", "#00AAAA");
+      labelAttributes[5].put("fillcolor", "#AA00AA");
       
       Map<Integer, ComponentAttributeProvider<Integer>> labelAttributeProviders = new HashMap<Integer, ComponentAttributeProvider<Integer>>();
       for (int i = 0; i < 6; ++i) {
@@ -161,7 +184,7 @@ public class SixColorVertexLabellerTest {
       }
       
       JGraph jGraph = new JGraph(new JGraphModelAdapterExt(graph,
-                         null, //new IdVertexNameProvider(),
+                         null, //new StringNameProvider(),
                          null,
                          new PlanarLayoutPositionProvider(layout, screenProjection, 
                             new FixedAttributeProvider(delaunayFixedAttributes,
