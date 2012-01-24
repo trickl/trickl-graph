@@ -20,8 +20,8 @@
  */
 package com.trickl.graph.planar;
 
+import com.trickl.graph.Labeller;
 import java.util.*;
-import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 
 /**
@@ -31,39 +31,31 @@ import org.jgrapht.Graphs;
  *
  * @author tgee
  */
-public class SixColorVertexLabeller<V, E> implements VertexLabeller<V, E> {
-
-   private Graph<V, E> graph;
+public class SixColorVertexLabeller<V, E> implements Labeller<V> {
+   
    private Map<Integer, Set<V>> labelVertices = new HashMap<Integer, Set<V>>();
    private Map<V, Integer> vertexLabels = new HashMap<V, Integer>();
+   
+   public SixColorVertexLabeller(PlanarGraph<V, E> graph) {
+      generateLabels(graph);
+   }
 
    @Override
-   public int getLabelCount(Graph<V, E> graph) {
-      if (graph != this.graph) {
-         generateLabels(graph);
-      }
+   public int getLabelCount() {      
       return labelVertices.size();
    }
 
    @Override
-   public int getLabel(Graph<V, E> graph, V vertex) {
-      if (graph != this.graph) {
-         generateLabels(graph);
-      }
+   public int getLabel(V vertex) {      
       return vertexLabels.get(vertex);
    }
 
    @Override
-   public Set<V> getVertices(int label) {
-      if (graph != this.graph) {
-         generateLabels(graph);
-      }
+   public Set<V> getMembers(int label) {      
       return labelVertices.get(label);
    }
 
-   private void generateLabels(Graph<V, E> graph) {
-      this.graph = graph;
-
+   private void generateLabels(PlanarGraph<V, E> graph) {      
       // Step 1. [Establish degree lists.] For each j where 0- j - n - 1, form a doubly
       // linked list of all vertices of G of degree j.
       Set<V> vertices = graph.vertexSet();
@@ -117,16 +109,17 @@ public class SixColorVertexLabeller<V, E> implements VertexLabeller<V, E> {
          colorOrder.push(vertex);
       }
 
-      // Step 3. [Color vertices.] For i = 1,2,. . . , n, assign vertex t)i the smallest color
+      // Step 3. [Color vertices.] For i = 1,2,. . . , n, assign vertex v(i) the smallest color
       // value (which must be some integer between one and six) not occuring on
-      // the vertices adjacent to t)i that have already been colored.
+      // the vertices adjacent to v(i) that have already been colored.
       for (V vertex : colorOrder) {
          // Use a mask to 'turn off' adjacent colors
          int labelMask = 63; // 0b111111
          for (E edge : graph.edgesOf(vertex)) {
             V adjacent = Graphs.getOppositeVertex(graph, edge, vertex);
             if (vertexLabels.containsKey(adjacent)) {
-               labelMask -= (1 << vertexLabels.get(adjacent));
+               // Switch off the adjacent label 
+               labelMask &= 63 - (1 << vertexLabels.get(adjacent));
             }
          }
          int label = 0;
