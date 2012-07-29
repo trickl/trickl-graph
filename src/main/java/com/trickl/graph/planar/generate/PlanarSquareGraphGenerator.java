@@ -18,21 +18,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.generate;
+package com.trickl.graph.planar.generate;
 
 import com.trickl.graph.planar.PlanarGraph;
 import com.trickl.graph.planar.PlanarLayout;
 import com.vividsolutions.jts.geom.Coordinate;
-import java.util.Map;
-import java.util.Hashtable;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.jgrapht.VertexFactory;
 
 public class PlanarSquareGraphGenerator<V, E> 
         implements PlanarGraphGenerator<V, E, V>, PlanarLayout<V> {
 
-   private Map<V, Coordinate> positions = new Hashtable<V, Coordinate>();
+   private Map<V, Coordinate> positions = new HashMap<V, Coordinate>();
 
    private ArrayList<V> vertices = new ArrayList<V>();      
    
@@ -41,7 +40,7 @@ public class PlanarSquareGraphGenerator<V, E>
 
    public PlanarSquareGraphGenerator(int size)
    {
-      this(size, 100);
+      this(size, 1);
    }
 
    public PlanarSquareGraphGenerator(int size, double scale)
@@ -100,7 +99,7 @@ public class PlanarSquareGraphGenerator<V, E>
          if (left != null) graph.addEdge(vertex, left, top, null);
          if (bottom != null) graph.addEdge(vertex, bottom, left, null);
                 
-         positions.put(vertex, new Coordinate(i * scale, j * scale));
+         positions.put(vertex, new Coordinate((i - width * 0.5) * scale, (j - width * 0.5) * scale));
       }
    }
 

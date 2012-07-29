@@ -18,27 +18,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.generate;
+package com.trickl.graph.planar.generate;
 
-import com.trickl.graph.generate.DelaunayGraphGenerator;
-import com.trickl.graph.vertices.IdCoordinateVertexFactory;
-import com.trickl.graph.planar.PlanarLayout;
-import com.trickl.graph.vertices.IdCoordinateVertex;
-import org.jgrapht.VertexFactory;
 import cern.jet.random.engine.MersenneTwister;
-import com.trickl.graph.vertices.IdVertex;
-import com.trickl.graph.vertices.IdVertexFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
+import com.trickl.graph.ext.JComponentWindow;
 import com.trickl.graph.planar.DoublyConnectedEdgeList;
+import com.trickl.graph.planar.JGraphAdaptor;
 import com.trickl.graph.planar.PlanarGraph;
-import com.trickl.graph.planar.PlanarGraphs;
-import static com.trickl.graph.planar.PlanarAssert.*;
+import com.trickl.graph.planar.PlanarLayout;
+import com.trickl.graph.vertices.IdCoordinateVertex;
+import com.trickl.graph.vertices.IdCoordinateVertexFactory;
+import com.trickl.graph.vertices.IdVertex;
+import com.trickl.graph.vertices.IdVertexFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
-
+import javax.swing.JScrollPane;
+import org.jgraph.JGraph;
+import org.jgrapht.VertexFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class DelaunayGraphGeneratorTest {
 
@@ -69,6 +70,12 @@ public class DelaunayGraphGeneratorTest {
       assertTrue(graph.containsEdge(generator.getVertex(B), generator.getVertex(C)));
       assertTrue(graph.containsEdge(generator.getVertex(C), generator.getVertex(D)));
       assertTrue(graph.containsEdge(generator.getVertex(D), generator.getVertex(A)));
+      
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, generator);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -110,6 +117,11 @@ public class DelaunayGraphGeneratorTest {
       assertTrue(graph.containsEdge(generator.getVertex(A), generator.getVertex(D)));
       assertTrue(graph.containsEdge(generator.getVertex(D), generator.getVertex(C)));
 
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, generator);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -151,5 +163,11 @@ public class DelaunayGraphGeneratorTest {
       assertTrue(graph.containsEdge(B, C));
       assertTrue(graph.containsEdge(C, D));
       assertTrue(graph.containsEdge(D, A));
-   }
+      
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, generator);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
+   }      
 }

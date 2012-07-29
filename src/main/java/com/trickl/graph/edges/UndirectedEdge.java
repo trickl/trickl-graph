@@ -20,9 +20,14 @@
  */
 package com.trickl.graph.edges;
 
-import com.trickl.graph.edges.DirectedEdge;
 import java.io.Serializable;
 
+/**
+ * A simple edge class that stores both vertices at either ends of the edge
+ * and is equal to any other edge with the same two vertices.
+ * @author tgee
+ * @param <V> 
+ */
 public class UndirectedEdge<V> extends DirectedEdge<V> 
         implements Serializable {
 

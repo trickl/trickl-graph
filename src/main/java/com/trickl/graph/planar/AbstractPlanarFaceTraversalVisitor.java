@@ -18,11 +18,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.generate;
+package com.trickl.graph.planar;
 
-import com.trickl.graph.planar.PlanarGraph;
-import org.jgrapht.VertexFactory;
+/**
+ *
+ * @author tgee
+ */
+public class AbstractPlanarFaceTraversalVisitor<V, E> implements PlanarFaceTraversalVisitor<V, E> {
 
-public interface PlanarGraphGenerator<V, E, T> {
-   void generateGraph(PlanarGraph<V,E> target, VertexFactory<V> vertexFactory, java.util.Map<java.lang.String,T> resultMap);
+   @Override
+   public void beginTraversal() {
+   }
+
+   @Override
+   public void beginFace(V source, V target) {
+   }
+
+   @Override
+   public void nextEdge(V source, V target) {
+   }
+
+   @Override
+   public void nextVertex(V vertex) {
+   }
+
+   @Override
+   public void endFace(V source, V target) {
+   }
+
+   @Override
+   public void endTraversal() {
+   }   
 }

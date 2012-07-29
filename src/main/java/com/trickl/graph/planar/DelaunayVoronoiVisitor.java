@@ -90,7 +90,7 @@ public class DelaunayVoronoiVisitor<V1, E1, V2, E2> extends DualGraphVisitor<V1,
    public void nextEdge(V1 source, V1 target) {
       super.nextEdge(source, target);
 
-      V2 dualSource = getEdgeToVertexMap().get(new DirectedEdge<V1>(target, source));
+      V2 dualSource = getFaceToVertexMap().get(new DirectedEdge<V1>(target, source));
 
       // Position the vertex inside the boundary first      
       if (dualSource != null && dualTarget != null
@@ -143,7 +143,7 @@ public class DelaunayVoronoiVisitor<V1, E1, V2, E2> extends DualGraphVisitor<V1,
                  || inputGraph.isBoundary(delaunayTarget, delaunaySource)) {
             // Remove the edge created by the dual graph visitor
             dualGraph.removeEdge(voronoiTarget, voronoiSource);
-            getEdgeToVertexMap().remove(new DirectedEdge<V1>(delaunaySource, delaunayTarget));
+            getFaceToVertexMap().remove(new DirectedEdge<V1>(delaunaySource, delaunayTarget));
             if (voronoiBefore != null && voronoiBefore.equals(voronoiSource)) {
                // This edge was removed
                voronoiBefore = null;
@@ -181,7 +181,7 @@ public class DelaunayVoronoiVisitor<V1, E1, V2, E2> extends DualGraphVisitor<V1,
               // Create the new edge to this boundary intercept
                E2 edge = edgeFactory.createEdge(voronoiTarget, boundaryVertex);
                dualGraph.addEdge(voronoiTarget, boundaryVertex, voronoiBefore, null, edge);
-               getEdgeToVertexMap().put(new DirectedEdge<V1>(delaunaySource, delaunayTarget), boundaryVertex);
+               getFaceToVertexMap().put(new DirectedEdge<V1>(delaunaySource, delaunayTarget), boundaryVertex);
             }
          }
       }

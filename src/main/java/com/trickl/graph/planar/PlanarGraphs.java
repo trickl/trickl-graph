@@ -279,22 +279,24 @@ public final class PlanarGraphs {
    }
 
    static public <V, E> List<V> getVerticesOnFace(PlanarGraph<V, E> graph, V startVertex, V targetVertex, V endVertex) {
-      if (graph == null || startVertex == null || targetVertex == null) {
+      if (graph == null) {
          throw new NullPointerException();
       }
       
-      List<V> vertices = new LinkedList<V>();
-      V boundaryCurrent = startVertex;
-      V boundaryNext = targetVertex;
-      if (endVertex == null) endVertex = startVertex;
-      do {
-         vertices.add(boundaryCurrent);
+      List<V> vertices = new LinkedList<V>();      
+      if (startVertex != null) {
+         V boundaryNext = targetVertex;
+         V boundaryCurrent = startVertex;
+         if (endVertex == null) endVertex = startVertex;      
+         do {
+            vertices.add(boundaryCurrent);
 
-         V boundaryNextNext = graph.getNextVertex(boundaryCurrent, boundaryNext);
-         boundaryCurrent = boundaryNext;
-         boundaryNext = boundaryNextNext;
+            V boundaryNextNext = graph.getNextVertex(boundaryCurrent, boundaryNext);
+            boundaryCurrent = boundaryNext;
+            boundaryNext = boundaryNextNext;
+         }
+         while (!boundaryCurrent.equals(endVertex));
       }
-      while (!boundaryCurrent.equals(endVertex));
       return vertices;
    }
 
@@ -428,7 +430,7 @@ public final class PlanarGraphs {
       while (itr.hasNext()) {
          E edge = itr.next();
          V opposite = Graphs.getOppositeVertex(graph, edge, target);
-         if (opposite == source) {
+         if (opposite.equals(source)) {
             foundEdge = true;
             break;        
          }
@@ -453,7 +455,7 @@ public final class PlanarGraphs {
       while (itr.hasNext()) {
          E edge = itr.next();         
          V opposite = Graphs.getOppositeVertex(graph, edge, source);
-         if (opposite == target) {
+         if (opposite.equals(target)) {
             foundEdge = true;
             break;        
          }

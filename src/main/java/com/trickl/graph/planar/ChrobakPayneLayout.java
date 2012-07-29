@@ -45,6 +45,10 @@ public class ChrobakPayneLayout<V, E> implements PlanarLayout<V> {
    private double scale;
    Map<V, Coordinate> drawing;
    PlanarCanonicalOrdering ordering;
+   
+   public ChrobakPayneLayout(PlanarGraph<V, E> graph) {
+      this(graph, 1.0);
+   }
       
    public ChrobakPayneLayout(PlanarGraph<V, E> graph, double scale) {
       // This feels hacky. Having to make a copy of the graph so we can

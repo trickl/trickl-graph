@@ -20,11 +20,11 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.planar.PlanarGraph;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
-import static org.junit.Assert.*;
+import org.jgrapht.Graphs;
+import static org.junit.Assert.assertEquals;
 
 public class PlanarAssert {
    static public <V, E> void assertEmbeddingEquals(PlanarGraph<V, E> graph,
@@ -34,10 +34,8 @@ public class PlanarAssert {
 
       LinkedList<String> embeddingIds = new LinkedList<String>();
       for (E edge : graph.edgesOf(vertex))
-      {
-         V other = graph.getEdgeSource(edge) == vertex ?
-                                 graph.getEdgeTarget(edge) :
-                                 graph.getEdgeSource(edge);
+      {         
+         V other = Graphs.getOppositeVertex(graph, edge, vertex);
          embeddingIds.add(other.toString());
       }
       

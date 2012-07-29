@@ -18,23 +18,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.planar;
-
-import com.trickl.graph.edges.DirectedEdge;
-import java.util.Set;
+package com.trickl.graph;
 
 /**
- * A planar graph that associates a face class instance to every logical
- * face.
+ *
  * @author tgee
- * @param <V> Vertex type
- * @param <E> Edge type
- * @param <F> Face type
  */
-public interface PlanarFaceGraph <V, E, F> extends PlanarGraph<V, E> {
-   public Set<F> faceSet();
-   public F getFace(V source, V target);
-   public FaceFactory<V, F> getFaceFactory();
-   public DirectedEdge<V> getAdjacentEdge(F face);
-   public boolean replaceFace(F oldFace, F newFace);
+public class AbstractSpanningSearchVisitor<V, E> implements SpanningSearchVisitor<V, E> {
+
+   @Override
+   public void initializeVertex(V u) {
+   }
+
+   @Override
+   public void startVertex(V u) {
+   }
+
+   @Override
+   public void discoverVertex(V u) {
+   }
+
+   @Override
+   public void examineEdge(V source, V target) {
+   }
+
+   @Override
+   public void treeEdge(V source, V target) {
+   }
+
+   @Override
+   public void backEdge(V source, V target) {
+   }
+
+   @Override
+   public void forwardOrCrossEdge(V source, V target) {
+   }
+
+   @Override
+   public void finishVertex(V u) {
+   }   
 }

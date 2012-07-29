@@ -21,24 +21,16 @@
 package com.trickl.graph.planar;
 
 import com.trickl.graph.edges.DirectedEdge;
-import com.trickl.graph.vertices.IdVertex;
-import com.trickl.graph.vertices.IdVertexFactory;
-import com.trickl.graph.edges.UndirectedIdEdge;
-import com.trickl.graph.edges.UndirectedIdEdgeFactory;
-import com.trickl.graph.planar.BreadthFirstPlanarFaceTraversal;
-import com.trickl.graph.planar.CanonicalPlanarFaceTraversal;
-import com.trickl.graph.planar.DoublyConnectedEdgeList;
-import com.trickl.graph.planar.PlanarFaceTraversal;
-import com.trickl.graph.planar.PlanarFaceTraversalVisitor;
-import com.trickl.graph.planar.PlanarGraph;
-import com.trickl.graph.generate.PlanarCircleGraphGenerator;
+import com.trickl.graph.edges.IntegerEdgeFactory;
+import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
+import com.trickl.graph.vertices.IntegerVertexFactory;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class PlanarFaceTraversalTest {
 
@@ -108,48 +100,46 @@ public class PlanarFaceTraversalTest {
    @Test
    public void testBreadthFirstTraverse() {
       System.out.println("breadthFirstTraverse");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph
-              = new DoublyConnectedEdgeList<IdVertex,
-              UndirectedIdEdge<IdVertex>,
-              Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph
+              = new DoublyConnectedEdgeList<Integer,
+              Integer,
+              Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      HistoryVisitor<IdVertex, UndirectedIdEdge<IdVertex>> historyVisitor
-              = new HistoryVisitor<IdVertex, UndirectedIdEdge<IdVertex>>();
-      PlanarFaceTraversal<IdVertex, UndirectedIdEdge<IdVertex>> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<IdVertex, UndirectedIdEdge<IdVertex>>(graph);
+      HistoryVisitor<Integer, Integer> historyVisitor
+              = new HistoryVisitor<Integer, Integer>();
+      PlanarFaceTraversal<Integer, Integer> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<Integer, Integer>(graph);
       planarFaceTraversal.traverse(historyVisitor);
 
-      assertEquals("[3-0, 0-2, 2-3, 0-3, 3-4, 4-0, 2-0, 0-1, 1-2, 0-4, 4-5, 5-0, 1-0, 0-6, 6-1, 0-5, 5-6, 6-0, 6-5, 5-4, 4-3, 3-2, 2-1, 1-6]", Arrays.toString(historyVisitor.getVisitedEdges().toArray()));
-      assertEquals("[3-0, 0-3, 2-0, 0-4, 1-0, 0-5, 6-5]", Arrays.toString(historyVisitor.getVisitedFaces().toArray()));
-      assertEquals("[3, 0, 2, 0, 3, 4, 2, 0, 1, 0, 4, 5, 1, 0, 6, 0, 5, 6, 6, 5, 4, 3, 2, 1]", Arrays.toString(historyVisitor.getVisitedVertices().toArray()));
+      assertEquals("[0-2, 2-3, 3-0, 2-0, 0-1, 1-2, 0-3, 3-4, 4-0, 1-0, 0-6, 6-1, 0-4, 4-5, 5-0, 6-0, 0-5, 5-6, 3-2, 2-1, 1-6, 6-5, 5-4, 4-3]", Arrays.toString(historyVisitor.getVisitedEdges().toArray()));
+      assertEquals("[0-2, 2-0, 0-3, 1-0, 0-4, 6-0, 3-2]", Arrays.toString(historyVisitor.getVisitedFaces().toArray()));
+      assertEquals("[0, 2, 3, 2, 0, 1, 0, 3, 4, 1, 0, 6, 0, 4, 5, 6, 0, 5, 3, 2, 1, 6, 5, 4]", Arrays.toString(historyVisitor.getVisitedVertices().toArray()));
    }
 
    @Test
    public void testCanonicalTraverse() {
       System.out.println("canonicalTraverse");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph
-              = new DoublyConnectedEdgeList<IdVertex,
-              UndirectedIdEdge<IdVertex>,
-              Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph
+              = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      HistoryVisitor<IdVertex, UndirectedIdEdge<IdVertex>> historyVisitor
-              = new HistoryVisitor<IdVertex, UndirectedIdEdge<IdVertex>>();
-      PlanarFaceTraversal<IdVertex, UndirectedIdEdge<IdVertex>> planarFaceTraversal = new CanonicalPlanarFaceTraversal<IdVertex, UndirectedIdEdge<IdVertex>>(graph);
+      HistoryVisitor<Integer, Integer> historyVisitor
+              = new HistoryVisitor<Integer, Integer>();
+      PlanarFaceTraversal<Integer, Integer> planarFaceTraversal = new CanonicalPlanarFaceTraversal<Integer, Integer>(graph);
       planarFaceTraversal.traverse(historyVisitor);
 
-      assertEquals("[0-4, 4-5, 5-0, 3-4, 4-0, 0-3, 2-3, 3-0, 0-2, 1-2, 2-0, 0-1, 6-0, 0-5, 5-6, 6-1, 1-0, 0-6, 6-5, 5-4, 4-3, 3-2, 2-1, 1-6]", Arrays.toString(historyVisitor.getVisitedEdges().toArray()));
-      assertEquals("[0-4, 3-4, 2-3, 1-2, 6-0, 6-1, 6-5]", Arrays.toString(historyVisitor.getVisitedFaces().toArray()));
-      assertEquals("[0, 4, 5, 3, 4, 0, 2, 3, 0, 1, 2, 0, 6, 0, 5, 6, 1, 0, 6, 5, 4, 3, 2, 1]", Arrays.toString(historyVisitor.getVisitedVertices().toArray()));
+      assertEquals("[0-1, 1-2, 2-0, 6-1, 1-0, 0-6, 5-6, 6-0, 0-5, 4-5, 5-0, 0-4, 3-4, 4-0, 0-3, 3-0, 0-2, 2-3, 6-5, 5-4, 4-3, 3-2, 2-1, 1-6]", Arrays.toString(historyVisitor.getVisitedEdges().toArray()));
+      assertEquals("[0-1, 6-1, 5-6, 4-5, 3-4, 3-0, 6-5]", Arrays.toString(historyVisitor.getVisitedFaces().toArray()));
+      assertEquals("[0, 1, 2, 6, 1, 0, 5, 6, 0, 4, 5, 0, 3, 4, 0, 3, 0, 2, 6, 5, 4, 3, 2, 1]", Arrays.toString(historyVisitor.getVisitedVertices().toArray()));
    }
 }

@@ -21,7 +21,7 @@
 package com.trickl.graph.planar;
 
 import com.trickl.graph.edges.DirectedEdge;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -39,7 +39,7 @@ public class BreadthFirstPlanarFaceTraversal<V, E> implements PlanarFaceTraversa
       visitor.beginTraversal();
 
       // Copy the embedding so the graph can be modified during traversal
-      Map<DirectedEdge<V>, DirectedEdge<V>> embedding = new Hashtable<DirectedEdge<V>, DirectedEdge<V>>();
+      Map<DirectedEdge<V>, DirectedEdge<V>> embedding = new HashMap<DirectedEdge<V>, DirectedEdge<V>>();
       for (V vertex : graph.vertexSet()) {
 
          V priorItr = null;

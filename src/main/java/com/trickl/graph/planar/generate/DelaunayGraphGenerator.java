@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.generate;
+package com.trickl.graph.planar.generate;
 
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
@@ -34,10 +34,13 @@ import com.vividsolutions.jts.geom.Envelope;
 import java.util.*;
 import org.jgrapht.VertexFactory;
 
-/* A delaunay generator loosely based off a description published  by Dani Lischinski of Cornell University */
-/* This is a randomized incremental algorithm that uses a directed search for point location O(n^3/2) */
-/* Faster algorithms rely on a more efficient search O(log(n)) that uses a tree structure, this algorithm sacrifices */
-/* that speed for simplicity */
+/**
+* A delaunay generator loosely based off a description published  by Dani Lischinski of Cornell University 
+* This is a randomized incremental algorithm that uses a directed search for point location O(n^3/2) 
+* Faster algorithms rely on a more efficient search O(log(n)) that uses a tree structure, this algorithm sacrifices 
+* that speed for simplicity
+* @author tgee
+*/
 public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, V>, PlanarLayout<V> {
 
    private RandomEngine randomEngine = new MersenneTwister();
@@ -55,7 +58,7 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       }
    }
 
-   public DelaunayGraphGenerator(List<Coordinate> sites, VertexFactory<V> vertexFactory) {
+   public DelaunayGraphGenerator(Collection<Coordinate> sites, VertexFactory<V> vertexFactory) {
       this.vertexToCoordinate = new HashMap<V, Coordinate>();
       this.coordinateToVertex = new HashMap<Coordinate, V>();
 

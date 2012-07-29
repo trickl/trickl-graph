@@ -22,26 +22,22 @@
 package com.trickl.graph.planar;
 
 import com.trickl.graph.DepthFirstSearch;
-import static com.trickl.graph.planar.FaceHandle.FaceIterator.*;
-
-import java.util.List;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Vector;
-
+import com.trickl.graph.planar.FaceHandle.FaceIterator.CurrentIteration;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.FaceIteratorBothSidesVertex;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.FaceIteratorSingleSideEdge;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.FaceIteratorSingleSideVertex;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.FirstSide;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.FollowVisitor;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.LeadVisitor;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.PreviousIteration;
+import com.trickl.graph.planar.FaceHandle.FaceIterator.SecondSide;
+import java.util.*;
 import org.jgrapht.Graph;
 
 /*
  * NOTE : This class is still to be tested and is very likely to have errors.
  */
-public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
+public class BoyerMyrvoldPlanarityTest<V, E> implements PlanarEmbedding<V, E> {
 
    private enum Case {
 
@@ -103,7 +99,7 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
    private FaceHandle.EmbeddingStoragePolicy<E> embeddingStorage;
    private FaceHandle.OldHandlesStoragePolicy<V, E> oldHandles;
 
-   public BoyerMyrvoldPlanarity(Graph<V, E> graph,
+   public BoyerMyrvoldPlanarityTest(Graph<V, E> graph,
            FaceHandle.EmbeddingStoragePolicy<E> embeddingStorage,
            FaceHandle.OldHandlesStoragePolicy<V, E> oldHandles) {
       this.graph = graph;
@@ -120,12 +116,12 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
       embed();
    }
 
-   public BoyerMyrvoldPlanarity(Graph<V, E> graph,
+   public BoyerMyrvoldPlanarityTest(Graph<V, E> graph,
            FaceHandle.EmbeddingStoragePolicy<E> embeddingStorage) {
       this(graph, embeddingStorage, new FaceHandle.StoreOldHandles<V, E>());
    }
 
-   public BoyerMyrvoldPlanarity(Graph<V, E> graph) {
+   public BoyerMyrvoldPlanarityTest(Graph<V, E> graph) {
       this(graph, new FaceHandle.TreeEmbedding<E>());
    }
 
@@ -1583,7 +1579,6 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
       }
    }
 
-   @Override
    public Set<E> edgesOf(V vertex) {
       List<E> vertexEmbedding = new LinkedList<E>();
       FaceHandle<V, E> faceHandle = faceHandles.get(vertex);
@@ -1591,5 +1586,16 @@ public class BoyerMyrvoldPlanarity<V, E> implements PlanarEmbedding<V, E> {
          faceHandle.getList(vertexEmbedding);
       }
       return new LinkedHashSet<E>(vertexEmbedding);
+   }
+   
+   
+   @Override
+   public V getNextVertex(V source, V target) {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
+   public V getPrevVertex(V source, V target) {
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 };

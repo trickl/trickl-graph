@@ -60,6 +60,7 @@ public class SixColorVertexLabeller<V, E> implements Labeller<V> {
       // linked list of all vertices of G of degree j.
       Set<V> vertices = graph.vertexSet();
       Map<V, List<V>> adjacencyList = new HashMap<V, List<V>>();
+            
       Set[] degreeLists = new Set[vertices.size()];
       for (V vertex : vertices) {
          // Setup the degree list structure

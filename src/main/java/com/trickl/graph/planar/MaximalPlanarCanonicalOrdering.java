@@ -20,12 +20,7 @@
  */
 package com.trickl.graph.planar;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Map;
-import java.util.Hashtable;
+import java.util.*;
 import org.jgrapht.Graphs;
 
 public class MaximalPlanarCanonicalOrdering<V, E> implements PlanarCanonicalOrdering<V, E>{
@@ -51,16 +46,28 @@ public class MaximalPlanarCanonicalOrdering<V, E> implements PlanarCanonicalOrde
    @Override
    public List<V> getOrder(PlanarGraph<V, E> graph,
                            V first) {
-      if (graph == null || first == null) {
+      if (graph == null) {
          throw new NullPointerException();
       }
-      V second = PlanarGraphs.getPrevVertexOnBoundary(graph, first);
-
-      List<V> ordering = new ArrayList<V>(graph.vertexSet().size());
+      Set<V> vertices = graph.vertexSet();
+      List<V> ordering = new ArrayList<V>(vertices.size());      
+      if (first == null) {
+         first = graph.getBoundary().getSource();         
+      }      
+      
+      if (vertices.isEmpty()) {
+         return ordering;
+      }
+      else if (vertices.size() == 1) {
+         ordering.add(first);
+         return ordering;
+      }
+      
+      V second = PlanarGraphs.getPrevVertexOnBoundary(graph, first);      
 
       Queue<V> readyQueue = new LinkedList<V>();
-      Map<V, V> processedNeighbors = new Hashtable<V, V>(graph.vertexSet().size());
-      Map<V, Integer> status = new Hashtable<V, Integer>();
+      Map<V, V> processedNeighbors = new HashMap<V, V>(graph.vertexSet().size());
+      Map<V, Integer> status = new HashMap<V, Integer>();
       for (V vertex : graph.vertexSet()) {
          status.put(vertex, State.UNPROCESSED.getValue());
       }

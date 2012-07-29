@@ -21,9 +21,8 @@
 package com.trickl.graph;
 
 import java.util.Map;
-import org.jgrapht.Graph;
 
-public class HopCountVisitor<V, E> implements SpanningSearchVisitor<V, E> {
+public class HopCountVisitor<V, E> extends AbstractSpanningSearchVisitor<V, E> {
 
    int maxHopCount = 0;
    private Map<V, Integer> vertexHopCounts;
@@ -36,17 +35,9 @@ public class HopCountVisitor<V, E> implements SpanningSearchVisitor<V, E> {
    }
 
    @Override
-   public void initializeVertex(V u) {
-   }
-
-   @Override
    public void startVertex(V u) {
       maxHopCount = 0;
       vertexHopCounts.put(u, 0);
-   }
-
-   @Override
-   public void discoverVertex(V u) {
    }
 
    @Override
@@ -56,22 +47,6 @@ public class HopCountVisitor<V, E> implements SpanningSearchVisitor<V, E> {
          maxHopCount = vertexHopCounts.get(source) + 1;
          getVertexHopCounts().put(target, maxHopCount);
       }
-   }
-
-   @Override
-   public void treeEdge(V source, V target) {
-   }
-
-   @Override
-   public void backEdge(V source, V target) {
-   }
-
-   @Override
-   public void forwardOrCrossEdge(V source, V target) {
-   }
-
-   @Override
-   public void finishVertex(V u) {
    }
 
    public int getMaxHopCount() {

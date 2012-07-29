@@ -61,11 +61,9 @@ public class CanonicalPlanarFaceTraversal<V, E> implements PlanarFaceTraversal<V
 
       // Get the canonical ordering
       PlanarCanonicalOrdering<V, E> planarCanonicalOrder = new LeftistPlanarCanonicalOrdering<V, E>();
+      
+      List<V> canonicalOrder = planarCanonicalOrder.getOrder(maximalGraphCopy, null);
 
-      DirectedEdge<V> boundary = maximalGraphCopy.getBoundary();
-      List<V> canonicalOrder = planarCanonicalOrder.getOrder(maximalGraphCopy, boundary.getSource());
-
-      boundary = graph.getBoundary();
       Set<V> processedVertices = new HashSet<V>();
       for (V source : canonicalOrder) {
          processedVertices.add(source);
@@ -82,7 +80,8 @@ public class CanonicalPlanarFaceTraversal<V, E> implements PlanarFaceTraversal<V
          }
       }
       
-      // Finally process the boundary face
+      // Finally process the boundary face            
+      DirectedEdge<V> boundary = graph.getBoundary(); 
       traverseFace(visitor, boundary.getSource(), boundary.getTarget());
 
       visitor.endTraversal();
@@ -103,7 +102,10 @@ public class CanonicalPlanarFaceTraversal<V, E> implements PlanarFaceTraversal<V
 
          prevVertex = vertex;
       }
-      visitor.nextEdge(prevVertex, firstVertex);
+      
+      if (firstVertex != null) {
+         visitor.nextEdge(prevVertex, firstVertex);
+      }
 
       visitor.endFace(source, target);
    }

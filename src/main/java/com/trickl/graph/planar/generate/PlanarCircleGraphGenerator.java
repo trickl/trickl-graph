@@ -18,20 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.generate;
+package com.trickl.graph.planar.generate;
 
 import com.trickl.graph.planar.PlanarGraph;
 import com.trickl.graph.planar.PlanarGraphs;
 import com.trickl.graph.planar.PlanarLayout;
+import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
-import java.util.Map;
-import java.util.Hashtable;
-import java.util.PriorityQueue;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
+import java.util.*;
 import org.jgrapht.VertexFactory;
 
 public class PlanarCircleGraphGenerator<V, E>
@@ -53,7 +47,7 @@ public class PlanarCircleGraphGenerator<V, E>
          this.logicalPosition = logicalPosition;
          this.discoveryDirection = discoveryDirection;
          this.scale = scale;
-         angleComparator = new AngleComparator<Coordinate>(new Coordinate(0, 0), new Coordinate(1, 0), this);
+         angleComparator = new AngleComparator<Coordinate>(new Coordinate(1, 0), new Coordinate(0, 0), this);
       }
 
       public Coordinate getLogicalPosition() {
@@ -85,7 +79,7 @@ public class PlanarCircleGraphGenerator<V, E>
        */
       @Override
       public int compareTo(Site other) {
-         if (Math.abs(distanceToOrigin() - other.distanceToOrigin()) < tolerance) {
+         if (Math.abs(distanceToOrigin() - other.distanceToOrigin()) < scale * tolerance) {
             return -angleComparator.compare(this.getCoordinate(), other.getCoordinate());
          } else if (distanceToOrigin() > other.distanceToOrigin()) {
             return 1;
@@ -125,34 +119,41 @@ public class PlanarCircleGraphGenerator<V, E>
       @Override
       public int compare(V first, V second) {
          // Compare angle with respect to the common vertex (the pivot)            
-         return -Double.compare(getAngle(source, pivot, first),
-                               getAngle(source, pivot, second));
+         return -Double.compare(getOrientedAngle(source, pivot, first),
+                               getOrientedAngle(source, pivot, second));
       }
 
-      private double getAngle(V source, V pivot, V target) {
-         double angle = 0;
+      private double getOrientedAngle(V source, V pivot, V target) {         
          if (source.equals(target)) return 0;
          Coordinate sourcePosition = planarLayout.getCoordinate(source);
          Coordinate pivotPosition  = planarLayout.getCoordinate(pivot);
          Coordinate targetPosition = planarLayout.getCoordinate(target);
-         Coordinate pivotTargetPosition =
-                 new Coordinate(targetPosition.x - pivotPosition.x,
-                                    targetPosition.y - pivotPosition.y);
-         Coordinate pivotSourcePosition =
-                 new Coordinate(sourcePosition.x - pivotPosition.x,
-                                    sourcePosition.y - pivotPosition.y);
-         angle = -Math.atan2(pivotSourcePosition.x, pivotSourcePosition.y)
-                 +Math.atan2(pivotTargetPosition.x, pivotTargetPosition.y);
-         return -angle;
+         double smallerAngle = Angle.angleBetween(sourcePosition, pivotPosition, targetPosition);
+         int turn = Angle.getTurn(Angle.angle(pivotPosition, sourcePosition), 
+                                  Angle.angle(pivotPosition, targetPosition));
+         double angle = 0;
+         switch(turn) {
+            case Angle.COUNTERCLOCKWISE:
+               angle = smallerAngle;
+               break;
+            case Angle.CLOCKWISE:
+               angle = -smallerAngle;
+               break;
+            case Angle.NONE:
+            default:
+               break;
+         }
+         
+         return angle;
       }
    }
 
    final private int size;
    final private double scale;
-   final private Map<V, Site> sites = new Hashtable<V, Site>();
+   final private Map<V, Site> sites = new HashMap<V, Site>();
 
    public PlanarCircleGraphGenerator(int size) {
-      this(size, 100);
+      this(size, 1);
    }
 
    public PlanarCircleGraphGenerator(int size, double scale) {
@@ -176,7 +177,7 @@ public class PlanarCircleGraphGenerator<V, E>
          graph.addVertex(vertex);
       }
       
-      Map<Coordinate, Integer> existingSites = new Hashtable<Coordinate, Integer>();
+      Map<Coordinate, Integer> existingSites = new HashMap<Coordinate, Integer>();
       PriorityQueue<Site> potentialSitesQueue = new PriorityQueue<Site>();
       potentialSitesQueue.add(new Site(new Coordinate(0, 0), scale));
 

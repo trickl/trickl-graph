@@ -21,11 +21,11 @@
 package com.trickl.graph.planar;
 
 import com.trickl.graph.PartitionByKernelClustering;
+import com.trickl.graph.edges.IntegerEdgeFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
-import com.trickl.graph.generate.PlanarCircleGraphGenerator;
-import com.trickl.graph.vertices.IdVertex;
-import com.trickl.graph.vertices.IdVertexFactory;
+import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
+import com.trickl.graph.vertices.IntegerVertexFactory;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,24 +40,24 @@ public class PartitionByKernelClusteringPlanarTest {
       System.out.println("testCircularGraphClusters");
       int totalClusters = 4;
       int vertices = 19;
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator = new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices);
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      PlanarCircleGraphGenerator<Integer, Integer> generator = new PlanarCircleGraphGenerator<Integer, Integer>(vertices);
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       generator.generateGraph(graph, vertexFactory, null);      
 
-      PartitionByKernelClustering<IdVertex, UndirectedIdEdge<IdVertex>> partitioner =
-              new PartitionByKernelClustering<IdVertex, UndirectedIdEdge<IdVertex>>();
+      PartitionByKernelClustering<Integer, Integer> partitioner =
+              new PartitionByKernelClustering<Integer, Integer>();
       partitioner.partition(graph, totalClusters);
-      Map<IdVertex, Integer> partitions = partitioner.getPartition();
+      Map<Integer, Integer> partitions = partitioner.getPartition();
 
       // Check the four corners of the graph belong to different partitions      
-      Assert.assertNotSame(partitions.get(vertexFactory.get(8)), partitions.get(vertexFactory.get(11)));
-      Assert.assertNotSame(partitions.get(vertexFactory.get(8)), partitions.get(vertexFactory.get(15)));
-      Assert.assertNotSame(partitions.get(vertexFactory.get(8)), partitions.get(vertexFactory.get(18)));
-      Assert.assertNotSame(partitions.get(vertexFactory.get(11)), partitions.get(vertexFactory.get(15)));
-      Assert.assertNotSame(partitions.get(vertexFactory.get(11)), partitions.get(vertexFactory.get(18)));
-      Assert.assertNotSame(partitions.get(vertexFactory.get(15)), partitions.get(vertexFactory.get(18)));
+      Assert.assertNotSame(partitions.get(8), partitions.get(10));
+      Assert.assertNotSame(partitions.get(8), partitions.get(12));
+      Assert.assertNotSame(partitions.get(8), partitions.get(14));
+      Assert.assertNotSame(partitions.get(10), partitions.get(12));
+      Assert.assertNotSame(partitions.get(10), partitions.get(14));
+      Assert.assertNotSame(partitions.get(12), partitions.get(14));
 
    }
 
@@ -66,14 +66,14 @@ public class PartitionByKernelClusteringPlanarTest {
       System.out.println("testLargeGraphFewClusters");
       int totalClusters = 10;
       int vertices = 500;
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator = new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices);
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      PlanarCircleGraphGenerator<Integer, Integer> generator = new PlanarCircleGraphGenerator<Integer, Integer>(vertices);
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       generator.generateGraph(graph, vertexFactory, null);
 
-      PartitionByKernelClustering<IdVertex, UndirectedIdEdge<IdVertex>> partitioner =
-              new PartitionByKernelClustering<IdVertex, UndirectedIdEdge<IdVertex>>();
+      PartitionByKernelClustering<Integer, Integer> partitioner =
+              new PartitionByKernelClustering<Integer, Integer>();
       partitioner.partition(graph, totalClusters);
    }
    
@@ -82,14 +82,14 @@ public class PartitionByKernelClusteringPlanarTest {
       System.out.println("testLargeGraphManyClusters");
       int totalClusters = 400;
       int vertices = 500;
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator = new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices);
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      PlanarCircleGraphGenerator<Integer, Integer> generator = new PlanarCircleGraphGenerator<Integer, Integer>(vertices);
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       generator.generateGraph(graph, vertexFactory, null);
 
-      PartitionByKernelClustering<IdVertex, UndirectedIdEdge<IdVertex>> partitioner =
-              new PartitionByKernelClustering<IdVertex, UndirectedIdEdge<IdVertex>>();
+      PartitionByKernelClustering<Integer, Integer> partitioner =
+              new PartitionByKernelClustering<Integer, Integer>();
       partitioner.partition(graph, totalClusters);
    }
 }

@@ -27,7 +27,7 @@ import com.trickl.graph.planar.MaximalPlanar;
 import com.trickl.graph.planar.PlanarGraph;
 import com.trickl.graph.vertices.IdVertex;
 import com.trickl.graph.vertices.IdVertexFactory;
-import com.trickl.graph.generate.PlanarCircleGraphGenerator;
+import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import static com.trickl.graph.planar.PlanarAssert.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -77,6 +77,6 @@ public class MaximalPlanarTest {
       MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
       maximalPlanar.makeMaximalPlanar(graph);
       
-      assertEmbeddingEquals(graph, vertexFactory.get(2), "1,0,3,6");
+      assertEmbeddingEquals(graph, vertexFactory.get(2), "1,0,3,5");
    }
 }

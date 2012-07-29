@@ -65,9 +65,9 @@ public class DoublyConnectedEdgeList<V, E, F>
    public DoublyConnectedEdgeList(EdgeFactory<V, E> edgeFactory, FaceFactory<V, F> faceFactory) {
       this.edgeFactory = edgeFactory;
       this.faceFactory = faceFactory;
-      edgeMap = new Hashtable<E, DcelHalfEdge<V, E, F>>();
-      vertexMap = new Hashtable<V, DcelVertex<V, E, F>>();
-      faceMap = new Hashtable<F, DcelFace<V, E, F>>();
+      edgeMap = new HashMap<E, DcelHalfEdge<V, E, F>>();
+      vertexMap = new HashMap<V, DcelVertex<V, E, F>>();
+      faceMap = new HashMap<F, DcelFace<V, E, F>>();
 
       if (faceFactory != null) {
          boundaryFace = faceFactory.createFace(null, null, true);
@@ -183,7 +183,12 @@ public class DoublyConnectedEdgeList<V, E, F>
       DcelFace<V, E, F> dcelFace = faceMap.get(boundaryFace);
       if (dcelFace.getAdjacent() == null) {
          // Graph contains zero edges
-         return null;
+         if (vertexMap.isEmpty()) {
+            return new DirectedEdge<V>(null, null);
+         }
+         else {
+            return new DirectedEdge<V>(vertexMap.keySet().iterator().next(), null);
+         }
       }
       return new DirectedEdge<V>(dcelFace.getAdjacent().getOrigin().getVertex(),
                                  dcelFace.getAdjacent().getNext().getOrigin().getVertex());
@@ -497,7 +502,7 @@ public class DoublyConnectedEdgeList<V, E, F>
    }
 
    @Override
-   public boolean replace(F oldFace, F newFace) {
+   public boolean replaceFace(F oldFace, F newFace) {
       DcelFace<V, E, F> dcelFace = faceMap.get(oldFace);
       if (dcelFace == null) {
          return false;

@@ -20,13 +20,12 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.HopCountVisitor;
 import com.trickl.graph.BreadthFirstSearch;
+import com.trickl.graph.HopCountVisitor;
 import com.trickl.graph.SpanningSearchVisitor;
 import com.vividsolutions.jts.geom.Coordinate;
-import java.util.Map;
-import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.Map;
 
 /*
  * This algorithm is described in the following paper:
@@ -220,7 +219,7 @@ public class FoldFreeLayout<V, E> implements PlanarLayout<V> {
       Map<V, Integer> h5 = new HashMap<V, Integer>();
       breadthFirstSearch.traverse(n5, new HopCountVisitor<V, E>(h5));
 
-      vertexLocations = new Hashtable<V, Coordinate>();
+      vertexLocations = new HashMap<V, Coordinate>();
       for (V v : graph.vertexSet()) {
          double radius = h5.get(v) * scale;
          double theta = Math.atan2((double) h2.get(v) - (double) h1.get(v),

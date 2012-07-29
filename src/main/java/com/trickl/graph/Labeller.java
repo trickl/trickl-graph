@@ -18,23 +18,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.planar;
+package com.trickl.graph;
 
-import com.trickl.graph.edges.DirectedEdge;
 import java.util.Set;
 
 /**
- * A planar graph that associates a face class instance to every logical
- * face.
+ *
  * @author tgee
- * @param <V> Vertex type
- * @param <E> Edge type
- * @param <F> Face type
  */
-public interface PlanarFaceGraph <V, E, F> extends PlanarGraph<V, E> {
-   public Set<F> faceSet();
-   public F getFace(V source, V target);
-   public FaceFactory<V, F> getFaceFactory();
-   public DirectedEdge<V> getAdjacentEdge(F face);
-   public boolean replaceFace(F oldFace, F newFace);
+public interface Labeller<V> {   
+   int getLabelCount();
+   int getLabel(V vertex);
+   Set<V> getMembers(int label);
 }

@@ -20,21 +20,23 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.edges.DirectedEdge;
-import java.util.Set;
+import com.sun.istack.logging.Logger;
 
 /**
- * A planar graph that associates a face class instance to every logical
- * face.
+ * See Algorithm and Experiments in Testing Planar Graphs for Isomorphism.
+ * by Jacek P. Kukluk
+ * Lawrence B. Holder
+ * Diane J. Cook
+ * Computer Science and Engineering Department
+ * University of Texas at Arlington
  * @author tgee
- * @param <V> Vertex type
- * @param <E> Edge type
- * @param <F> Face type
  */
-public interface PlanarFaceGraph <V, E, F> extends PlanarGraph<V, E> {
-   public Set<F> faceSet();
-   public F getFace(V source, V target);
-   public FaceFactory<V, F> getFaceFactory();
-   public DirectedEdge<V> getAdjacentEdge(F face);
-   public boolean replaceFace(F oldFace, F newFace);
+public class KuklukHolderCookCodeGenerator {
+   private final Logger logger = Logger.getLogger(KuklukHolderCookCodeGenerator.class);
+   
+   public <V, E> String getCode(PlanarGraph<V, E> graph) {
+      // TODO: !     
+      logger.warning("KuklukHolderCookCodeGenerator not implemented yet.");
+      return "";
+   }
 }

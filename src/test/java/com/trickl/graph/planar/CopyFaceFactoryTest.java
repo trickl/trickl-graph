@@ -20,17 +20,13 @@
  */
 package com.trickl.graph.planar;
 
+import com.trickl.graph.edges.IntegerEdgeFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
-import com.trickl.graph.planar.CopyFaceFactory;
-import com.trickl.graph.planar.DoublyConnectedEdgeList;
-import com.trickl.graph.planar.PlanarFaceGraph;
-import com.trickl.graph.planar.PlanarGraphs;
-import com.trickl.graph.generate.PlanarCircleGraphGenerator;
+import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
-import com.trickl.graph.vertices.IdVertex;
-import com.trickl.graph.vertices.IdVertexFactory;
+import com.trickl.graph.vertices.IntegerVertexFactory;
 import org.junit.*;
 
 public class CopyFaceFactoryTest {
@@ -38,21 +34,21 @@ public class CopyFaceFactoryTest {
    @Test
    public void testCopyStructureOnly() throws Exception {
       // Create a graph with face ids >= 100
-      IdFaceFactory<IdVertex> faceFactory = new IdFaceFactory<IdVertex>();
+      IdFaceFactory<Integer> faceFactory = new IdFaceFactory<Integer>();
       faceFactory.setNextId(100);
 
-      PlanarFaceGraph<IdVertex, UndirectedIdEdge<IdVertex>, IdFace> graph =
-              new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), faceFactory);
+      PlanarFaceGraph<Integer, Integer, IdFace> graph =
+              new DoublyConnectedEdgeList<Integer, Integer, IdFace>(new IntegerEdgeFactory(), faceFactory);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
       // Copy the graph
-      PlanarFaceGraph<IdVertex, UndirectedIdEdge<IdVertex>, IdFace> copyGraph =
-              new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new CopyFaceFactory(graph));
+      PlanarFaceGraph<Integer, Integer, IdFace> copyGraph =
+              new DoublyConnectedEdgeList<Integer, Integer, IdFace>(new IntegerEdgeFactory(), new CopyFaceFactory(graph));
       PlanarGraphs.copy(graph, copyGraph, null, null);
 
       Assert.assertEquals(7, copyGraph.faceSet().size());

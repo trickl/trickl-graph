@@ -82,10 +82,23 @@ public class LeftistPlanarCanonicalOrdering<V, E> implements PlanarCanonicalOrde
     */
    @Override
    public List<V> getOrder(PlanarGraph<V, E> graph, V first) {
-      if (graph == null || first == null) {
+      if (graph == null) {
          throw new NullPointerException();
       }
-      List<V> ordering = new ArrayList<V>(graph.vertexSet().size());
+      
+      Set<V> vertices = graph.vertexSet();
+      List<V> ordering = new ArrayList<V>(vertices.size());      
+      if (first == null) {
+         first = graph.getBoundary().getSource();         
+      }      
+      
+      if (vertices.isEmpty()) {
+         return ordering;
+      }
+      else if (vertices.size() == 1) {
+         ordering.add(first);
+         return ordering;
+      }
 
       this.graph = graph;
       belt = new LinkedList<BeltCutFace<V>>();
@@ -96,7 +109,7 @@ public class LeftistPlanarCanonicalOrdering<V, E> implements PlanarCanonicalOrde
       V second = PlanarGraphs.getPrevVertexOnBoundary(graph, first);
       V last   = PlanarGraphs.getNextVertexOnBoundary(graph, first);
       
-      for (V vertex : graph.vertexSet()) {
+      for (V vertex : vertices) {
          vertexCutFaces.put(vertex, 0);
          vertexCutEdges.put(vertex, 0);
       }

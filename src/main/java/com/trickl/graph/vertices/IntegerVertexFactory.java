@@ -1,4 +1,12 @@
 /*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.trickl.graph.vertices;
+
+import org.jgrapht.VertexFactory;
+
+/*
  * This file is part of the Trickl Open Source Libraries.
  *
  * Trickl Open Source Libraries - http://open.trickl.com/
@@ -18,23 +26,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.planar;
+public class IntegerVertexFactory implements VertexFactory<Integer> {
+   
+   private int nextValue;
+   
+   public IntegerVertexFactory() {
+      this(0);
+   }
+   
+   public IntegerVertexFactory(int start) {
+      this.nextValue = start;
+   }
 
-import com.trickl.graph.edges.DirectedEdge;
-import java.util.Set;
-
-/**
- * A planar graph that associates a face class instance to every logical
- * face.
- * @author tgee
- * @param <V> Vertex type
- * @param <E> Edge type
- * @param <F> Face type
- */
-public interface PlanarFaceGraph <V, E, F> extends PlanarGraph<V, E> {
-   public Set<F> faceSet();
-   public F getFace(V source, V target);
-   public FaceFactory<V, F> getFaceFactory();
-   public DirectedEdge<V> getAdjacentEdge(F face);
-   public boolean replaceFace(F oldFace, F newFace);
+   @Override
+   public Integer createVertex() {
+      return new Integer(nextValue++);
+   } 
 }

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jgrapht.Graph;
 
-public class CopyGraphVisitor<V1, E1, V2, E2> implements SpanningSearchVisitor<V1, E1> {
+public class CopyGraphVisitor<V1, E1, V2, E2> extends AbstractSpanningSearchVisitor<V1, E1> {
 
    protected Graph<V1, E1> inputGraph;
    protected Graph<V2, E2> outputGraph;
@@ -55,18 +55,6 @@ public class CopyGraphVisitor<V1, E1, V2, E2> implements SpanningSearchVisitor<V
       this.edgeFactory = edgeFactory;
       this.vertexMap = new HashMap<V1, V2>();
       this.aggregationVertices = new HashMap<Integer, V2>();
-   }
-
-   @Override
-   public void initializeVertex(V1 vertex) {
-   }
-
-   @Override
-   public void startVertex(V1 vertex) {
-   }
-
-   @Override
-   public void discoverVertex(V1 inputVertex) {      
    }
 
    @Override
@@ -121,22 +109,6 @@ public class CopyGraphVisitor<V1, E1, V2, E2> implements SpanningSearchVisitor<V
       }
 
       return vertexMap.get(inputVertex);
-   }
-
-   @Override
-   public void treeEdge(V1 source, V1 target) {
-   }
-
-   @Override
-   public void backEdge(V1 source, V1 target) {
-   }
-
-   @Override
-   public void forwardOrCrossEdge(V1 source, V1 target) {
-   }
-
-   @Override
-   public void finishVertex(V1 vertex) {
    }
 
    public Map<V1, V2> getVertexMap() {

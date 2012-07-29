@@ -18,24 +18,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this project.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.trickl.graph.generate;
+package com.trickl.graph.planar.generate;
 
-import com.trickl.graph.generate.PlanarSquareGraphGenerator;
-import com.trickl.graph.vertices.IdVertex;
-import com.trickl.graph.vertices.IdVertexFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
+import com.trickl.graph.ext.JComponentWindow;
 import com.trickl.graph.planar.DoublyConnectedEdgeList;
+import com.trickl.graph.planar.JGraphAdaptor;
+import static com.trickl.graph.planar.PlanarAssert.assertEmbeddingEquals;
 import com.trickl.graph.planar.PlanarGraph;
 import com.trickl.graph.planar.PlanarGraphs;
-import java.awt.Color;
-import java.awt.Rectangle;
-import static com.trickl.graph.planar.PlanarAssert.*;
-
-import org.junit.Ignore;
-
+import com.trickl.graph.vertices.IdVertex;
+import com.trickl.graph.vertices.IdVertexFactory;
+import javax.swing.JScrollPane;
+import org.jgraph.JGraph;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class PlanarSquareGraphGeneratorTest {
 
@@ -46,7 +44,7 @@ public class PlanarSquareGraphGeneratorTest {
 
       PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
 
-      PlanarSquareGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator = new PlanarSquareGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices, 100);
+      PlanarSquareGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator = new PlanarSquareGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices, 0.25);
       generator.generateGraph(graph, new IdVertexFactory(), null);
 
       assertEquals(36, PlanarGraphs.getBoundaryVertices(graph).size());
@@ -66,27 +64,11 @@ public class PlanarSquareGraphGeneratorTest {
             assertEmbeddingEquals(graph, vertex, "91,80");
          }
       }
+      
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, generator);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
-
-    /* TODO: Move code into graph toolbox
-   @Test
-   @Ignore("Visual test, no assertions")
-   public void drawLayout() throws Exception {
-
-      int vertices = 99;
-
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
-
-      PlanarSquareGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator = new PlanarSquareGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices);
-      generator.generateGraph(graph, new IdVertexFactory(), null);
-
-      // Display the results
-      // TODO Show layout using drawing pad and planar face traversal
-      DrawingPad pad = new DrawingPad(720, 600, 20, 20, "Test Drawing Pad - Circle Graph");
-      pad.getViewport().setRect(new Rectangle.Double(-1200, -1200, 2400, 2400));
-      pad.getViewport().setView(new JPlanarGraphView(graph, generator, Color.black));
-      pad.showAndWait();
-   }
-     * 
-     */
 }

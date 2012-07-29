@@ -21,19 +21,18 @@
 package com.trickl.graph.planar;
 
 import com.trickl.graph.EdgeVisitor;
+import com.trickl.graph.edges.IntegerEdgeFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
-import com.trickl.graph.planar.DoublyConnectedEdgeList;
-import com.trickl.graph.planar.MaximalPlanar;
-import com.trickl.graph.planar.PlanarGraph;
-import com.trickl.graph.planar.PlanarGraphs;
-import com.trickl.graph.planar.PlanarLayout;
-import com.trickl.graph.generate.PlanarCircleGraphGenerator;
 import static com.trickl.graph.planar.PlanarAssert.assertEmbeddingEquals;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
+import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import com.trickl.graph.planar.xml.XmlDcelDocument;
-import com.trickl.graph.vertices.*;
+import com.trickl.graph.vertices.CircleVertex;
+import com.trickl.graph.vertices.IdCoordinateVertex;
+import com.trickl.graph.vertices.IdCoordinateVertexFactory;
+import com.trickl.graph.vertices.IntegerVertexFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -62,254 +61,254 @@ public class PlanarGraphsTest {
    @Test
    public void testAggregation() {
       System.out.println("aggregation");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> subgraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> subgraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(19);
+              new PlanarCircleGraphGenerator<Integer, Integer>(19);
       generator.generateGraph(graph, vertexFactory, null);
 
-      Map<IdVertex, Integer> aggregationGroups = new HashMap<IdVertex, Integer>();
-      aggregationGroups.put(vertexFactory.get(0), 0);
-      aggregationGroups.put(vertexFactory.get(1), 0);
-      aggregationGroups.put(vertexFactory.get(2), 1);
-      aggregationGroups.put(vertexFactory.get(3), 1);
-      aggregationGroups.put(vertexFactory.get(4), 2);
-      aggregationGroups.put(vertexFactory.get(5), 2);
-      aggregationGroups.put(vertexFactory.get(6), 3);
-      aggregationGroups.put(vertexFactory.get(7), 3);
-      aggregationGroups.put(vertexFactory.get(8), 4);
-      aggregationGroups.put(vertexFactory.get(9), 5);
-      aggregationGroups.put(vertexFactory.get(10), 6);
-      aggregationGroups.put(vertexFactory.get(11), 7);
-      aggregationGroups.put(vertexFactory.get(12), 8);
-      aggregationGroups.put(vertexFactory.get(13), 9);
-      aggregationGroups.put(vertexFactory.get(14), 4);
-      aggregationGroups.put(vertexFactory.get(15), 5);
-      aggregationGroups.put(vertexFactory.get(16), 6);
-      aggregationGroups.put(vertexFactory.get(17), 7);
-      aggregationGroups.put(vertexFactory.get(18), 8);
+      Map<Integer, Integer> aggregationGroups = new HashMap<Integer, Integer>();
+      aggregationGroups.put(0, 0);
+      aggregationGroups.put(1, 0);
+      aggregationGroups.put(2, 1);
+      aggregationGroups.put(3, 1);
+      aggregationGroups.put(4, 2);
+      aggregationGroups.put(5, 2);
+      aggregationGroups.put(6, 3);
+      aggregationGroups.put(7, 4);
+      aggregationGroups.put(8, 5);
+      aggregationGroups.put(9, 6);
+      aggregationGroups.put(10, 7);
+      aggregationGroups.put(11, 8);
+      aggregationGroups.put(12, 3);
+      aggregationGroups.put(13, 4);
+      aggregationGroups.put(14, 5);
+      aggregationGroups.put(15, 6);
+      aggregationGroups.put(16, 7);
+      aggregationGroups.put(17, 8);
+      aggregationGroups.put(18, 9);
       
-      Map<IdVertex, IdVertex> vertexMap = PlanarGraphs.aggregate(graph, subgraph, aggregationGroups);
+      Map<Integer, Integer> vertexMap = PlanarGraphs.aggregate(graph, subgraph, aggregationGroups);
 
       assertEquals(10, subgraph.vertexSet().size());
-      assertEmbeddingEquals(subgraph, vertexMap.get(vertexFactory.get(0)), "5,2,8,13,7");
-      assertEmbeddingEquals(subgraph, vertexMap.get(vertexFactory.get(4)), "10,2,1,7,18,17");
-      assertEmbeddingEquals(subgraph, vertexMap.get(vertexFactory.get(6)), "1,13,18,5");
-      assertEmbeddingEquals(subgraph, vertexMap.get(vertexFactory.get(8)), "13,1,2,9");
+      assertEmbeddingEquals(subgraph, vertexMap.get(0), "7,6,4,3");
+      assertEmbeddingEquals(subgraph, vertexMap.get(4), "6,17,16,9,3,0");
+      assertEmbeddingEquals(subgraph, vertexMap.get(6), "7,18,17,4,0");
+      assertEmbeddingEquals(subgraph, vertexMap.get(8), "7,3,9");
    }
 
    @Test
    public void testBoundaryHops() {
       System.out.println("boundaryHops");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(99);
+              new PlanarCircleGraphGenerator<Integer, Integer>(99);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      Map<IdVertex, Integer> boundaryHops = new HashMap<IdVertex, Integer>();
+      Map<Integer, Integer> boundaryHops = new HashMap<Integer, Integer>();
 
       PlanarGraphs.boundaryHops(graph, boundaryHops);
 
       assertEquals(99, boundaryHops.size());
-      assertEquals(5, (int) boundaryHops.get(vertexFactory.get(0)));
-      assertEquals(0, (int) boundaryHops.get(vertexFactory.get(98)));
+      assertEquals(5, (int) boundaryHops.get(0));
+      assertEquals(0, (int) boundaryHops.get(98));
    }
 
    @Test
    public void testConnectedVertices() {
       System.out.println("connectedVertices");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
       assertEquals("[6, 1, 2, 3, 4, 5]", Arrays.toString(
               PlanarGraphs.getConnectedVertices(
-              graph, vertexFactory.get(0)).toArray()));
+              graph, 0).toArray()));
 
       assertEquals("[1, 2, 3, 4, 5, 6]", Arrays.toString(
               PlanarGraphs.getConnectedVertices(
-              graph, vertexFactory.get(0),
-              vertexFactory.get(1)).toArray()));
+              graph, 0,
+              1).toArray()));
 
       assertEquals("[4, 5, 6, 1, 2, 3]", Arrays.toString(
               PlanarGraphs.getConnectedVertices(
-              graph, vertexFactory.get(0),
-              vertexFactory.get(4)).toArray()));
+              graph, 0,
+              4).toArray()));
 
       assertEquals("[4, 5, 6]", Arrays.toString(
               PlanarGraphs.getConnectedVertices(
-              graph, vertexFactory.get(0),
-              vertexFactory.get(4),
-              vertexFactory.get(1)).toArray()));
+              graph, 0,
+              4,
+              1).toArray()));
 
       assertEquals("[1, 2, 3]", Arrays.toString(
               PlanarGraphs.getConnectedVertices(
-              graph, vertexFactory.get(0),
-              vertexFactory.get(1),
-              vertexFactory.get(4)).toArray()));
+              graph, 0,
+              1,
+              4).toArray()));
    }
 
    @Test
    public void testVerticesOnFace() {
       System.out.println("verticesOnFace");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
       assertEquals("[1, 6, 5, 4, 3, 2]", Arrays.toString(
               PlanarGraphs.getVerticesOnFace(
-              graph, vertexFactory.get(1),
-              vertexFactory.get(6)).toArray()));
+              graph, 1,
+              6).toArray()));
 
       assertEquals("[6, 1, 0]", Arrays.toString(
               PlanarGraphs.getVerticesOnFace(
-              graph, vertexFactory.get(6),
-              vertexFactory.get(1)).toArray()));
+              graph, 6,
+              1).toArray()));
 
       assertEquals("[0, 4, 5]", Arrays.toString(
               PlanarGraphs.getVerticesOnFace(
-              graph, vertexFactory.get(0),
-              vertexFactory.get(4)).toArray()));
+              graph, 0,
+              4).toArray()));
 
       assertEquals("[1, 6, 5]", Arrays.toString(
               PlanarGraphs.getVerticesOnFace(
-              graph, vertexFactory.get(1),
-              vertexFactory.get(6),
-              vertexFactory.get(4)).toArray()));
+              graph, 1,
+              6,
+              4).toArray()));
 
       assertEquals("[1]", Arrays.toString(
               PlanarGraphs.getVerticesOnFace(
-              graph, vertexFactory.get(1),
-              vertexFactory.get(6),
-              vertexFactory.get(6)).toArray()));
+              graph, 1,
+              6,
+              6).toArray()));
    }
 
    @Test
    public void testSubgraphDegreeTwo() {
       System.out.println("subgraph");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> subgraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> subgraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      Set<IdVertex> vertices = new HashSet<IdVertex>();
+      Set<Integer> vertices = new HashSet<Integer>();
       for (int i = 0; i <= 4; ++i) {
-         vertices.add(vertexFactory.get(i));
+         vertices.add(i);
       }
 
-      PlanarGraphs.subgraph(graph, subgraph, vertices, vertexFactory.get(2), vertexFactory.get(1));
+      PlanarGraphs.subgraph(graph, subgraph, vertices, 2, 1);
 
       assertEquals(12, graph.edgeSet().size());
       assertEquals(7, subgraph.edgeSet().size());
-      assertTrue(!subgraph.containsVertex(vertexFactory.get(5)));
-      assertTrue(!subgraph.containsVertex(vertexFactory.get(6)));
-      assertEmbeddingEquals(subgraph, vertexFactory.get(0), "4,3,2,1");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(1), "0,2");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(2), "0,3,1");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(3), "0,4,2");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(4), "3,0");
+      assertTrue(!subgraph.containsVertex(5));
+      assertTrue(!subgraph.containsVertex(6));
+      assertEmbeddingEquals(subgraph, 0, "4,3,2,1");
+      assertEmbeddingEquals(subgraph, 1, "0,2");
+      assertEmbeddingEquals(subgraph, 2, "0,3,1");
+      assertEmbeddingEquals(subgraph, 3, "0,4,2");
+      assertEmbeddingEquals(subgraph, 4, "3,0");
       assertEquals(5, PlanarGraphs.getBoundaryVertices(subgraph).size());
    }
 
    @Test
    public void testSubgraphDegreeHigherThanTwo() {
       System.out.println("subgraph");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> subgraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> subgraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      Set<IdVertex> vertices = new HashSet<IdVertex>();
-      vertices.add(vertexFactory.get(1));
-      vertices.add(vertexFactory.get(6));
-      vertices.add(vertexFactory.get(5));
-      vertices.add(vertexFactory.get(0));
+      Set<Integer> vertices = new HashSet<Integer>();
+      vertices.add(1);
+      vertices.add(6);
+      vertices.add(5);
+      vertices.add(0);
 
-      PlanarGraphs.subgraph(graph, subgraph, vertices, vertexFactory.get(1), vertexFactory.get(6));
+      PlanarGraphs.subgraph(graph, subgraph, vertices, 1, 6);
 
       assertEquals(12, graph.edgeSet().size());
       assertEquals(5, subgraph.edgeSet().size());
-      assertTrue(!subgraph.containsVertex(vertexFactory.get(2)));
-      assertTrue(!subgraph.containsVertex(vertexFactory.get(3)));
-      assertTrue(!subgraph.containsVertex(vertexFactory.get(4)));
-      assertEmbeddingEquals(subgraph, vertexFactory.get(1), "6,0");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(6), "5,0,1");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(5), "0,6");
-      assertEmbeddingEquals(subgraph, vertexFactory.get(0), "1,6,5");
+      assertTrue(!subgraph.containsVertex(2));
+      assertTrue(!subgraph.containsVertex(3));
+      assertTrue(!subgraph.containsVertex(4));
+      assertEmbeddingEquals(subgraph, 1, "6,0");
+      assertEmbeddingEquals(subgraph, 6, "5,0,1");
+      assertEmbeddingEquals(subgraph, 5, "0,6");
+      assertEmbeddingEquals(subgraph, 0, "1,6,5");
       assertEquals(4, PlanarGraphs.getBoundaryVertices(subgraph).size());
    }
 
    @Test
    public void testDualGraph() {
       System.out.println("dualgraph");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> dualGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> dualGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(7);
+              new PlanarCircleGraphGenerator<Integer, Integer>(7);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      IdVertexFactory dualVertexFactory = new IdVertexFactory();
+      IntegerVertexFactory dualVertexFactory = new IntegerVertexFactory();
       PlanarGraphs.dualGraph(graph, dualGraph, dualVertexFactory);
 
       assertEquals(12, dualGraph.edgeSet().size());
       assertEquals(3, PlanarGraphs.getBoundaryVertices(dualGraph).size());
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(0), "1,4,6");
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(1), "6,2,0");
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(2), "6,3,1");
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(3), "6,5,2");
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(4), "6,0,5");
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(5), "6,4,3");
-      assertEmbeddingEquals(dualGraph, dualVertexFactory.get(6), "1,0,4,5,3,2");
+      assertEmbeddingEquals(dualGraph, 0, "1,5,6");
+      assertEmbeddingEquals(dualGraph, 1, "6,2,0");
+      assertEmbeddingEquals(dualGraph, 2, "6,3,1");
+      assertEmbeddingEquals(dualGraph, 3, "6,4,2");
+      assertEmbeddingEquals(dualGraph, 4, "6,5,3");
+      assertEmbeddingEquals(dualGraph, 5, "6,0,4");
+      assertEmbeddingEquals(dualGraph, 6, "1,0,5,4,3,2");
    }
 
    @Test
    public void testDualGraphLarge() {
       System.out.println("dualgraphlarge");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> dualGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> dualGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(37);
+              new PlanarCircleGraphGenerator<Integer, Integer>(37);
 
       generator.generateGraph(graph, vertexFactory, null);
 
-      IdVertexFactory dualVertexFactory = new IdVertexFactory();
+      IntegerVertexFactory dualVertexFactory = new IntegerVertexFactory();
       PlanarGraphs.dualGraph(graph, dualGraph, dualVertexFactory);
    }
 
    @Test
    public void testDelaunayVoronoiMedium() throws Exception {
       System.out.println("delaunayVoronoiMedium");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> delaunayGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
-      PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator =
-              new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(37);
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
+      PlanarCircleGraphGenerator<Integer, Integer> generator =
+              new PlanarCircleGraphGenerator<Integer, Integer>(37);
 
       generator.generateGraph(delaunayGraph, vertexFactory, null);
 
@@ -328,25 +327,25 @@ public class PlanarGraphsTest {
    @Test
    public void testDelaunayVoronoiTiny() throws Exception {
       System.out.println("delaunayVoronoiTiny");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> delaunayGraph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       for (int i = 0; i < 5; ++i) {
          vertexFactory.createVertex();
       }
-      delaunayGraph.addEdge(vertexFactory.get(0), vertexFactory.get(1));
-      delaunayGraph.addEdge(vertexFactory.get(1), vertexFactory.get(2));
-      delaunayGraph.addEdge(vertexFactory.get(2), vertexFactory.get(0), vertexFactory.get(1), null);
+      delaunayGraph.addEdge(0, 1);
+      delaunayGraph.addEdge(1, 2);
+      delaunayGraph.addEdge(2, 0, 1, null);
 
-      final Map<IdVertex, Coordinate> delaunayLocations = new HashMap<IdVertex, Coordinate>();
-      delaunayLocations.put(vertexFactory.get(0), new Coordinate(-300, -200));
-      delaunayLocations.put(vertexFactory.get(1), new Coordinate(300, -200));
-      delaunayLocations.put(vertexFactory.get(2), new Coordinate(0, 200));
+      final Map<Integer, Coordinate> delaunayLocations = new HashMap<Integer, Coordinate>();
+      delaunayLocations.put(0, new Coordinate(-300, -200));
+      delaunayLocations.put(1, new Coordinate(300, -200));
+      delaunayLocations.put(2, new Coordinate(0, 200));
 
-      PlanarLayout<IdVertex> delaunayLayout = new PlanarLayout<IdVertex>() {
+      PlanarLayout<Integer> delaunayLayout = new PlanarLayout<Integer>() {
 
          @Override
-         public Coordinate getCoordinate(IdVertex vertex) {
+         public Coordinate getCoordinate(Integer vertex) {
             return delaunayLocations.get(vertex);
          }
       };
@@ -359,7 +358,7 @@ public class PlanarGraphsTest {
                  new Coordinate(400, -300)}),
               new GeometryFactory(coordinateSequenceFactory));
 
-      MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
+      MaximalPlanar<Integer, Integer> maximalPlanar = new MaximalPlanar<Integer, Integer>();
       maximalPlanar.makeMaximalPlanar(delaunayGraph);
 
       runDelaunayVoronoi(delaunayGraph, delaunayLayout, boundary);
@@ -462,133 +461,133 @@ public class PlanarGraphsTest {
    @Test
    public void testRemoveEdgesWithinBoundary() {
       System.out.println("removeEdgesWithinBoundary");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       for (int i = 0; i < 5; ++i) {
          graph.addVertex(vertexFactory.createVertex());
       }
-      graph.addEdge(vertexFactory.get(0), vertexFactory.get(1));
-      graph.addEdge(vertexFactory.get(1), vertexFactory.get(2), vertexFactory.get(0), null);
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(0), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(1), vertexFactory.get(3), vertexFactory.get(0), null);
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(2), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(4), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(4), vertexFactory.get(2), vertexFactory.get(3), null);
+      graph.addEdge(0, 1);
+      graph.addEdge(1, 2, 0, null);
+      graph.addEdge(2, 0, 1, null);
+      graph.addEdge(1, 3, 0, null);
+      graph.addEdge(3, 2, 1, null);
+      graph.addEdge(3, 4, 1, null);
+      graph.addEdge(4, 2, 3, null);
 
-      List<IdVertex> boundary = new LinkedList<IdVertex>();
-      boundary.add(vertexFactory.get(0));
-      boundary.add(vertexFactory.get(2));
-      boundary.add(vertexFactory.get(4));
-      boundary.add(vertexFactory.get(3));
-      boundary.add(vertexFactory.get(1));
-      EdgeVisitor<UndirectedIdEdge<IdVertex>> removeEdgeVisitor = null;
+      List<Integer> boundary = new LinkedList<Integer>();
+      boundary.add(0);
+      boundary.add(2);
+      boundary.add(4);
+      boundary.add(3);
+      boundary.add(1);
+      EdgeVisitor<Integer> removeEdgeVisitor = null;
       PlanarGraphs.removeEdgesInsideBoundary(graph, boundary, removeEdgeVisitor);
 
-      assertEmbeddingEquals(graph, vertexFactory.get(0), "1,2");
-      assertEmbeddingEquals(graph, vertexFactory.get(1), "3,0");
-      assertEmbeddingEquals(graph, vertexFactory.get(2), "0,4");
-      assertEmbeddingEquals(graph, vertexFactory.get(3), "4,1");
-      assertEmbeddingEquals(graph, vertexFactory.get(4), "2,3");
+      assertEmbeddingEquals(graph, 0, "1,2");
+      assertEmbeddingEquals(graph, 1, "3,0");
+      assertEmbeddingEquals(graph, 2, "0,4");
+      assertEmbeddingEquals(graph, 3, "4,1");
+      assertEmbeddingEquals(graph, 4, "2,3");
       assertEquals(5, graph.edgeSet().size());
    }
 
    @Test
    public void testRemoveEdgesWithinBoundaryCaseTwo() {
       System.out.println("removeEdgesWithinBoundaryCaseTwo");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       for (int i = 0; i < 8; ++i) {
          graph.addVertex(vertexFactory.createVertex());
       }
-      addTriangularFace(graph, vertexFactory.get(0), vertexFactory.get(1), vertexFactory.get(7));
-      addTriangularFace(graph, vertexFactory.get(7), vertexFactory.get(1), vertexFactory.get(6));
-      addTriangularFace(graph, vertexFactory.get(6), vertexFactory.get(1), vertexFactory.get(5));
-      addTriangularFace(graph, vertexFactory.get(5), vertexFactory.get(1), vertexFactory.get(2));
-      addTriangularFace(graph, vertexFactory.get(5), vertexFactory.get(2), vertexFactory.get(4));
-      addTriangularFace(graph, vertexFactory.get(4), vertexFactory.get(2), vertexFactory.get(3));
+      addTriangularFace(graph, 0, 1, 7);
+      addTriangularFace(graph, 7, 1, 6);
+      addTriangularFace(graph, 6, 1, 5);
+      addTriangularFace(graph, 5, 1, 2);
+      addTriangularFace(graph, 5, 2, 4);
+      addTriangularFace(graph, 4, 2, 3);
 
-      List<IdVertex> boundary = new LinkedList<IdVertex>();
+      List<Integer> boundary = new LinkedList<Integer>();
       for (int i = 0; i < 8; ++i) {
-         boundary.add(vertexFactory.get(i));
+         boundary.add(i);
       }
 
-      EdgeVisitor<UndirectedIdEdge<IdVertex>> removeEdgeVisitor = null;
+      EdgeVisitor<Integer> removeEdgeVisitor = null;
       PlanarGraphs.removeEdgesInsideBoundary(graph, boundary, removeEdgeVisitor);
 
-      assertEmbeddingEquals(graph, vertexFactory.get(0), "1,7");
-      assertEmbeddingEquals(graph, vertexFactory.get(1), "2,0");
-      assertEmbeddingEquals(graph, vertexFactory.get(2), "3,1");
-      assertEmbeddingEquals(graph, vertexFactory.get(3), "4,2");
-      assertEmbeddingEquals(graph, vertexFactory.get(4), "5,3");
-      assertEmbeddingEquals(graph, vertexFactory.get(5), "6,4");
-      assertEmbeddingEquals(graph, vertexFactory.get(6), "7,5");
-      assertEmbeddingEquals(graph, vertexFactory.get(7), "0,6");
+      assertEmbeddingEquals(graph, 0, "1,7");
+      assertEmbeddingEquals(graph, 1, "2,0");
+      assertEmbeddingEquals(graph, 2, "3,1");
+      assertEmbeddingEquals(graph, 3, "4,2");
+      assertEmbeddingEquals(graph, 4, "5,3");
+      assertEmbeddingEquals(graph, 5, "6,4");
+      assertEmbeddingEquals(graph, 6, "7,5");
+      assertEmbeddingEquals(graph, 7, "0,6");
       assertEquals(8, graph.edgeSet().size());
    }
 
    @Test
    public void testTriangulateFace() {
       System.out.println("triangulateFace");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
 
       // Open pentagon
       for (int i = 0; i < 5; ++i) {
          graph.addVertex(vertexFactory.createVertex());
       }
-      graph.addEdge(vertexFactory.get(0), vertexFactory.get(1));
-      graph.addEdge(vertexFactory.get(1), vertexFactory.get(2), vertexFactory.get(0), null);
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(3), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(4), vertexFactory.get(2), null);
-      graph.addEdge(vertexFactory.get(4), vertexFactory.get(0), vertexFactory.get(3), null);
+      graph.addEdge(0, 1);
+      graph.addEdge(1, 2, 0, null);
+      graph.addEdge(2, 3, 1, null);
+      graph.addEdge(3, 4, 2, null);
+      graph.addEdge(4, 0, 3, null);
 
-      IdVertex source = vertexFactory.get(0);
-      IdVertex target = vertexFactory.get(1);
-      EdgeVisitor<UndirectedIdEdge<IdVertex>> addEdgeVisitor = null;
+      Integer source = 0;
+      Integer target = 1;
+      EdgeVisitor<Integer> addEdgeVisitor = null;
       PlanarGraphs.triangulateFace(graph, source, target, addEdgeVisitor);
 
       assertEquals(7, graph.edgeSet().size());
-      assertEmbeddingEquals(graph, vertexFactory.get(0), "4,3,2,1");
-      assertEmbeddingEquals(graph, vertexFactory.get(1), "2,0");
-      assertEmbeddingEquals(graph, vertexFactory.get(2), "3,1,0");
-      assertEmbeddingEquals(graph, vertexFactory.get(3), "4,2,0");
-      assertEmbeddingEquals(graph, vertexFactory.get(4), "0,3");
+      assertEmbeddingEquals(graph, 0, "4,3,2,1");
+      assertEmbeddingEquals(graph, 1, "2,0");
+      assertEmbeddingEquals(graph, 2, "3,1,0");
+      assertEmbeddingEquals(graph, 3, "4,2,0");
+      assertEmbeddingEquals(graph, 4, "0,3");
    }
 
    @Test
    public void testTriangulateFaceCaseTwo() {
       System.out.println("triangulateFace");
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
-      IdVertexFactory vertexFactory = new IdVertexFactory();
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
 
       // Open pentagon
       for (int i = 0; i < 6; ++i) {
          graph.addVertex(vertexFactory.createVertex());
       }
-      graph.addEdge(vertexFactory.get(0), vertexFactory.get(1));
-      graph.addEdge(vertexFactory.get(1), vertexFactory.get(2), vertexFactory.get(0), null);
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(3), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(4), vertexFactory.get(2), null);
-      graph.addEdge(vertexFactory.get(4), vertexFactory.get(5), vertexFactory.get(3), null);
-      graph.addEdge(vertexFactory.get(5), vertexFactory.get(0), vertexFactory.get(4), null);
-      graph.addEdge(vertexFactory.get(0), vertexFactory.get(1), vertexFactory.get(5), null);
-      graph.addEdge(vertexFactory.get(0), vertexFactory.get(2), vertexFactory.get(1), null);
+      graph.addEdge(0, 1);
+      graph.addEdge(1, 2, 0, null);
+      graph.addEdge(2, 3, 1, null);
+      graph.addEdge(3, 4, 2, null);
+      graph.addEdge(4, 5, 3, null);
+      graph.addEdge(5, 0, 4, null);
+      graph.addEdge(0, 1, 5, null);
+      graph.addEdge(0, 2, 1, null);
 
-      IdVertex source = vertexFactory.get(0);
-      IdVertex target = vertexFactory.get(1);
-      EdgeVisitor<UndirectedIdEdge<IdVertex>> addEdgeVisitor = null;
+      Integer source = 0;
+      Integer target = 1;
+      EdgeVisitor<Integer> addEdgeVisitor = null;
       PlanarGraphs.triangulateFace(graph, source, target, addEdgeVisitor);
 
-      assertEmbeddingEquals(graph, vertexFactory.get(0), "5,4,3,1,2");
-      assertEmbeddingEquals(graph, vertexFactory.get(1), "0,3,2");
-      assertEmbeddingEquals(graph, vertexFactory.get(2), "0,1,3");
-      assertEmbeddingEquals(graph, vertexFactory.get(3), "2,1,0,4");
-      assertEmbeddingEquals(graph, vertexFactory.get(4), "3,0,5");
-      assertEmbeddingEquals(graph, vertexFactory.get(5), "4,0");
+      assertEmbeddingEquals(graph, 0, "5,4,3,1,2");
+      assertEmbeddingEquals(graph, 1, "0,3,2");
+      assertEmbeddingEquals(graph, 2, "0,1,3");
+      assertEmbeddingEquals(graph, 3, "2,1,0,4");
+      assertEmbeddingEquals(graph, 4, "3,0,5");
+      assertEmbeddingEquals(graph, 5, "4,0");
       assertEquals(10, graph.edgeSet().size());
    }
 
@@ -611,7 +610,7 @@ public class PlanarGraphsTest {
       OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
       JAXBContext context = JAXBContext.newInstance(XmlDcelDocument.class,
               CircleVertex.class,
-              IdVertex.class,
+              Integer.class,
               IdCoordinateVertex.class,
               UndirectedIdEdge.class,
               UndirectedIdEdgeFactory.class,

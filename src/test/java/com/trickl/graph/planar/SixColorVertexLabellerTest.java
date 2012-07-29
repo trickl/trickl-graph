@@ -4,31 +4,17 @@
  */
 package com.trickl.graph.planar;
 
-import com.jgraph.components.labels.MultiLineVertexView;
-import com.trickl.graph.Labeller;
 import com.trickl.graph.edges.IntegerEdgeFactory;
-import com.trickl.graph.ext.FixedAttributeProvider;
 import com.trickl.graph.ext.JComponentWindow;
-import com.trickl.graph.ext.JGraphModelAdapterExt;
-import com.trickl.graph.ext.VertexLabellerAttributeProvider;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
 import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import com.trickl.graph.vertices.IntegerVertexFactory;
-import java.awt.geom.AffineTransform;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.JScrollPane;
 import junit.framework.Assert;
 import org.jgraph.JGraph;
-import org.jgraph.graph.DefaultCellViewFactory;
-import org.jgraph.graph.GraphLayoutCache;
-import org.jgraph.graph.VertexView;
-import org.jgrapht.ext.ComponentAttributeProvider;
-import org.jgrapht.ext.StringNameProvider;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -83,9 +69,11 @@ public class SixColorVertexLabellerTest {
       Assert.assertEquals(1,  labeller.getMembers(2).size());
     
       // Visual Check
-      //JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
    
    @Test
@@ -125,9 +113,11 @@ public class SixColorVertexLabellerTest {
       }
       
       // Visual Check
-      //JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph, 0.5), labeller);
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
    
    @Test
@@ -148,59 +138,10 @@ public class SixColorVertexLabellerTest {
       }
       
       // Visual Check
-      //JGraph jGraph = getDisplayGraph(graph, generator, labeller);
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
-   }
-   
-   private JGraph getDisplayGraph(PlanarGraph<Integer, Integer> graph, PlanarLayout<Integer> layout, Labeller<Integer> labeller)
-           throws InterruptedException, InvocationTargetException {
-      
-      // Visual check     
-      AffineTransform screenProjection = AffineTransform.getTranslateInstance(300, 300);
-      screenProjection.scale(100, -100); // Flip y-axis            
-      
-      Map<String, String> delaunayFixedAttributes = new HashMap<String, String>();
-      delaunayFixedAttributes.put("shape", "circle");
-      delaunayFixedAttributes.put("size", "15,15");     
-      delaunayFixedAttributes.put("color", "#000000");
-      
-      Map<String, String>[] labelAttributes = new Map[6];
-      for (int i = 0; i < 6; ++i) {
-         labelAttributes[i] = new HashMap<String, String>();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
       }
-      
-      // Color vertices according to the label
-      labelAttributes[0].put("fillcolor", "#CC0000");
-      labelAttributes[1].put("fillcolor", "#00CC00");
-      labelAttributes[2].put("fillcolor", "#0000CC");
-      labelAttributes[3].put("fillcolor", "#AAAA00");
-      labelAttributes[4].put("fillcolor", "#00AAAA");
-      labelAttributes[5].put("fillcolor", "#AA00AA");
-      
-      Map<Integer, ComponentAttributeProvider<Integer>> labelAttributeProviders = new HashMap<Integer, ComponentAttributeProvider<Integer>>();
-      for (int i = 0; i < 6; ++i) {
-         labelAttributeProviders.put(i, new FixedAttributeProvider(labelAttributes[i]));
-      }
-      
-      JGraph jGraph = new JGraph(new JGraphModelAdapterExt(graph,
-                         null, //new StringNameProvider(),
-                         null,
-                         new PlanarLayoutPositionProvider(layout, screenProjection, 
-                            new FixedAttributeProvider(delaunayFixedAttributes,
-                              new VertexLabellerAttributeProvider<Integer>(labeller, labelAttributeProviders))),
-                         null));
-      jGraph.setEnabled(false);      
-      jGraph.setMinimumSize(jGraph.getPreferredSize());            
-      GraphLayoutCache delaunayCache = jGraph.getGraphLayoutCache();
-      delaunayCache.setFactory(new DefaultCellViewFactory() {
-         @Override
-         protected VertexView createVertexView(Object v) {
-            return new MultiLineVertexView(v);
-         }   
-      });
-      delaunayCache.reload();
-
-      return jGraph;      
-   }
+   }      
 }

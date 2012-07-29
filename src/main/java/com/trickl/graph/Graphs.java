@@ -96,7 +96,7 @@ public final class Graphs {
          queue.remove(u);
 
          for (E edge : graph.edgesOf(u)) {
-            V v = (u == graph.getEdgeSource(edge)) ? graph.getEdgeTarget(edge) : graph.getEdgeSource(edge);
+            V v = org.jgrapht.Graphs.getOppositeVertex(graph, edge, u);
             double altDistance = distances.get(u) + graph.getEdgeWeight(graph.getEdge(u, v));
             double altWeight = neighbourhoodFunction.evaluate(altDistance);
 

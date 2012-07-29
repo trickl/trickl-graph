@@ -24,15 +24,16 @@ import com.trickl.graph.edges.DirectedEdge;
 import org.jgrapht.Graph;
 
 public interface PlanarGraph<V, E> extends Graph<V, E>, PlanarEmbedding<V, E> {
-   // Usually the after vertex is not necessary and can be determined, however
-   // sometimes it is ambiguous.
+   // To define a unique embedding, when edges are added, the before and
+   // after vertex should be supplied.
    E addEdge(V sourceVertex, V targetVertex, V beforeVertex, V afterVertex);
    boolean addEdge(V sourceVertex, V targetVertex, V beforeVertex, V afterVertex, E e);
 
-   V getNextVertex(V source, V target);
-   V getPrevVertex(V source, V target);
-
+   // Perhaps the boundary accessors are also a requirement of an embedding?
    DirectedEdge<V> getBoundary();
+   
+   // TODO : isBoundary is not strictly necessary (can be calculated from the getBoundary
+   // function. 
    boolean isBoundary(V source, V target);
    void setBoundary(V source, V target);
 }

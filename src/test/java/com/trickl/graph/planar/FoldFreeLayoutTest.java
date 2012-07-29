@@ -24,7 +24,7 @@ import com.trickl.graph.vertices.IdVertex;
 import com.trickl.graph.vertices.IdVertexFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
-import com.trickl.graph.generate.PlanarSquareGraphGenerator;
+import com.trickl.graph.planar.generate.PlanarSquareGraphGenerator;
 import com.vividsolutions.jts.geom.Coordinate;
 import java.lang.reflect.InvocationTargetException;
 import org.junit.Ignore;

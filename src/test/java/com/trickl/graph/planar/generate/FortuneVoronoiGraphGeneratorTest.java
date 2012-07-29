@@ -32,7 +32,6 @@ import com.trickl.graph.planar.faces.IdFaceFactory;
 import com.trickl.graph.planar.xml.XmlDcelDocument;
 import com.trickl.graph.vertices.IdVertex;
 import com.trickl.graph.vertices.IdVertexFactory;
-import com.trickl.graph.vertices.IdVertexNameProvider;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import java.awt.geom.AffineTransform;
@@ -52,6 +51,7 @@ import org.jgraph.graph.DefaultCellViewFactory;
 import org.jgraph.graph.GraphLayoutCache;
 import org.jgraph.graph.VertexView;
 import org.jgrapht.VertexFactory;
+import org.jgrapht.ext.StringNameProvider;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
@@ -95,9 +95,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
    
    @Test
@@ -137,9 +139,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
    
    @Test
@@ -180,9 +184,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -215,9 +221,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -259,9 +267,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -295,9 +305,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }   
    
    @Test
@@ -341,9 +353,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
    
    @Test
@@ -392,67 +406,11 @@ public class FortuneVoronoiGraphGeneratorTest {
       assertTrue(PlanarGraphs.isIsomorphic(voronoiGraph, modelGraph));
       
       // Visual check     
-      //JGraph jGraph = getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
-      //window.showAndWait();
-   }
-   
-   private JGraph getDisplayGraph(PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> voronoiGraph, PlanarLayout<IdVertex> voronoiPlanarLayout,
-                             PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> delaunayGraph, PlanarLayout<IdVertex> delaunayPlanarLayout)
-           throws InterruptedException, InvocationTargetException {
-      
-      // Visual check     
-      AffineTransform screenProjection = AffineTransform.getTranslateInstance(300, 300);
-      screenProjection.scale(100, -100); // Flip y-axis      
-      
-      Map<String, String> voronoiFixedAttributes = new HashMap<String, String>();
-      voronoiFixedAttributes.put("shape", "circle");
-      voronoiFixedAttributes.put("size", "5,5");     
-      voronoiFixedAttributes.put("color", "#000000");
-      voronoiFixedAttributes.put("fillcolor", "#AA0000");
-      
-      JGraph jVoronoiGraph = new JGraph(new JGraphModelAdapterExt(voronoiGraph,
-                         new IdVertexNameProvider(),
-                         null,
-                         new PlanarLayoutPositionProvider(voronoiPlanarLayout, screenProjection, 
-                            new FixedAttributeProvider(voronoiFixedAttributes)),
-                         null));
-      jVoronoiGraph.setEnabled(false);      
-      jVoronoiGraph.setMinimumSize(jVoronoiGraph.getPreferredSize());      
-      GraphLayoutCache voronoiCache = jVoronoiGraph.getGraphLayoutCache();
-      voronoiCache.setFactory(new DefaultCellViewFactory() {
-         @Override
-         protected VertexView createVertexView(Object v) {
-            return new MultiLineVertexView(v);
-         }   
-      });
-      voronoiCache.reload();
-      
-      Map<String, String> delaunayFixedAttributes = new HashMap<String, String>();
-      delaunayFixedAttributes.put("shape", "circle");
-      delaunayFixedAttributes.put("size", "7,7");     
-      delaunayFixedAttributes.put("color", "#000000");
-      delaunayFixedAttributes.put("fillcolor", "#00FF00");
-      
-      JGraph jDelaunayGraph = new JGraph(new JGraphModelAdapterExt(delaunayGraph,
-                         null, //new IdVertexNameProvider(),
-                         null,
-                         new PlanarLayoutPositionProvider(delaunayPlanarLayout, screenProjection, 
-                            new FixedAttributeProvider(delaunayFixedAttributes)),
-                         null));
-      jDelaunayGraph.setEnabled(false);      
-      jDelaunayGraph.setMinimumSize(jDelaunayGraph.getPreferredSize());            
-      GraphLayoutCache delaunayCache = jDelaunayGraph.getGraphLayoutCache();
-      delaunayCache.setFactory(new DefaultCellViewFactory() {
-         @Override
-         protected VertexView createVertexView(Object v) {
-            return new MultiLineVertexView(v);
-         }   
-      });
-      delaunayCache.reload();
-
-      jDelaunayGraph.setBackgroundComponent(jVoronoiGraph);
-      return jDelaunayGraph;      
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiGraphGenerator, siteGraph, new MapPlanarLayout<IdVertex>(siteCoordinates));
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
    
    private PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> readGraph(String fileName)
@@ -468,8 +426,7 @@ public class FortuneVoronoiGraphGeneratorTest {
                  IdFaceFactory.class);
       XmlDcelDocument document = new XmlDcelDocument();
       document.read(controlReader, context);
-      
-      
+            
       return document.getDoublyConnectedEdgeList();      
    } 
    

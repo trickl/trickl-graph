@@ -20,7 +20,7 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.planar.BoyerMyrvoldPlanarity;
+import com.trickl.graph.planar.BoyerMyrvoldPlanarityTest;
 import java.lang.reflect.InvocationTargetException;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.Graph;
@@ -47,7 +47,7 @@ public class BoyerMyrboldPlanarityTest {
       graph.addEdge(3, 4);
       graph.addEdge(4, 2);
 
-      BoyerMyrvoldPlanarity<Integer, DefaultEdge> boyerMyrvoldPlanarity = new BoyerMyrvoldPlanarity<Integer, DefaultEdge>(graph);
+      BoyerMyrvoldPlanarityTest<Integer, DefaultEdge> boyerMyrvoldPlanarity = new BoyerMyrvoldPlanarityTest<Integer, DefaultEdge>(graph);
       assert(boyerMyrvoldPlanarity.isPlanar());
 
       // TODO: Validate the embedding

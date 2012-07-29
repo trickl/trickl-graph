@@ -86,9 +86,11 @@ public class DualGraphFaceLabellerTest {
       Assert.assertEquals(3, labeller.getMembers(1).size());
 
       // Visual Check
-      //JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -127,10 +129,11 @@ public class DualGraphFaceLabellerTest {
          Assert.assertNotSame(leftLabel, rightLabel);
       }
 
-      // Visual Check
-      //JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph, 0.5), labeller);
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    @Test
@@ -151,9 +154,11 @@ public class DualGraphFaceLabellerTest {
       }
 
       // Visual Check
-      //JGraph jGraph = getDisplayGraph(graph, generator, labeller);
-      //JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));
-      //window.showAndWait();
+      if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+        JGraph jGraph = getDisplayGraph(graph, new ChrobakPayneLayout<Integer, Integer>(graph), labeller);
+        JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));              
+        window.showAndWait();
+      }
    }
 
    private JGraph getDisplayGraph(PlanarGraph<Integer, Integer> graph, PlanarLayout<Integer> layout, Labeller<DirectedEdge<Integer>> labeller)

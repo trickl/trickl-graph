@@ -21,11 +21,7 @@
 package com.trickl.graph.vertices;
 
 import java.io.Serializable;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 @XmlType(name="id-vertex")
 @XmlRootElement(name="id-vertex")

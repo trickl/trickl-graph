@@ -24,7 +24,12 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 
-
+/**
+ * A simple edge class that stores both vertices at either ends of the edge
+ * and is equal to any other edge with the source and target.
+ * @author tgee
+ * @param <V> 
+ */
 public class DirectedEdge<V> implements Serializable {
    protected V source;
    protected V target;

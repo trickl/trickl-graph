@@ -20,19 +20,13 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.vertices.IdVertex;
-import com.trickl.graph.vertices.IdVertexFactory;
-import com.trickl.graph.edges.UndirectedIdEdge;
-import com.trickl.graph.edges.UndirectedIdEdgeFactory;
-import com.trickl.graph.planar.DoublyConnectedEdgeList;
-import com.trickl.graph.planar.LeftistPlanarCanonicalOrdering;
-import com.trickl.graph.planar.PlanarCanonicalOrdering;
-import com.trickl.graph.planar.PlanarGraph;
+import com.trickl.graph.edges.IntegerEdgeFactory;
+import com.trickl.graph.vertices.IntegerVertexFactory;
 import java.util.List;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class LeftistPlanarCanonicalOrderingTest {
 
@@ -49,51 +43,51 @@ public class LeftistPlanarCanonicalOrderingTest {
 
    @Test
    public void testPaperExample() {
-      IdVertexFactory vertexFactory = new IdVertexFactory();
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph = new DoublyConnectedEdgeList<IdVertex, UndirectedIdEdge<IdVertex>, Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+      IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
+      PlanarGraph<Integer,Integer> graph = new DoublyConnectedEdgeList<Integer,Integer, Object>(new IntegerEdgeFactory(), Object.class);
 
       for (int i = 0; i < 16; ++i) {
          graph.addVertex(vertexFactory.createVertex());
       }
 
       // From Figure 1b) in the paper.
-      graph.addEdge(vertexFactory.get(1), vertexFactory.get(2));
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(5), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(5), vertexFactory.get(4), vertexFactory.get(2), null);
-      graph.addEdge(vertexFactory.get(4), vertexFactory.get(3), vertexFactory.get(5), null);
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(1), vertexFactory.get(4), null);
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(6), vertexFactory.get(1), null);
-      graph.addEdge(vertexFactory.get(6), vertexFactory.get(1), vertexFactory.get(3), null);
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(13), vertexFactory.get(5), null);
-      graph.addEdge(vertexFactory.get(13), vertexFactory.get(12), vertexFactory.get(2), null);
-      graph.addEdge(vertexFactory.get(12), vertexFactory.get(5), vertexFactory.get(13), null);
-      graph.addEdge(vertexFactory.get(13), vertexFactory.get(11), vertexFactory.get(12), null);
-      graph.addEdge(vertexFactory.get(11), vertexFactory.get(12), vertexFactory.get(13), null);
-      graph.addEdge(vertexFactory.get(11), vertexFactory.get(9), vertexFactory.get(12), null);
-      graph.addEdge(vertexFactory.get(9), vertexFactory.get(8), vertexFactory.get(11), null);
-      graph.addEdge(vertexFactory.get(8), vertexFactory.get(5), vertexFactory.get(9), null);
-      graph.addEdge(vertexFactory.get(8), vertexFactory.get(7), vertexFactory.get(5), null);
-      graph.addEdge(vertexFactory.get(7), vertexFactory.get(4), vertexFactory.get(8), null);
-      graph.addEdge(vertexFactory.get(9), vertexFactory.get(7), vertexFactory.get(8), null);
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(14), vertexFactory.get(13), null);
-      graph.addEdge(vertexFactory.get(14), vertexFactory.get(13), vertexFactory.get(2), null);
-      graph.addEdge(vertexFactory.get(14), vertexFactory.get(10), vertexFactory.get(13), null);
-      graph.addEdge(vertexFactory.get(10), vertexFactory.get(9), vertexFactory.get(14), null);
-      graph.addEdge(vertexFactory.get(10), vertexFactory.get(7), vertexFactory.get(9), null);
-      graph.addEdge(vertexFactory.get(14), vertexFactory.get(15), vertexFactory.get(10), null);
-      graph.addEdge(vertexFactory.get(15), vertexFactory.get(10), vertexFactory.get(14), null);
-      graph.addEdge(vertexFactory.get(15), vertexFactory.get(6), vertexFactory.get(10), null);
-      graph.addEdge(vertexFactory.get(15), vertexFactory.get(1), vertexFactory.get(6), null);
+      graph.addEdge(1, 2);
+      graph.addEdge(2, 5, 1, null);
+      graph.addEdge(5, 4, 2, null);
+      graph.addEdge(4, 3, 5, null);
+      graph.addEdge(3, 1, 4, null);
+      graph.addEdge(3, 6, 1, null);
+      graph.addEdge(6, 1, 3, null);
+      graph.addEdge(2, 13, 5, null);
+      graph.addEdge(13, 12, 2, null);
+      graph.addEdge(12, 5, 13, null);
+      graph.addEdge(13, 11, 12, null);
+      graph.addEdge(11, 12, 13, null);
+      graph.addEdge(11, 9, 12, null);
+      graph.addEdge(9, 8, 11, null);
+      graph.addEdge(8, 5, 9, null);
+      graph.addEdge(8, 7, 5, null);
+      graph.addEdge(7, 4, 8, null);
+      graph.addEdge(9, 7, 8, null);
+      graph.addEdge(2, 14, 13, null);
+      graph.addEdge(14, 13, 2, null);
+      graph.addEdge(14, 10, 13, null);
+      graph.addEdge(10, 9, 14, null);
+      graph.addEdge(10, 7, 9, null);
+      graph.addEdge(14, 15, 10, null);
+      graph.addEdge(15, 10, 14, null);
+      graph.addEdge(15, 6, 10, null);
+      graph.addEdge(15, 1, 6, null);
 
-      PlanarCanonicalOrdering<IdVertex, UndirectedIdEdge<IdVertex>> planarCanonicalOrder = new LeftistPlanarCanonicalOrdering<IdVertex, UndirectedIdEdge<IdVertex>>();
+      PlanarCanonicalOrdering<Integer,Integer> planarCanonicalOrder = new LeftistPlanarCanonicalOrdering<Integer,Integer>();
 
-      List<IdVertex> ordering = planarCanonicalOrder.getOrder(graph, vertexFactory.get(1));
+      List<Integer> ordering = planarCanonicalOrder.getOrder(graph, 1);
 
       assertList(ordering, "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
    }
 
-   static private void assertList(List<IdVertex> list, String str) {
-      StringBuffer idString = new StringBuffer();
+   static private void assertList(List<Integer> list, String str) {
+      StringBuilder idString = new StringBuilder();
       for (int i = 0; i < list.size(); ++i) {
          if (i > 0) {
             idString.append(',');

@@ -26,7 +26,7 @@ import com.trickl.graph.edges.DirectedEdge;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlanarCopyGraphVisitor<V1, E1, V2, E2> implements PlanarFaceTraversalVisitor<V1, E1> {
+public class PlanarCopyGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversalVisitor<V1, E1> {
 
    protected PlanarGraph<V1, E1> inputGraph;
    protected PlanarGraph<V2, E2> outputGraph;
@@ -57,10 +57,6 @@ public class PlanarCopyGraphVisitor<V1, E1, V2, E2> implements PlanarFaceTravers
       this.edgeFactory = edgeFactory;
       this.vertexMap = new HashMap<V1, V2>();
       this.aggregationVertices= new HashMap<Integer, V2>();
-   }
-
-   @Override
-   public void beginFace(V1 source, V1 target) {
    }
 
    @Override
@@ -109,10 +105,6 @@ public class PlanarCopyGraphVisitor<V1, E1, V2, E2> implements PlanarFaceTravers
    }
 
    @Override
-   public void beginTraversal() {
-   }
-
-   @Override
    public void nextVertex(V1 inputVertex) {
       if (!vertexMap.containsKey(inputVertex)) {
          V2 outputVertex = null;
@@ -145,19 +137,18 @@ public class PlanarCopyGraphVisitor<V1, E1, V2, E2> implements PlanarFaceTravers
    }
 
    @Override
-   public void endFace(V1 source, V1 target) {
-   }
-
-   @Override
    public void endTraversal() {
       // Depending on the face traversal method, it cannot be guaranteed
       // that the boundary face was maintained after the edge copying
       // so we set it here.
       DirectedEdge<V1> inputBoundary = inputGraph.getBoundary();
-      V2 outputBoundarySource = vertexMap.get(inputBoundary.getSource());
-      V2 outputBoundaryTarget = vertexMap.get(inputBoundary.getTarget());
-      if (outputGraph.containsEdge(outputBoundarySource, outputBoundaryTarget)) {
-         outputGraph.setBoundary(outputBoundarySource, outputBoundaryTarget);
+      // Need to test for null as inputGraph could have zero vertices.
+      if (inputBoundary != null) {
+         V2 outputBoundarySource = vertexMap.get(inputBoundary.getSource());
+         V2 outputBoundaryTarget = vertexMap.get(inputBoundary.getTarget());
+         if (outputGraph.containsEdge(outputBoundarySource, outputBoundaryTarget)) {
+            outputGraph.setBoundary(outputBoundarySource, outputBoundaryTarget);
+         }
       }
    }
 

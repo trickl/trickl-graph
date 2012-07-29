@@ -20,21 +20,28 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.edges.DirectedEdge;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Coordinate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * A planar graph that associates a face class instance to every logical
- * face.
+ *
  * @author tgee
- * @param <V> Vertex type
- * @param <E> Edge type
- * @param <F> Face type
  */
-public interface PlanarFaceGraph <V, E, F> extends PlanarGraph<V, E> {
-   public Set<F> faceSet();
-   public F getFace(V source, V target);
-   public FaceFactory<V, F> getFaceFactory();
-   public DirectedEdge<V> getAdjacentEdge(F face);
-   public boolean replaceFace(F oldFace, F newFace);
+public class MapPlanarLayout<V> implements PlanarLayout<V> {
+   
+   final private Map<V, Coordinate> vertexCoordinateMap;
+   
+   public MapPlanarLayout() {
+      this(new HashMap<V, Coordinate>());
+   }
+   
+   public MapPlanarLayout(Map<V, Coordinate> vertexCoordinateMap) {
+      this.vertexCoordinateMap = vertexCoordinateMap;
+   }
+
+   @Override
+   public Coordinate getCoordinate(V vertex) {
+      return vertexCoordinateMap.get(vertex);
+   }   
 }
