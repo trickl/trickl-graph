@@ -16,7 +16,7 @@
     </license>
   </licenses>
   <properties>
-    <jgrapht.version>0.8.2</jgrapht.version>
+    <jgrapht.version>0.9.0</jgrapht.version>
     <jts.version>1.11</jts.version>
     <commons.math.version>1.2</commons.math.version>
     <jaxb-impl.version>2.2.1</jaxb-impl.version>
@@ -128,7 +128,12 @@
     </dependency>
     <dependency>
       <groupId>org.jgrapht</groupId>
-      <artifactId>jgrapht-jdk1.6</artifactId>
+      <artifactId>jgrapht-core</artifactId>
+      <version>${jgrapht.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jgrapht</groupId>
+      <artifactId>jgrapht-ext</artifactId>
       <version>${jgrapht.version}</version>
     </dependency>
     <dependency>
