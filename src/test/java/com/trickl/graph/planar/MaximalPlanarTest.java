@@ -28,6 +28,7 @@ import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import static com.trickl.graph.planar.PlanarAssert.*;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
+import com.vividsolutions.jts.util.Assert;
 
 import java.lang.reflect.InvocationTargetException;
 import javax.xml.bind.JAXBException;
@@ -58,7 +59,10 @@ public class MaximalPlanarTest {
       graph.addEdge(vertexFactory.get(4), vertexFactory.get(2), vertexFactory.get(3), vertexFactory.get(3));
 
       MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
+      
+      Assert.isTrue(!maximalPlanar.isMaximalPlanar(graph), "Graph is already maximal planar.");
       maximalPlanar.makeMaximalPlanar(graph);
+      Assert.isTrue(maximalPlanar.isMaximalPlanar(graph), "Graph did not become maximal planar");      
       
       assertEmbeddingEquals(graph, vertexFactory.get(0), "4,2,1,3");
       assertEmbeddingEquals(graph, vertexFactory.get(3), "4,0,1,2");
@@ -74,10 +78,13 @@ public class MaximalPlanarTest {
 
       PlanarCircleGraphGenerator generator = new PlanarCircleGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(vertices, 100);
       generator.generateGraph(graph, vertexFactory, null);
-
-      MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
-      maximalPlanar.makeMaximalPlanar(graph);
       
-      assertEmbeddingEquals(graph, vertexFactory.get(2), "1,0,3,5");
+      MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
+      
+      Assert.isTrue(!maximalPlanar.isMaximalPlanar(graph), "Graph is already maximal planar.");
+      maximalPlanar.makeMaximalPlanar(graph);
+      Assert.isTrue(maximalPlanar.isMaximalPlanar(graph), "Graph did not become maximal planar");
+      
+      assertEmbeddingEquals(graph, vertexFactory.get(2), "1,0,3,4,5,6");
    }
 }
