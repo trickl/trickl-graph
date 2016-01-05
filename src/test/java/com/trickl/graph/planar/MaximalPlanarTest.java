@@ -29,8 +29,16 @@ import com.trickl.graph.vertices.IdVertex;
 import com.trickl.graph.vertices.IdVertexFactory;
 import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import static com.trickl.graph.planar.PlanarAssert.*;
+import com.trickl.graph.planar.faces.IdFace;
+import com.trickl.graph.planar.faces.IdFaceFactory;
+import com.trickl.graph.planar.xml.XmlDcelDocument;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import java.lang.reflect.InvocationTargetException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
 
@@ -40,24 +48,44 @@ public class MaximalPlanarTest {
    }
 
    @Test   
-   public void testMinimal() throws InterruptedException, InvocationTargetException {
+   public void testMinimal() throws InterruptedException, InvocationTargetException, JAXBException {
       IdVertexFactory vertexFactory = new IdVertexFactory();
-      PlanarGraph<IdVertex, UndirectedIdEdge<IdVertex>> graph
+      DoublyConnectedEdgeList<IdVertex,
+              UndirectedIdEdge<IdVertex>,
+              IdFace> graph
               = new DoublyConnectedEdgeList<IdVertex,
               UndirectedIdEdge<IdVertex>,
-              Object>(new UndirectedIdEdgeFactory<IdVertex>(), Object.class);
+              IdFace>(new UndirectedIdEdgeFactory<IdVertex>(), new IdFaceFactory());
       for (int i = 0; i < 5; ++i) graph.addVertex(vertexFactory.createVertex());
       graph.addEdge(vertexFactory.get(0), vertexFactory.get(1));
       graph.addEdge(vertexFactory.get(1), vertexFactory.get(2));
-      graph.addEdge(vertexFactory.get(2), vertexFactory.get(0));
+      graph.addEdge(vertexFactory.get(2), vertexFactory.get(0), vertexFactory.get(1), vertexFactory.get(1));
       graph.addEdge(vertexFactory.get(1), vertexFactory.get(3));
-      graph.addEdge(vertexFactory.get(3), vertexFactory.get(2));
+      graph.addEdge(vertexFactory.get(3), vertexFactory.get(2), vertexFactory.get(1), vertexFactory.get(1));
       graph.addEdge(vertexFactory.get(3), vertexFactory.get(4));
-      graph.addEdge(vertexFactory.get(4), vertexFactory.get(2));
+      graph.addEdge(vertexFactory.get(4), vertexFactory.get(2), vertexFactory.get(3), vertexFactory.get(3));
 
   
+      Writer writer = new PrintWriter(System.out);
+      JAXBContext context = JAXBContext.newInstance(XmlDcelDocument.class,
+                                                    IdVertex.class,
+                                                    UndirectedIdEdge.class,
+                                                    UndirectedIdEdgeFactory.class,
+                                                    IdFace.class,
+                                                    IdFaceFactory.class);
+      
+      XmlDcelDocument<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>
+              beforeDocument = new XmlDcelDocument<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>();
+      beforeDocument.setDoublyConnectedEdgeList(graph);      
+      beforeDocument.write(writer, context);      
+      
       MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>> maximalPlanar = new MaximalPlanar<IdVertex, UndirectedIdEdge<IdVertex>>();
       maximalPlanar.makeMaximalPlanar(graph);
+      
+      XmlDcelDocument<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>
+              afterDocument = new XmlDcelDocument<IdVertex, UndirectedIdEdge<IdVertex>, IdFace>();
+      afterDocument.setDoublyConnectedEdgeList(graph);      
+      afterDocument.write(writer, context);    
       
       assertEmbeddingEquals(graph, vertexFactory.get(0), "4,2,1,3");
       assertEmbeddingEquals(graph, vertexFactory.get(3), "4,0,1,2");
