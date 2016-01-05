@@ -91,7 +91,7 @@ public class PlanarCanonicalOrderTest {
       
       List<Integer> ordering = planarCanonicalOrder.getOrder(graph, graph.getBoundary().getSource());
 
-      assertList(ordering, "1,2,3,6,5,4,0");
+      assertList(ordering, "6,1,2,5,4,3,0");
    }
 
    @Test
