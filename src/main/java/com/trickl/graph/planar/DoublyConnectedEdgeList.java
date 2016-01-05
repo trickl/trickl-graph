@@ -65,9 +65,9 @@ public class DoublyConnectedEdgeList<V, E, F>
    public DoublyConnectedEdgeList(EdgeFactory<V, E> edgeFactory, FaceFactory<V, F> faceFactory) {
       this.edgeFactory = edgeFactory;
       this.faceFactory = faceFactory;
-      edgeMap = new HashMap<E, DcelHalfEdge<V, E, F>>();
-      vertexMap = new HashMap<V, DcelVertex<V, E, F>>();
-      faceMap = new HashMap<F, DcelFace<V, E, F>>();
+      edgeMap = new LinkedHashMap<E, DcelHalfEdge<V, E, F>>();
+      vertexMap = new LinkedHashMap<V, DcelVertex<V, E, F>>();
+      faceMap = new LinkedHashMap<F, DcelFace<V, E, F>>();
 
       if (faceFactory != null) {
          boundaryFace = faceFactory.createFace(null, null, true);
