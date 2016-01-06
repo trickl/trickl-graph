@@ -93,10 +93,10 @@ public class PlanarGraphsTest {
       Map<Integer, Integer> vertexMap = PlanarGraphs.aggregate(graph, subgraph, aggregationGroups);
 
       assertEquals(10, subgraph.vertexSet().size());
-      assertEmbeddingEquals(subgraph, vertexMap.get(0), "7,6,4,3");
-      assertEmbeddingEquals(subgraph, vertexMap.get(4), "6,17,16,9,3,0");
-      assertEmbeddingEquals(subgraph, vertexMap.get(6), "7,18,17,4,0");
-      assertEmbeddingEquals(subgraph, vertexMap.get(8), "7,3,9");
+      assertEmbeddingEquals(subgraph, vertexMap.get(0), "7,6,5,2");
+      assertEmbeddingEquals(subgraph, vertexMap.get(4), "6,11,10,15,2,1");
+      assertEmbeddingEquals(subgraph, vertexMap.get(6), "7,18,11,5,1");
+      assertEmbeddingEquals(subgraph, vertexMap.get(8), "7,2,15");
    }
 
    @Test

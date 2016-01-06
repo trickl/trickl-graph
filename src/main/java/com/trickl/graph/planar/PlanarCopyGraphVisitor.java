@@ -69,21 +69,58 @@ public class PlanarCopyGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTr
       V2 outputBefore = null;
       V2 outputAfter = null;
       if (!outputSource.equals(outputTarget))
-      {
-         for (V1 vertex : PlanarGraphs.getConnectedVertices(inputGraph, inputSource, inputGraph.getPrevVertex(inputSource, inputTarget), inputTarget)) {
-            V2 outputVertex = vertexMap.get(vertex);
-            if (outputVertex != null && outputGraph.containsEdge(outputVertex, outputSource)) {
-               // First encountered so break on success
-               outputBefore = outputVertex;
-               break;
+      {  
+         V1 currentSource = inputSource;      
+         V1 currentTarget = inputGraph.getPrevVertex(inputSource, inputTarget);                           
+         
+         while (!currentTarget.equals(inputTarget) || !currentSource.equals(inputSource)) {
+             
+            Integer aggregationGroup = aggregationGroups == null ? null :
+                    aggregationGroups.get(currentTarget);           
+            V2 outputVertex = aggregationGroup == null ? vertexMap.get(currentTarget) : 
+                    aggregationVertices.get(aggregationGroup);  
+            
+            if (outputVertex == outputSource) {    
+                currentSource = inputGraph.getPrevVertex(currentTarget, currentSource);   
+                
+                // Swap source and target
+                V1 temp = currentTarget;
+                currentTarget = currentSource;
+                currentSource = temp;
+            }
+            else if (outputVertex == outputTarget || !outputGraph.containsEdge(outputVertex, outputSource)) {                
+                currentTarget = inputGraph.getPrevVertex(currentSource, currentTarget);  
+            }
+            else {
+                outputBefore = outputVertex;
+                break;
             }
          }
-
-         for (V1 vertex : PlanarGraphs.getConnectedVertices(inputGraph, inputTarget, inputSource)) {
-            V2 outputVertex = vertexMap.get(vertex);
-            if (outputVertex != null && outputGraph.containsEdge(outputTarget, outputVertex)) {
-               // Last encountered, so overwrite on success
-               outputAfter = outputVertex;
+                   
+         currentTarget = inputTarget;
+         currentSource = inputGraph.getNextVertex(inputSource, inputTarget);                           
+         
+         while (!currentTarget.equals(inputTarget) || !currentSource.equals(inputSource)) {
+             
+            Integer aggregationGroup = aggregationGroups == null ? null :
+                    aggregationGroups.get(currentSource);           
+            V2 outputVertex = aggregationGroup == null ? vertexMap.get(currentSource) : 
+                    aggregationVertices.get(aggregationGroup);  
+            
+            if (outputVertex == outputTarget) {    
+                currentTarget = inputGraph.getNextVertex(currentTarget, currentSource);   
+                
+                // Swap source and target
+                V1 temp = currentTarget;
+                currentTarget = currentSource;
+                currentSource = temp;
+            }
+            else if (outputVertex == outputSource || !outputGraph.containsEdge(outputTarget, outputVertex)) {                
+                currentSource = inputGraph.getNextVertex(currentSource, currentTarget);  
+            }
+            else {
+                outputAfter = outputVertex;
+                break;
             }
          }
       }
