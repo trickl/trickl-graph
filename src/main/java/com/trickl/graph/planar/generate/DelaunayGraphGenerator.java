@@ -31,6 +31,7 @@ import com.trickl.random.Shuffler;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineSegment;
 import java.util.*;
 import org.jgrapht.VertexFactory;
 
@@ -179,35 +180,46 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       }
 
       // Loop until p is left of every edge in the triangle
-      while (true) {
+      int iterations = 0;
+      while (true) {        
+         if (iterations++ > 3) {
+             // Should not happen, if it does the boundary conditions and tolerances may be inconsistent.
+             throw new RuntimeException("Search overflow, geometric conditions not met.");
+         }
          V first = face.getSource();
          V second = face.getTarget();
          V third = graph.getNextVertex(face.getSource(), face.getTarget());
 
-         if (p.equals(first)
-                 || p.equals(second)
-                 || p.equals(third)) {
-            break;
-         } else if (isLeftOf(first, second, p)) {
+         if (!isLeftOf(first, second, p)) {
             face = new DirectedEdge<V>(second, first);
-         } else if (isLeftOf(second, third, p)) {
+         } else if (!isLeftOf(second, third, p)) {
             face = new DirectedEdge<V>(third, second);
-         } else if (isLeftOf(third, first, p)) {
+         } else if (!isLeftOf(third, first, p)) {
             face = new DirectedEdge<V>(first, third);
          } else {
             break;
-         }
+         }         
       }
 
       lastSearchFace = face;
 
       return face;
    }
-
+   
    private boolean isLeftOf(V source, V target, Coordinate p) {
       Coordinate a = vertexToCoordinate.get(source);
       Coordinate b = vertexToCoordinate.get(target);
-      return Angle.getTurn(Angle.angle(a, b), Angle.angle(b, p)) == Angle.CLOCKWISE;
+      
+      LineSegment line = new LineSegment(a, b);
+      return line.orientationIndex(p) == 1;
+   }
+
+   private boolean isRightOf(V source, V target, Coordinate p) {
+      Coordinate a = vertexToCoordinate.get(source);
+      Coordinate b = vertexToCoordinate.get(target);
+      
+      LineSegment line = new LineSegment(b, a);
+      return line.orientationIndex(p) == 1;
    }
 
    private void insertVertexInsideFace(PlanarGraph<V, E> graph, DirectedEdge<V> face, V vertex) {
@@ -248,11 +260,11 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       // Treat the boundary as if infinitely far away
       Coordinate p = vertexToCoordinate.get(fourth);
       if (PlanarGraphs.isVertexBoundary(graph, first)) {
-         return isLeftOf(third, second, p);
+         return isRightOf(third, second, p);
       } else if (PlanarGraphs.isVertexBoundary(graph, second)) {
-         return isLeftOf(first, third, p);
+         return isRightOf(first, third, p);
       } else if (PlanarGraphs.isVertexBoundary(graph, third)) {
-         return isLeftOf(second, first, p);
+         return isRightOf(second, first, p);
       } else if (PlanarGraphs.isVertexBoundary(graph, fourth)) {
          return false;
       }
