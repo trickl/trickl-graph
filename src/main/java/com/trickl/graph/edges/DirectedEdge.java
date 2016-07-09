@@ -20,6 +20,7 @@
  */
 package com.trickl.graph.edges;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -41,6 +42,11 @@ public class DirectedEdge<V> implements Serializable {
    public DirectedEdge(V source, V target) {
       this.source = source;
       this.target = target;
+   }
+   
+   @Transient
+   public DirectedEdge<V> getTwin() {
+       return new DirectedEdge<>(target, source);
    }
 
    @XmlIDREF
