@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import org.jgrapht.EdgeFactory;
@@ -40,30 +40,27 @@ public class MaximalPlanar<V, E> {
          int degreeSize;
       }
             
-      private Map<V, Detail<V>> vertexDetails;      
-      private LinkedList<V> verticesOnFace;
+      private final Map<V, Detail<V>> vertexDetails;      
+      private final LinkedList<V> verticesOnFace;
       private int timestamp = 0;
-      private EdgeFactory<V, E> edgeFactory;
-      private PlanarGraph<V, E> graph;
-      private boolean addEdges;
-      private boolean checkInteriorOnly;
-      private Set<UndirectedEdge<V>> missingEdges;
+      private final PlanarGraph<V, E> graph;
+      private final boolean addEdges;
+      private final boolean checkInteriorOnly;
+      private final Set<E> missingEdges;
 
-      TriangulationVisitor(PlanarGraph<V, E> graph, EdgeFactory<V, E> edgeFactory, boolean addEdges, boolean checkInteriorOnly) {
+      TriangulationVisitor(PlanarGraph<V, E> graph, boolean addEdges, boolean checkInteriorOnly) {
          this.graph = graph;
-         this.edgeFactory = edgeFactory;
          this.addEdges = addEdges;
          this.checkInteriorOnly = checkInteriorOnly;
-         this.vertexDetails = new Hashtable<V, Detail<V>>();
-         this.verticesOnFace = new LinkedList<V>();
-         this.missingEdges = new HashSet<UndirectedEdge<V>>();
+         this.vertexDetails = new HashMap<>();
+         this.verticesOnFace = new LinkedList<>();
+         this.missingEdges = new HashSet<>();
 
-         for (V vertex : graph.vertexSet())
-         {
-            Detail<V> detail = new Detail<V>();
-            detail.degreeSize = graph.edgesOf(vertex).size();
-            vertexDetails.put(vertex, detail);
-         }
+         graph.vertexSet().stream().forEach((vertex) -> {
+             Detail<V> detail = new Detail<>();
+             detail.degreeSize = graph.edgesOf(vertex).size();
+             vertexDetails.put(vertex, detail);
+          });
       }
 
       @Override
@@ -157,19 +154,18 @@ public class MaximalPlanar<V, E> {
       public void endTraversal() {
       }
 
-
-      public Set<UndirectedEdge<V>> getMissingEdges() {
+      public Set<E> getMissingEdges() {
          return missingEdges;
       }
 
       private void addEdgeRange(V source, V before, List<V> targets) {                           
          for (V target : targets) {
-             if (addEdges) {
-               E edge = edgeFactory.createEdge(source, target);
+             E edge = graph.getEdgeFactory().createEdge(source, target);
+             if (addEdges) {               
                graph.addEdge(source, target, before, null, edge);
              }
              
-             missingEdges.add(new UndirectedEdge<V>(source, target));
+             missingEdges.add(edge);
              vertexDetails.get(source).degreeSize++;
              vertexDetails.get(target).degreeSize++;
          }
@@ -179,12 +175,12 @@ public class MaximalPlanar<V, E> {
    public MaximalPlanar() {            
    }
 
-   public Set<UndirectedEdge<V>>  getMaximalPlanarEdgeDeficit(PlanarGraph<V, E> graph) {
-      return traverse(graph, graph.getEdgeFactory(), false, false);
+   public Set<E>  getMaximalPlanarEdgeDeficit(PlanarGraph<V, E> graph) {
+      return traverse(graph, false, false);
    }
 
-   public Set<UndirectedEdge<V>> getInteriorTriangulatedEdgeDeficit(PlanarGraph<V, E> graph) {
-      return traverse(graph, graph.getEdgeFactory(), false, true);
+   public Set<E> getInteriorTriangulatedEdgeDeficit(PlanarGraph<V, E> graph) {
+      return traverse(graph, false, true);
    }
 
 
@@ -196,17 +192,13 @@ public class MaximalPlanar<V, E> {
       return getInteriorTriangulatedEdgeDeficit(graph).isEmpty();
    }
 
-   public Set<UndirectedEdge<V>> makeMaximalPlanar(PlanarGraph<V, E> graph) {
-      return makeMaximalPlanar(graph, graph.getEdgeFactory());
+   public Set<E> makeMaximalPlanar(PlanarGraph<V, E> graph) {
+      return traverse(graph, true, false);
    }
 
-   public Set<UndirectedEdge<V>> makeMaximalPlanar(PlanarGraph<V, E> graph, EdgeFactory<V, E> edgeFactory) {
-      return traverse(graph, edgeFactory, true, false);
-   }
-
-   private Set<UndirectedEdge<V>> traverse(PlanarGraph<V, E> graph, EdgeFactory<V, E> edgeFactory, boolean addEdges, boolean checkInteriorOnly) {
-      BreadthFirstPlanarFaceTraversal<V, E> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<V, E>(graph);
-      TriangulationVisitor<V, E> triangulationVisitor = new TriangulationVisitor(graph, edgeFactory, addEdges, checkInteriorOnly);
+   private Set<E> traverse(PlanarGraph<V, E> graph, boolean addEdges, boolean checkInteriorOnly) {
+      BreadthFirstPlanarFaceTraversal<V, E> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<>(graph);
+      TriangulationVisitor<V, E> triangulationVisitor = new TriangulationVisitor(graph, addEdges, checkInteriorOnly);
       planarFaceTraversal.traverse(triangulationVisitor);
       return triangulationVisitor.getMissingEdges();
    }
