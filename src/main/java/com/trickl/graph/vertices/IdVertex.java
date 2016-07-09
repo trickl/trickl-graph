@@ -21,6 +21,7 @@
 package com.trickl.graph.vertices;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.xml.bind.annotation.*;
 
 @XmlType(name="id-vertex")
@@ -67,25 +68,25 @@ public class IdVertex implements Serializable {
       return Integer.toString(id);
    }
 
-   @Override
-   public int hashCode() {
-      int hash = 5;
-      hash = 83 * hash + (this.id != null ? this.id.hashCode() : 0);
-      return hash;
-   }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
 
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-      if (getClass() != obj.getClass()) {
-         return false;
-      }
-      final IdVertex other = (IdVertex) obj;
-      if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
-         return false;
-      }
-      return true;
-   }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final IdVertex other = (IdVertex) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }   
 }
