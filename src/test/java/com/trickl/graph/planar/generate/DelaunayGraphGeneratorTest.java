@@ -127,8 +127,7 @@ public class DelaunayGraphGeneratorTest {
    @Test
    public void worksForExistingGraphWithPlanarLayout() throws Exception {
 
-      PlanarGraph<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>> graph = new DoublyConnectedEdgeList<IdCoordinateVertex,
-              UndirectedIdEdge<IdCoordinateVertex>, Object>(new UndirectedIdEdgeFactory<IdCoordinateVertex>(), Object.class);
+      PlanarGraph<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>> baseGraph = new DoublyConnectedEdgeList<>(new UndirectedIdEdgeFactory<IdCoordinateVertex>(), Object.class);
 
       IdCoordinateVertexFactory vertexFactory = new IdCoordinateVertexFactory();
       IdCoordinateVertex A = vertexFactory.createVertex();
@@ -139,21 +138,18 @@ public class DelaunayGraphGeneratorTest {
       B.setCoordinate(new Coordinate(0, 0));
       C.setCoordinate(new Coordinate(1, 0));
       D.setCoordinate(new Coordinate(0.6, 0.6));
-      graph.addVertex(A);
-      graph.addVertex(B);
-      graph.addVertex(C);
-      graph.addVertex(D);
+      baseGraph.addVertex(A);
+      baseGraph.addVertex(B);
+      baseGraph.addVertex(C);
+      baseGraph.addVertex(D);
 
-      PlanarLayout<IdCoordinateVertex> layout = new PlanarLayout<IdCoordinateVertex>() {
-
-         @Override
-         public Coordinate getCoordinate(IdCoordinateVertex vertex) {
-            return vertex.getCoordinate();
-         }
-      };
-
+      PlanarLayout<IdCoordinateVertex> layout = (IdCoordinateVertex vertex) -> vertex.getCoordinate();
+      
       DelaunayGraphGenerator<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>> generator
-              = new DelaunayGraphGenerator<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>>(graph.vertexSet(), layout);
+              = new DelaunayGraphGenerator<>(baseGraph.vertexSet(), layout);
+      
+      
+      PlanarGraph<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>> graph = new DoublyConnectedEdgeList<>(new UndirectedIdEdgeFactory<>(), Object.class);
       generator.setRandomEngine(new MersenneTwister(12345));
       generator.generateGraph(graph, vertexFactory, null);
 
