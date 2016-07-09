@@ -73,6 +73,10 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
    @Override
    public void generateGraph(PlanarGraph<V, E> graph, VertexFactory<V> vertexFactory,
            java.util.Map<java.lang.String, V> resultMap) {
+      if (!graph.vertexSet().isEmpty()) {
+          throw new IllegalArgumentException("Must supply an empty graph");
+      }
+       
       if (coordinateToVertex.isEmpty()) {
          return;
       }
@@ -143,8 +147,16 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
    }
 
    private void addSite(PlanarGraph<V, E> graph, Coordinate p, V vertex) {
+      
+      // More efficient to set the start edge to the last found edge, effectively randomizing it
+      DirectedEdge<V> start = lastSearchFace;
+      if (start == null) {
+         start = graph.getBoundary().getTwin();
+      } 
+       
       // Locate the edge that this site is next to
-      DirectedEdge<V> face = locate(graph, p);
+      DirectedEdge<V> face = locateInsideBoundary(graph, p, start);      
+      lastSearchFace = face;
 
       V first = face.getSource();
       V second = face.getTarget();
@@ -170,61 +182,97 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       enforceDelaunayCondition(graph, third, first);
    }
 
-   private DirectedEdge<V> locate(PlanarGraph<V, E> graph, Coordinate p) {
-      // More efficient to set the start edge to the last found edge, effectively randomizing it
-      DirectedEdge<V> face = lastSearchFace;
-      if (face == null) {
-         E edge = graph.edgeSet().iterator().next();
-         face = new DirectedEdge<V>(graph.getEdgeSource(edge),
-                 graph.getEdgeTarget(edge));
+   // See https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-728.pdf
+   private DirectedEdge<V> locateInsideBoundary(PlanarGraph<V, E> graph, Coordinate x, DirectedEdge<V> start) {
+      // Validate that the supplied point is inside the boundary, otherwise we may not terminate
+      for (E boundaryEdge : PlanarGraphs.getBoundaryEdges(graph)) {
+          if (isRightOf(x, new DirectedEdge(graph.getEdgeSource(boundaryEdge), graph.getEdgeTarget(boundaryEdge)))) {
+             throw new IllegalArgumentException("Search Coordinate must be inside or on boundary.");
+          }
       }
-
+       
       // Loop until p is left of every edge in the triangle
       int iterations = 0;
+      int maxIterations = graph.edgeSet().size();
+      DirectedEdge<V> edge = start;
+            
+      if (isRightOf(x, edge)) {
+         edge = edge.getTwin();
+      } 
+      
       while (true) {        
-         if (iterations++ > 3) {
+         if (iterations++ > maxIterations) {
              // Should not happen, if it does the boundary conditions and tolerances may be inconsistent.
-             throw new RuntimeException("Search overflow, geometric conditions not met.");
+             //throw new RuntimeException("Search overflow, geometric conditions not met.");
+             System.out.println("BADNESS");
          }
-         V first = face.getSource();
-         V second = face.getTarget();
-         V third = graph.getNextVertex(face.getSource(), face.getTarget());
-
-         if (!isLeftOf(first, second, p)) {
-            face = new DirectedEdge<V>(second, first);
-         } else if (!isLeftOf(second, third, p)) {
-            face = new DirectedEdge<V>(third, second);
-         } else if (!isLeftOf(third, first, p)) {
-            face = new DirectedEdge<V>(first, third);
-         } else {
+         
+         V origVertex = edge.getSource();
+         V destVertex = edge.getTarget();
+         Coordinate origCoord = vertexToCoordinate.get(origVertex);
+         Coordinate destCoord = vertexToCoordinate.get(destVertex);
+         
+               
+         
+         // Keep p to the left of our edge walk
+         if (x.equals2D(origCoord) || x.equals2D(destCoord)) {
             break;
-         }         
+         }
+         else {
+             int whichOp = 0;
+             
+             V nextVertex = graph.getPrevVertex(origVertex, destVertex);
+            DirectedEdge<V> next = new DirectedEdge<>(origVertex, nextVertex);
+            if (!isRightOf(x, next)) {
+              whichOp += 1;
+            }
+            
+            DirectedEdge<V> prev = new DirectedEdge<>(nextVertex, destVertex);
+            if (!isRightOf(x, prev)) {
+                whichOp += 2;
+            }
+            
+            if (whichOp == 0) break;
+            else if (whichOp == 1) edge = next;
+            else if (whichOp == 2) edge = prev;
+            else {
+                if (distance(x, next) < distance(x, prev)) {
+                    edge = next;
+                }
+                else {
+                    edge = prev;
+                }
+            }             
+         }
       }
 
-      lastSearchFace = face;
-
-      return face;
+      return edge;
    }
    
-   private boolean isLeftOf(V source, V target, Coordinate p) {
-      Coordinate a = vertexToCoordinate.get(source);
-      Coordinate b = vertexToCoordinate.get(target);
+   private boolean isRightOf(Coordinate x, DirectedEdge<V> edge) {
+      Coordinate source = vertexToCoordinate.get(edge.getSource());
+      Coordinate target = vertexToCoordinate.get(edge.getTarget());
       
-      LineSegment line = new LineSegment(a, b);
-      return line.orientationIndex(p) == 1;
+      // Note we flip source and target as orientationIndex == 1, when isLeftOf(...) is true.
+      LineSegment line = new LineSegment(target, source);
+      return line.orientationIndex(x) == 1;
+   }
+   
+   private double distance(Coordinate x, DirectedEdge<V> edge) {       
+      Coordinate source = vertexToCoordinate.get(edge.getSource());
+      Coordinate target = vertexToCoordinate.get(edge.getTarget());
+      
+      LineSegment line = new LineSegment(source, target);
+      return line.distance(x);
    }
 
-   private boolean isRightOf(V source, V target, Coordinate p) {
-      Coordinate a = vertexToCoordinate.get(source);
-      Coordinate b = vertexToCoordinate.get(target);
-      
-      LineSegment line = new LineSegment(b, a);
-      return line.orientationIndex(p) == 1;
-   }
-
-   private void insertVertexInsideFace(PlanarGraph<V, E> graph, DirectedEdge<V> face, V vertex) {
+   private void insertVertexInsideFace(PlanarGraph<V, E> graph, DirectedEdge<V> face, V vertex) {            
       V current = face.getSource();
       V next = face.getTarget();
+      
+      if (graph.isBoundary(current, next)) {
+          throw new IllegalArgumentException("Cannot insert vertex into the boundary face");
+      }
 
       do {
          V nextNext = graph.getNextVertex(current, next);
@@ -260,11 +308,11 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       // Treat the boundary as if infinitely far away
       Coordinate p = vertexToCoordinate.get(fourth);
       if (PlanarGraphs.isVertexBoundary(graph, first)) {
-         return isRightOf(third, second, p);
+         return isRightOf(p, new DirectedEdge(third, second));
       } else if (PlanarGraphs.isVertexBoundary(graph, second)) {
-         return isRightOf(first, third, p);
+         return isRightOf(p, new DirectedEdge(first, third));
       } else if (PlanarGraphs.isVertexBoundary(graph, third)) {
-         return isRightOf(second, first, p);
+         return isRightOf(p, new DirectedEdge(second, first));
       } else if (PlanarGraphs.isVertexBoundary(graph, fourth)) {
          return false;
       }
