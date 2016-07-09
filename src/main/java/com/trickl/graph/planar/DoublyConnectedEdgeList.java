@@ -272,6 +272,16 @@ public class DoublyConnectedEdgeList<V, E, F>
       addEdge(sourceVertex, targetVertex, beforeVertex, afterVertex, edge);
       return edge;
    }
+   
+   private E getEdge(E e) {
+       if (!edgeMap.containsKey(e)) return null;
+       for (E edge : edgeMap.keySet()) {
+           if (edge.equals(e)) {
+               return edge;
+           }
+       }
+       return null;
+   }
 
     /**
     * An an edge to the DCEL.
@@ -280,6 +290,7 @@ public class DoublyConnectedEdgeList<V, E, F>
     * @param sourceVertex
     * @param targetVertex
     * @param beforeVertex
+    * @param afterVertex
     * @param e
     * @return
     */
@@ -288,6 +299,10 @@ public class DoublyConnectedEdgeList<V, E, F>
 
       if (containsEdge(sourceVertex, targetVertex)) {
          return false;
+      }
+      
+      if (edgeMap.containsKey(e)) {                    
+          throw new IllegalArgumentException("Cannot redefine an existing edge" + getEdge(e) + " as " + e.toString());
       }
 
       addVertex(sourceVertex);
