@@ -111,21 +111,22 @@ public class MaximalPlanar<V, E> {
          }
 
          // The iterator manipulations on the next two lines are safe because
-         // verticesOnFace.size() > 3 (from the first test in this function)
-         V markedNeighbour = null;
-         for (V vertex : verticesOnFace.subList(2, verticesOnFace.size() - 1)) {
+         // verticesOnFace.size() > 3 (from the first test in this function)   
+         int markedNeighbourIndex = -1;
+         for (int index = 2; index < verticesOnFace.size() - 1; ++index)
+         {
+            V vertex = verticesOnFace.get(index);
             if (vertexDetails.get(vertex).marked == timestamp) {
-               markedNeighbour = vertex;
+               markedNeighbourIndex = index;
             }
          }
 
-         if (markedNeighbour == null) {
+         if (markedNeighbourIndex < 0) {
             addEdgeRange(verticesOnFace.get(0),
                          verticesOnFace.get(verticesOnFace.size() - 1),
                          verticesOnFace.subList(2, verticesOnFace.size() - 1));
          }
          else {
-            int markedNeighbourIndex = verticesOnFace.indexOf(markedNeighbour);
             addEdgeRange(verticesOnFace.get(1),
                          verticesOnFace.get(0),
                          verticesOnFace.subList(markedNeighbourIndex + 1, verticesOnFace.size()));
