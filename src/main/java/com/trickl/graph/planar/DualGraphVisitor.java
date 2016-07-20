@@ -52,7 +52,7 @@ public class DualGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversa
       this.vertexFactory = vertexFactory;
       this.edgeFactory = edgeFactory == null
               ? dualGraph.getEdgeFactory() : edgeFactory;
-      this.faceToVertexMap = new HashMap<DirectedEdge<V1>, V2>();
+      this.faceToVertexMap = new HashMap<>();
    }
 
    @Override
@@ -61,23 +61,28 @@ public class DualGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversa
       dualGraph.addVertex(dualTarget);
       if (target == null) {
          // There are no actual edges to define the face
-         faceToVertexMap.put(new DirectedEdge<V1>(source, target), dualTarget);
+         faceToVertexMap.put(new DirectedEdge<>(source, target), dualTarget);
       }
+   }
+   
+   @Override
+   public void endFace(V1 source, V1 target) {
+       dualTarget = null;
    }
 
    @Override
    public void nextEdge(V1 inputSource, V1 inputTarget) {
-      DirectedEdge edge = new DirectedEdge<V1>(inputSource, inputTarget);
+      DirectedEdge edge = new DirectedEdge<>(inputSource, inputTarget);
       faceToVertexMap.put(edge, dualTarget);
 
-      if (faceToVertexMap.containsKey(new DirectedEdge<V1>(inputTarget, inputSource))) {
-         V2 dualSource = faceToVertexMap.get(new DirectedEdge<V1>(inputTarget, inputSource));
+      if (faceToVertexMap.containsKey(new DirectedEdge<>(inputTarget, inputSource))) {
+         V2 dualSource = faceToVertexMap.get(new DirectedEdge<>(inputTarget, inputSource));
          V2 dualBefore = null;
          V1 inputBefore = inputGraph.getNextVertex(inputTarget, inputSource);
          V1 inputLast = inputSource;
          V1 inputVertex = inputBefore;
          do {
-            V2 dualVertex = faceToVertexMap.get(new DirectedEdge<V1>(inputVertex, inputLast));
+            V2 dualVertex = faceToVertexMap.get(new DirectedEdge<>(inputVertex, inputLast));
             if (dualVertex != null && dualGraph.containsEdge(dualVertex, dualSource)) {
                // First encountered so break on success
                dualBefore = dualVertex;
@@ -94,7 +99,7 @@ public class DualGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversa
          inputLast = inputSource;
          inputVertex = inputAfter;
          do {
-            V2 dualVertex = faceToVertexMap.get(new DirectedEdge<V1>(inputVertex, inputLast));
+            V2 dualVertex = faceToVertexMap.get(new DirectedEdge<>(inputVertex, inputLast));
             if (dualVertex != null && dualGraph.containsEdge(dualVertex, dualTarget)) {
                // Last encountered, so overwrite on success
                dualAfter = dualVertex;
@@ -116,13 +121,13 @@ public class DualGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversa
    
    public Map<V2, Set<DirectedEdge<V1>>> getVertexToFaceMap() {
       Set<V2> dualVertices = dualGraph.vertexSet();
-      Map<V2, Set<DirectedEdge<V1>>> vertexToFaceMap = new HashMap<V2, Set<DirectedEdge<V1>>>(dualVertices.size());
-      for (V2 dualVertex : dualVertices) {
-         vertexToFaceMap.put(dualVertex, new HashSet<DirectedEdge<V1>>());
-      }
-      for (Map.Entry<DirectedEdge<V1>, V2> faceToVertexEntry : faceToVertexMap.entrySet()) {
-         vertexToFaceMap.get(faceToVertexEntry.getValue()).add(faceToVertexEntry.getKey());
-      }
+      Map<V2, Set<DirectedEdge<V1>>> vertexToFaceMap = new HashMap<>(dualVertices.size());
+      dualVertices.stream().forEach((dualVertex) -> {
+          vertexToFaceMap.put(dualVertex, new HashSet<>());
+       });
+      faceToVertexMap.entrySet().stream().forEach((faceToVertexEntry) -> {
+          vertexToFaceMap.get(faceToVertexEntry.getValue()).add(faceToVertexEntry.getKey());
+       });
       return vertexToFaceMap;
    }
 }
