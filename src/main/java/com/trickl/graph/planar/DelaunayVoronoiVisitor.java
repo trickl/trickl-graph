@@ -20,7 +20,6 @@
  */
 package com.trickl.graph.planar;
 
-import com.trickl.graph.edges.DirectedEdge;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.ConvexHull;
@@ -29,215 +28,204 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import java.util.*;
 import org.jgrapht.VertexFactory;
 
-public class DelaunayVoronoiVisitor<V1, E1, V2, E2> extends DualGraphVisitor<V1, E1, V2, E2> implements PlanarLayout<V2> {
+public class DelaunayVoronoiVisitor<V1, E1, V2, E2> extends DualGraphVisitor<V1, E1, V2, E2> {
 
-   final private PlanarLayout<V1> inputLocations;
-   final private Map<V2, Coordinate> vertexToCoordinate;
-   final private LinearRing boundary;
-   final private List<V2> boundaryVertices;
+    final private PlanarLayout<V1> inputLayout;
+    final private PlanarLayoutStore<V2> outputLayout;
+    final private LinearRing boundary;
+    final private List<V2> boundaryVertices;
+    final private GeometryFactory geometryFactory;
 
-   /**
-    *
-    * @param inputGraph
-    * @param inputLayout
-    * @param dualGraph
-    * @param boundary Outward facing boundary
-    * @param vertexFactory
-    */
-   public DelaunayVoronoiVisitor(PlanarGraph<V1, E1> inputGraph,
-           PlanarLayout<V1> inputLayout,
-           PlanarGraph<V2, E2> dualGraph,
-           LinearRing boundary,
-           VertexFactory<V2> vertexFactory) {
-      super(inputGraph, dualGraph, vertexFactory);
-      if (inputLayout == null) {
-         throw new NullPointerException();
-      }
-
-      // Validate that dual graph boundary is convex
-      if (!PlanarGraphs.isBoundaryConvex(inputGraph, inputLayout)) {
-         throw new IllegalArgumentException("Delaunay graphs must have a convex boundary.");
-      }
-
-      this.inputLocations = inputLayout;
-      this.vertexToCoordinate = new HashMap<V2, Coordinate>();
-      this.boundary = boundary;
-      this.boundaryVertices = new ArrayList<V2>(boundary == null ? 0
-              : boundary.getCoordinates().length);
-
-      if (boundary != null) {
-         // Note that in a linear ring, end element equals start element
-         for (int i = 0; i < boundary.getCoordinates().length - 1; ++i) {
-            Coordinate coord = boundary.getCoordinateN(i);
-            Coordinate nextCoord = boundary.getCoordinateN(i + 1);
-            Coordinate nextNextCoord = boundary.getCoordinateN((i + 2) 
-                    % (boundary.getCoordinates().length - 1));
-            if (Angle.getTurn(Angle.angle(coord, nextCoord),
-                    Angle.angle(nextCoord, nextNextCoord))
-                    == Angle.COUNTERCLOCKWISE) {
+    /**
+     *
+     * @param inputGraph
+     * @param inputLayout
+     * @param dualGraph
+     * @param outputLayout
+     * @param boundary Outward facing boundary
+     * @param vertexFactory
+     */
+    public DelaunayVoronoiVisitor(PlanarGraph<V1, E1> inputGraph,
+            PlanarLayout<V1> inputLayout,
+            PlanarGraph<V2, E2> dualGraph,
+            PlanarLayoutStore<V2> outputLayout,
+            LinearRing boundary,
+            VertexFactory<V2> vertexFactory) {
+        super(inputGraph, dualGraph, vertexFactory);
+        
+        this.geometryFactory = new GeometryFactory();
+        
+        if (inputLayout == null) {
+            throw new NullPointerException();
+        }
+  
+        // Validate the boundary is defined clockwise
+        if (boundary != null) {
+            if (CGAlgorithms.signedArea(boundary.getCoordinates()) < 0)
+            {
                throw new IllegalArgumentException("Boundary must be defined clockwise");
+            }            
+        }
+
+        // Validate that dual graph boundary is convex
+        if (!PlanarGraphs.isBoundaryConvex(inputGraph, inputLayout)) {
+            throw new IllegalArgumentException("Delaunay graphs must have a convex boundary.");
+        }
+
+        this.inputLayout = inputLayout;
+        this.outputLayout = outputLayout;
+        this.boundary = boundary;
+        this.boundaryVertices = new ArrayList<V2>(boundary == null ? 0
+                : boundary.getCoordinates().length);
+
+        if (boundary != null) {
+            // Note that in a linear ring, end element equals start element
+            for (int i = 0; i < boundary.getCoordinates().length - 1; ++i) {
+                Coordinate coord = boundary.getCoordinateN(i);
+                V2 boundaryVertex = vertexFactory.createVertex();
+                boundaryVertices.add(boundaryVertex);
+                this.outputLayout.setCoordinate(boundaryVertex, coord);
+                this.dualGraph.addVertex(boundaryVertex);
+            }
+        }
+    }
+
+    @Override
+    public void beginFace(V1 source, V1 target) {
+        Coordinate dualTargetLocation = getDualLocation(source, target);
+        
+        if (dualTargetLocation != null && 
+            CGAlgorithms.isPointInRing(dualTargetLocation, boundary.getCoordinates())) {
+            super.beginFace(source, target);
+            outputLayout.setCoordinate(dualTarget, dualTargetLocation);
+        }
+    }
+
+    @Override
+    public void nextEdge(V1 source, V1 target) {
+
+        if (dualTarget == null) {
+            Coordinate dualTargetLocation = getDualLocation(source, target);            
+            Coordinate dualSourceLocation = getDualLocation(target, source);
+            if (dualSourceLocation != null) {
+                if (dualTargetLocation == null &&
+                    // There's no dual target as this is the boundary of the graph
+                    CGAlgorithms.isPointInRing(dualSourceLocation, boundary.getCoordinates())) {                    
+                    createEdgeToBoundary(source, target);
+                }
+                else if (dualTargetLocation != null) {
+                    // The dual target exists, but is outside the boundary
+                    LineSegment line = new LineSegment(dualSourceLocation, dualTargetLocation);
+                    if (boundary.intersects(line.toGeometry(geometryFactory))) {
+                        createEdgeToBoundary(source, target);
+                    }
+                }                
+            }
+        } else {
+            super.nextEdge(source, target);
+        }
+    }
+
+    /**
+     * Get the location of the Voronoi vertex given a delaunay edge
+     *
+     * @param delaunaySource
+     * @param delaunayTarget
+     * @return If the corresponding vertex is inside the boundary, returns the
+     * coordinates of the vertex, otherwise returns null.
+     */
+    private Coordinate getDualLocation(V1 delaunaySource, V1 delaunayTarget) {
+        if (inputGraph.isBoundary(delaunaySource, delaunayTarget)) {
+            return null;
+        }
+
+        Coordinate a = inputLayout.getCoordinate(delaunaySource);
+        Coordinate b = inputLayout.getCoordinate(delaunayTarget);
+        Coordinate c = inputLayout.getCoordinate(inputGraph.getNextVertex(delaunaySource, delaunayTarget));
+
+        // Inner faces should be defined counterclockwise by convention
+        Coordinate circumcentre = Triangle.circumcentre(a, b, c);
+
+        return circumcentre;
+    }
+
+    @Override
+    public void endTraversal() {
+        super.endTraversal();
+
+        // Assumes the boundary is convex so half lines should never intersect.
+        // Join up the boundary vertices, note the boundary faces
+        // outwards so we take care to create an inward face        
+        Collections.reverse(boundaryVertices);
+        for (int prevItr = 0; prevItr < boundaryVertices.size(); ++prevItr) {
+            int itr = (prevItr + 1) % boundaryVertices.size();
+            int nextItr = (prevItr + 2) % boundaryVertices.size();
+            V2 boundaryPrevious = boundaryVertices.get(prevItr);
+            V2 boundarySource = boundaryVertices.get(itr);
+            V2 boundaryTarget = boundaryVertices.get(nextItr);
+            V2 boundaryBefore = null;
+
+            if (dualGraph.containsEdge(boundarySource, boundaryPrevious)) {
+                boundaryBefore = dualGraph.getPrevVertex(boundarySource, boundaryPrevious);
+            } else if (PlanarGraphs.isVertexBoundary(dualGraph, boundarySource)) {
+                boundaryBefore = PlanarGraphs.getPrevVertexOnBoundary(dualGraph, boundarySource);
             }
 
-            V2 boundaryVertex = vertexFactory.createVertex();
-            boundaryVertices.add(boundaryVertex);
-            vertexToCoordinate.put(boundaryVertex, coord);
-            this.dualGraph.addVertex(boundaryVertex);
-         }
-      }
-   }
+            E2 edge = edgeFactory.createEdge(boundarySource, boundaryTarget);
+            dualGraph.addEdge(boundarySource, boundaryTarget, boundaryBefore, null, edge);
+        }
+    }
 
-   @Override
-   public void nextEdge(V1 source, V1 target) {
-      super.nextEdge(source, target);
+    private void createEdgeToBoundary(V1 source, V1 target) {
+        LineSegment halfLine = getHalfLineToBoundary(source, target);
+        int segmentIndex = PlanarGraphs.getNearestInterceptingLineSegment(halfLine, boundaryVertices, outputLayout);
+        LineSegment boundarySegment = PlanarGraphs.getLineSegment(segmentIndex, boundaryVertices, outputLayout);
+        Coordinate dualTargetLocation = boundarySegment.lineIntersection(halfLine);
 
-      V2 dualSource = getFaceToVertexMap().get(new DirectedEdge<V1>(target, source));
+        super.beginFace(source, target);
+        boundaryVertices.add((segmentIndex + 1) % boundaryVertices.size(), dualTarget);
+        outputLayout.setCoordinate(dualTarget, dualTargetLocation);
+        super.nextEdge(source, target);
+        super.endFace(source, target);
+    }
 
-      // Position the vertex inside the boundary first      
-      if (dualSource != null && dualTarget != null
-              && dualGraph.containsEdge(dualSource, dualTarget)) {
-         locateVertex(inputGraph, target, source, dualSource, dualTarget);
-         locateVertex(inputGraph, source, target, dualTarget, dualSource);
-      }
-   }
+    private LineSegment getHalfLineToBoundary(V1 delaunaySource, V1 delaunayTarget) {
+        Coordinate dualSourceLocation = getDualLocation(delaunayTarget, delaunaySource);
+        Coordinate a = inputLayout.getCoordinate(delaunaySource);
+        Coordinate b = inputLayout.getCoordinate(delaunayTarget);
+        LineSegment ab = new LineSegment(a, b);
+        Coordinate midPoint = ab.midPoint();
+        Coordinate reflectedDualSourceLocation =
+                new Coordinate(2 * midPoint.x - dualSourceLocation.x, 
+                               2 * midPoint.y - dualSourceLocation.y);
+        
+        return new LineSegment(midPoint, reflectedDualSourceLocation);
+    }
 
-   @Override
-   public void endTraversal() {
-      super.endTraversal();
+    public static <V> List<V> getConvexBoundaryVertices(List<V> vertices, PlanarLayout<V> planarLayout) {
+        Map<Coordinate, V> coordinateToVertex = new HashMap<>();
+        CoordinateList flattenedLocations = new CoordinateList();
 
-      // Assumes the boundary is convex so half lines should never intersect.
-      // Join up the boundary vertices, note the boundary faces
-      // outwards so we take care to create an inward face
+        for (V vertex : vertices) {
+            Coordinate location = planarLayout.getCoordinate(vertex);
 
-      Collections.reverse(boundaryVertices);
-      for (int prevItr = 0; prevItr < boundaryVertices.size(); ++prevItr) {
-         int itr = (prevItr + 1) % boundaryVertices.size();
-         int nextItr = (prevItr + 2) % boundaryVertices.size();
-         V2 boundaryPrevious = boundaryVertices.get(prevItr);
-         V2 boundarySource = boundaryVertices.get(itr);
-         V2 boundaryTarget = boundaryVertices.get(nextItr);
-         V2 boundaryBefore = null;
-
-         if (dualGraph.containsEdge(boundarySource, boundaryPrevious)) {
-            boundaryBefore = dualGraph.getPrevVertex(boundarySource, boundaryPrevious);
-         } else if (PlanarGraphs.isVertexBoundary(dualGraph, boundarySource)) {
-            boundaryBefore = PlanarGraphs.getPrevVertexOnBoundary(dualGraph, boundarySource);
-         }
-
-         E2 edge = edgeFactory.createEdge(boundarySource, boundaryTarget);
-         dualGraph.addEdge(boundarySource, boundaryTarget, boundaryBefore, null, edge);
-      }
-
-   }
-
-   private void locateVertex(PlanarGraph<V1, E1> inputGraph,
-           V1 delaunaySource,
-           V1 delaunayTarget,
-           V2 voronoiSource,
-           V2 voronoiTarget) {
-      if (!vertexToCoordinate.containsKey(voronoiSource)) {
-
-         // Record the vertex before this boundary edge
-         V2 voronoiBefore = dualGraph.containsEdge(voronoiTarget, voronoiSource)
-                 ? dualGraph.getPrevVertex(voronoiTarget, voronoiSource) : null;
-         if (inputGraph.isBoundary(delaunaySource, delaunayTarget)
-                 || inputGraph.isBoundary(delaunayTarget, delaunaySource)) {
-            // Remove the edge created by the dual graph visitor
-            dualGraph.removeEdge(voronoiTarget, voronoiSource);
-            getFaceToVertexMap().remove(new DirectedEdge<V1>(delaunaySource, delaunayTarget));
-            if (voronoiBefore != null && voronoiBefore.equals(voronoiSource)) {
-               // This edge was removed
-               voronoiBefore = null;
+            if (location != null) {
+                flattenedLocations.add(location);
+                coordinateToVertex.put(location, vertex);
             }
-         }
+        }
 
-         // Location is the cirumcenter of face, which is also the circumcenter of
-         // any set of three points of the face
-         Coordinate a = inputLocations.getCoordinate(delaunaySource);
-         Coordinate b = inputLocations.getCoordinate(delaunayTarget);
-         Coordinate c = inputLocations.getCoordinate(inputGraph.getNextVertex(delaunaySource, delaunayTarget));
-         LineSegment ab = new LineSegment(a, b);
+        CoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.instance();
+        GeometryFactory geometryFactory = new GeometryFactory(coordinateSequenceFactory);
+        ConvexHull convexHull = new ConvexHull(flattenedLocations.toCoordinateArray(), geometryFactory);
+        Coordinate[] boundary = convexHull.getConvexHull().getCoordinates();
 
-         // Inner faces should be defined counterclockwise by convention
-         Coordinate circumcentre = !inputGraph.isBoundary(delaunaySource, delaunayTarget)
-                 ? Triangle.circumcentre(a, b, c) : null;
+        List<V> boundaryVertices = new LinkedList<>();
 
-         if (circumcentre != null
-                 && CGAlgorithms.isPointInRing(circumcentre, boundary.getCoordinates())) {
-            // Location is the cirumcenter of face, which is also the circumcenter of
-            // any set of three points of the face                        
-            vertexToCoordinate.put(voronoiSource, circumcentre);
-         } else {
-            // Location is the intersection of the boundary and the perpendicular
-            // bisector of the delaunay edge                        
-            Coordinate midPoint = ab.midPoint();
-            V2 boundaryVertex = createVertexAtBoundaryInterception(new LineSegment(
-                    midPoint,
-                    new Coordinate(midPoint.x - (b.y - a.y),
-                    midPoint.y - (a.x - b.x))),
-                       boundaryVertices,
-                       vertexFactory,
-                       this);
-            if (boundaryVertex != null) {
-              // Create the new edge to this boundary intercept
-               E2 edge = edgeFactory.createEdge(voronoiTarget, boundaryVertex);
-               dualGraph.addEdge(voronoiTarget, boundaryVertex, voronoiBefore, null, edge);
-               getFaceToVertexMap().put(new DirectedEdge<V1>(delaunaySource, delaunayTarget), boundaryVertex);
-            }
-         }
-      }
-   }
-   
-   private V2 createVertexAtBoundaryInterception(LineSegment halfLine, List<V2> boundaryVertices, VertexFactory<V2> vertexFactory, PlanarLayout<V2> layout) {
-      V2 boundaryVertex = null;
-      int segmentIndex = PlanarGraphs.getNearestInterceptingLineSegment(halfLine, boundaryVertices, layout);      
-      if (segmentIndex >= 0) {
-         int nextItr = (segmentIndex + 1) % boundaryVertices.size();
-         LineSegment boundarySegment = PlanarGraphs.getLineSegment(segmentIndex, boundaryVertices, layout);
-         Coordinate intersection = PlanarGraphs.getHalfLineIntersection(halfLine, boundarySegment);
+        for (int i = 0; i < (boundary.length - 1); ++i) {
+            boundaryVertices.add(coordinateToVertex.get(boundary[i]));
+        }
 
-         if (intersection.equals(boundarySegment.p0)) {
-            boundaryVertex = boundaryVertices.get(segmentIndex);
-         } else if (intersection.equals(boundarySegment.p1)) {
-            boundaryVertex = boundaryVertices.get(nextItr);
-         } else {
-            boundaryVertex = vertexFactory.createVertex();
-            vertexToCoordinate.put(boundaryVertex, intersection);
-            boundaryVertices.add(nextItr, boundaryVertex);
-         }
-      }
-
-      return boundaryVertex;
-   }
-
-   @Override
-   public Coordinate getCoordinate(V2 vertex) {
-      return vertexToCoordinate.get(vertex);
-   }
-
-   public static <V> List<V> getConvexBoundaryVertices(List<V> vertices, PlanarLayout<V> planarLayout) {
-      Map<Coordinate, V> coordinateToVertex = new HashMap<Coordinate, V>();
-      CoordinateList flattenedLocations = new CoordinateList();
-
-      for (V vertex : vertices) {
-         Coordinate location = planarLayout.getCoordinate(vertex);
-
-         if (location != null) {
-            flattenedLocations.add(location);
-            coordinateToVertex.put(location, vertex);
-         }
-      }
-
-      CoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.instance();
-      GeometryFactory geometryFactory = new GeometryFactory(coordinateSequenceFactory);
-      ConvexHull convexHull = new ConvexHull(flattenedLocations.toCoordinateArray(), geometryFactory);
-      Coordinate[] boundary = convexHull.getConvexHull().getCoordinates();
-
-      List<V> boundaryVertices = new LinkedList<V>();
-
-      for (int i = 0; i < (boundary.length - 1); ++i) {
-         boundaryVertices.add(coordinateToVertex.get(boundary[i]));
-      }
-
-      return boundaryVertices;
-   }
+        return boundaryVertices;
+    }
 }
