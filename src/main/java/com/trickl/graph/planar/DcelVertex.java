@@ -247,12 +247,14 @@ public class DcelVertex<V, E, F> implements Serializable {
 
       // Check if a closed face is formed by the addition of this edge
       // i.e. is after edge already connected to before edge?
-      boolean isFaceFormed = false;
+      F createdFace = null;
       if (afterEdge != null) {
          for (DcelHalfEdge<V, E, F> halfEdge : afterEdge.edges())
          {
             if (halfEdge.equals(beforeEdge)) {
-               isFaceFormed = true;
+               createdFace = faceFactory.createFace(this.getVertex(),
+                    target.getVertex(),
+                    false);
             }
          }
       }
@@ -293,12 +295,9 @@ public class DcelVertex<V, E, F> implements Serializable {
       } else {         
          createdTwin.setFace(createdEdge.getNext().getFace());       
          createdEdge.getNext().getFace().setAdjacent(createdTwin);       
-         if (isFaceFormed) {
+         if (createdFace != null) {
             // By convention, the before -> edge -> after all belong to the new face
             // if one is formed
-            F createdFace = faceFactory.createFace(this.getVertex(),
-                    target.getVertex(),
-                    false);
             final DcelFace<V, E, F> dcelFace = new DcelFace<V, E, F>(createdFace);
 
             for (DcelHalfEdge<V, E, F> halfEdge : createdEdge.edges()) {
