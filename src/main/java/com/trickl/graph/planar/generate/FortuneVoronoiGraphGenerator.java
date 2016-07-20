@@ -311,10 +311,18 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
    // Boundary of calculation
    private LinearRing boundary;
    private GeometryFactory geometryFactory = new GeometryFactory();
+   
+   public FortuneVoronoiGraphGenerator(Set<V> vertices, PlanarLayout<V> layout, LinearRing boundary) {      
+      sites = new ArrayList<>(vertices.size());
+      vertices.stream().forEach((vertex) -> {
+          sites.add(layout.getCoordinate(vertex));
+       });
+      this.boundary = boundary;
+   }
 
    public FortuneVoronoiGraphGenerator(Collection<Coordinate> sites,
            LinearRing boundary) {
-      this.sites = sites;
+      this.sites = sites; 
       this.boundary = boundary;
    }
 
@@ -333,18 +341,14 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
               : boundary.getCoordinates().length);
 
       if (boundary != null) {
+          if (CGAlgorithms.signedArea(boundary.getCoordinates()) < 0)
+            {
+               throw new IllegalArgumentException("Boundary must be defined clockwise");
+            } 
+          
          // Note that in a linear ring, end element equals start element
          for (int i = 0; i < boundary.getCoordinates().length - 1; ++i) {
             Coordinate coord = boundary.getCoordinateN(i);
-            Coordinate nextCoord = boundary.getCoordinateN(i + 1);
-            Coordinate nextNextCoord = boundary.getCoordinateN((i + 2)
-                    % (boundary.getCoordinates().length - 1));
-            if (Angle.getTurn(Angle.angle(coord, nextCoord),
-                    Angle.angle(nextCoord, nextNextCoord))
-                    == Angle.COUNTERCLOCKWISE) {
-               throw new IllegalArgumentException("Boundary must be defined clockwise");
-            }
-
             V boundaryVertex = vertexFactory.createVertex();
             boundaryVertices.add(boundaryVertex);
             vertexToCoordinate.put(boundaryVertex, coord);
@@ -667,7 +671,7 @@ public class FortuneVoronoiGraphGenerator<V, E> implements PlanarGraphGenerator<
       if (segmentIndex >= 0) {
          int nextItr = (segmentIndex + 1) % boundaryVertices.size();
          LineSegment boundarySegment = PlanarGraphs.getLineSegment(segmentIndex, boundaryVertices, layout);
-         Coordinate intersection = PlanarGraphs.getHalfLineIntersection(halfLine, boundarySegment);
+         Coordinate intersection = boundarySegment.lineIntersection(halfLine);
 
          if (intersection.equals(boundarySegment.p0)) {
             boundaryVertex = boundaryVertices.get(segmentIndex);
