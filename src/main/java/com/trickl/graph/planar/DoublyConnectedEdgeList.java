@@ -20,6 +20,7 @@
  */
 package com.trickl.graph.planar;
 
+import com.trickl.graph.GraphArgumentException;
 import com.trickl.graph.edges.DirectedEdge;
 import com.trickl.graph.planar.xml.XmlDoublyConnectedEdgeListAdapter;
 import java.io.Serializable;
@@ -111,7 +112,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public int degreeOf(V vertex) {
       DcelVertex<V, E, F> dcelVertex = vertexMap.get(vertex);
       if (dcelVertex == null) {
-         throw new NoSuchElementException("Vertex not found.");
+          throw new GraphArgumentException(this, 
+              new NoSuchElementException("Vertex not found."));
       }
       return dcelVertex.getEdgeCount();
    }
@@ -159,7 +161,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public V getEdgeSource(E edge) {
       DcelHalfEdge<V, E, F> dcelHalfEdge = edgeMap.get(edge);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Edge not found.");
+          throw new GraphArgumentException(this, 
+          new NoSuchElementException("Edge not found."));
       }
       return dcelHalfEdge.getOrigin().getVertex();
    }
@@ -168,7 +171,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public V getEdgeTarget(E edge) {
       DcelHalfEdge<V, E, F> dcelHalfEdge = edgeMap.get(edge);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Edge not found.");
+          throw new GraphArgumentException(this, 
+            new NoSuchElementException("Edge not found."));
       }
       return dcelHalfEdge.getNext().getOrigin().getVertex();
    }
@@ -198,7 +202,8 @@ public class DoublyConnectedEdgeList<V, E, F>
       DcelFace<V, E, F> dcelFace = faceMap.get(boundaryFace);
       DcelHalfEdge<V, E, F> dcelHalfEdge = dcelFace.getHalfEdge(vertex);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Vertex not found on boundary.");
+          throw new GraphArgumentException(this, 
+             new NoSuchElementException("Vertex not found on boundary."));
       }
       return dcelHalfEdge.getNext().getOrigin().getVertex();
    }
@@ -207,7 +212,8 @@ public class DoublyConnectedEdgeList<V, E, F>
       DcelFace<V, E, F> dcelFace = faceMap.get(boundaryFace);
       DcelHalfEdge<V, E, F> dcelHalfEdge = dcelFace.getHalfEdge(vertex);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Vertex not found on boundary.");
+          throw new GraphArgumentException(this,
+             new NoSuchElementException("Vertex not found on boundary."));
       }
       return dcelHalfEdge.getPrev().getOrigin().getVertex();
    }
@@ -216,7 +222,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public V getNextVertex(V source, V target) {
       DcelHalfEdge<V, E, F> dcelHalfEdge = getHalfEdge(source, target);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Edge not found.");
+          throw new GraphArgumentException(this, 
+           new NoSuchElementException("Edge not found."));
       }
       return dcelHalfEdge.getNext().getNext().getOrigin().getVertex();
    }
@@ -225,7 +232,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public V getPrevVertex(V source, V target) {
       DcelHalfEdge<V, E, F> dcelHalfEdge = getHalfEdge(source, target);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Edge not found.");
+          throw new GraphArgumentException(this, 
+             new NoSuchElementException("Edge not found."));
       }
       return dcelHalfEdge.getPrev().getOrigin().getVertex();
    }
@@ -234,7 +242,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public boolean isBoundary(V source, V target) {
       DcelHalfEdge<V, E, F> dcelHalfEdge = getHalfEdge(source, target);
       if (dcelHalfEdge == null) {
-         throw new NoSuchElementException("Edge not found.");
+          throw new GraphArgumentException(this, 
+             new NoSuchElementException("Edge not found."));
       }
       return dcelHalfEdge.isBoundary();
    }
@@ -242,7 +251,8 @@ public class DoublyConnectedEdgeList<V, E, F>
    public boolean isVertexBoundary(V vertex) {
       DcelVertex<V, E, F> dcelVertex = vertexMap.get(vertex);
       if (dcelVertex == null) {
-         throw new NoSuchElementException("Vertex not found.");
+          throw new GraphArgumentException(this, 
+             new NoSuchElementException("Vertex not found."));
       }
       return dcelVertex.isBoundary();
    }
@@ -302,7 +312,8 @@ public class DoublyConnectedEdgeList<V, E, F>
       }
       
       if (edgeMap.containsKey(e)) {                    
-          throw new IllegalArgumentException("Cannot redefine an existing edge" + getEdge(e) + " as " + e.toString());
+          throw new GraphArgumentException(this,
+                  new IllegalArgumentException("Cannot redefine an existing edge" + getEdge(e) + " as " + e.toString()));
       }
 
       addVertex(sourceVertex);
@@ -317,11 +328,12 @@ public class DoublyConnectedEdgeList<V, E, F>
             beforeEdge = before.getHalfEdge(sourceVertex);
          }
          if (beforeEdge == null) {
-            throw new NoSuchElementException("Before ("
+             throw new GraphArgumentException(this,
+             new NoSuchElementException("Before ("
                                              + beforeVertex.toString()
                                              + ") to ("
                                              + sourceVertex.toString()
-                                             + ") source edge not found");
+                                             + ") source edge not found"));
          }   
       }
 
@@ -329,20 +341,22 @@ public class DoublyConnectedEdgeList<V, E, F>
       if (afterVertex != null) {
          afterEdge = target.getHalfEdge(afterVertex);
          if (afterEdge == null) {
-            throw new NoSuchElementException("Target ("
+            throw new GraphArgumentException(this, 
+                    new NoSuchElementException("Target ("
                                              + targetVertex.toString()
                                              + ") to ("
                                              + afterVertex.toString()
-                                             + ") after edge not found");
+                                             + ") after edge not found"));
          }
 
          if (beforeEdge != null 
           &&!beforeEdge.getFace().equals(afterEdge.getFace())) {
-            throw new NoSuchElementException("Before ("
+            throw new GraphArgumentException(this, 
+                    new NoSuchElementException("Before ("
                                              + beforeEdge.toString()
                                              + ") and ("
                                              + afterEdge.toString()
-                                             + ") after edges must share a face");
+                                             + ") after edges must share a face"));
          }
       }
 
