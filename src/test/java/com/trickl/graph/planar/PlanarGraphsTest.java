@@ -24,9 +24,12 @@ import com.trickl.graph.EdgeVisitor;
 import com.trickl.graph.edges.IntegerEdgeFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
+import com.trickl.graph.ext.JComponentWindow;
 import static com.trickl.graph.planar.PlanarAssert.assertEmbeddingEquals;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
+import com.trickl.graph.planar.faces.ThrowableFaceFactory;
+import com.trickl.graph.planar.generate.DelaunayGraphGenerator;
 import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import com.trickl.graph.planar.xml.XmlDcelDocument;
 import com.trickl.graph.vertices.CircleVertex;
@@ -42,10 +45,13 @@ import java.io.*;
 import java.math.MathContext;
 import java.net.URL;
 import java.util.*;
+import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.jgraph.JGraph;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -288,12 +294,12 @@ public class PlanarGraphsTest {
    @Test
    public void testDualGraphLarge() {
       System.out.println("dualgraphlarge");
-      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
-      PlanarGraph<Integer, Integer> dualGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> dualGraph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
 
       IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator generator =
-              new PlanarCircleGraphGenerator<Integer, Integer>(37);
+              new PlanarCircleGraphGenerator<>(37);
 
       generator.generateGraph(graph, vertexFactory, null);
 
@@ -304,30 +310,30 @@ public class PlanarGraphsTest {
    @Test
    public void testDelaunayVoronoiMedium() throws Exception {
       System.out.println("delaunayVoronoiMedium");
-      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
 
       IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       PlanarCircleGraphGenerator<Integer, Integer> generator =
-              new PlanarCircleGraphGenerator<Integer, Integer>(37);
+              new PlanarCircleGraphGenerator<>(37, 0.25);
 
       generator.generateGraph(delaunayGraph, vertexFactory, null);
 
       CoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.instance();
       LinearRing boundary = new LinearRing(coordinateSequenceFactory.create(new Coordinate[]{
-                 new Coordinate(-1000, -1000),
-                 new Coordinate(-1000, 1000),
-                 new Coordinate(1000, 1000),
-                 new Coordinate(1000, -1000),
-                 new Coordinate(-1000, -1000)}),
+                 new Coordinate(-2, -2),
+                 new Coordinate(-2, 2),
+                 new Coordinate(2, 2),
+                 new Coordinate(2, -2),
+                 new Coordinate(-2, -2)}),
               new GeometryFactory(coordinateSequenceFactory));
-
+      
       runDelaunayVoronoi(delaunayGraph, generator, boundary);
    }
 
    @Test
    public void testDelaunayVoronoiTiny() throws Exception {
       System.out.println("delaunayVoronoiTiny");
-      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
 
       IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
       for (int i = 0; i < 5; ++i) {
@@ -337,30 +343,61 @@ public class PlanarGraphsTest {
       delaunayGraph.addEdge(1, 2);
       delaunayGraph.addEdge(2, 0, 1, null);
 
-      final Map<Integer, Coordinate> delaunayLocations = new HashMap<Integer, Coordinate>();
-      delaunayLocations.put(0, new Coordinate(-300, -200));
-      delaunayLocations.put(1, new Coordinate(300, -200));
-      delaunayLocations.put(2, new Coordinate(0, 200));
+      final Map<Integer, Coordinate> delaunayLocations = new HashMap<>();
+      delaunayLocations.put(0, new Coordinate(-3, -2));
+      delaunayLocations.put(1, new Coordinate(3, -2));
+      delaunayLocations.put(2, new Coordinate(0, 2));
 
-      PlanarLayout<Integer> delaunayLayout = new PlanarLayout<Integer>() {
-
-         @Override
-         public Coordinate getCoordinate(Integer vertex) {
-            return delaunayLocations.get(vertex);
-         }
-      };
+      PlanarLayout<Integer> delaunayLayout = (Integer vertex) -> delaunayLocations.get(vertex);
       
       CoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.instance();
       LinearRing boundary = new LinearRing(coordinateSequenceFactory.create(new Coordinate[]{
-                 new Coordinate(400, -300),
-                 new Coordinate(-400, -300),
-                 new Coordinate(0, 300),
-                 new Coordinate(400, -300)}),
+                 new Coordinate(-4, -3),
+                 new Coordinate(0, 3),
+                 new Coordinate(4, -3),
+                 new Coordinate(-4, -3)}),
               new GeometryFactory(coordinateSequenceFactory));
 
-      MaximalPlanar<Integer, Integer> maximalPlanar = new MaximalPlanar<Integer, Integer>();
+      MaximalPlanar<Integer, Integer> maximalPlanar = new MaximalPlanar<>();
       maximalPlanar.makeMaximalPlanar(delaunayGraph);
 
+      runDelaunayVoronoi(delaunayGraph, delaunayLayout, boundary);
+   }
+   
+   @Test
+   public void testDelaunayVoronoiBoundaryConditions() throws Exception {
+      System.out.println("delaunayVoronoiBoundaryConditions");
+      PlanarGraph<Integer, Integer> delaunayGraph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
+
+      IntegerVertexFactory  vertexFactory = new IntegerVertexFactory();
+      for (int i = 0; i < 6; ++i) {         
+         delaunayGraph.addVertex(vertexFactory.createVertex());
+      }
+
+      final Map<Integer, Coordinate> delaunayLocations = new HashMap<>();
+      delaunayLocations.put(0, new Coordinate(-0.5, 2));
+      delaunayLocations.put(1, new Coordinate(0.5, 2));
+      delaunayLocations.put(2, new Coordinate(0, 1));
+      delaunayLocations.put(3, new Coordinate(0, -1));
+      delaunayLocations.put(4, new Coordinate(0.5, -2));
+      delaunayLocations.put(5, new Coordinate(-0.5, -2));      
+      
+      // First generate the delaunay graph
+      DelaunayGraphGenerator<Integer, Integer> delaunayGenerator =
+              new DelaunayGraphGenerator<>(delaunayGraph.vertexSet(), new MapPlanarLayout(delaunayLocations));
+
+      PlanarLayout<Integer> delaunayLayout = (Integer vertex) -> delaunayLocations.get(vertex);
+      
+      CoordinateSequenceFactory coordinateSequenceFactory = CoordinateArraySequenceFactory.instance();
+      LinearRing boundary = new LinearRing(coordinateSequenceFactory.create(new Coordinate[]{
+                 new Coordinate(3, 3),
+                 new Coordinate(3, -3),
+                 new Coordinate(-3, -3),
+                 new Coordinate(-3, 3),
+                 new Coordinate(3, 3)}),
+              new GeometryFactory(coordinateSequenceFactory));
+
+      delaunayGenerator.generateGraph(delaunayGraph, vertexFactory, null);
       runDelaunayVoronoi(delaunayGraph, delaunayLayout, boundary);
    }
 
@@ -395,67 +432,26 @@ public class PlanarGraphsTest {
    }
 */    
    private <V, E> void runDelaunayVoronoi(PlanarGraph<V, E> delaunayGraph, PlanarLayout<V> delaunayLayout, final LinearRing boundary) throws Exception {
-      final DoublyConnectedEdgeList<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>, Object> voronoiGraph = new DoublyConnectedEdgeList<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>, Object>(new UndirectedIdEdgeFactory<IdCoordinateVertex>(), Object.class);
+      final DoublyConnectedEdgeList<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>, IdFace> voronoiGraph
+               = new DoublyConnectedEdgeList<>(new UndirectedIdEdgeFactory<>(), new IdFaceFactory());
 
-      int coordinatePrecision = 5;
-      IdCoordinateVertexFactory voronoiVertexFactory = new IdCoordinateVertexFactory(new MathContext(coordinatePrecision));
+       int coordinatePrecision = 5;
+       IdCoordinateVertexFactory voronoiVertexFactory = new IdCoordinateVertexFactory(new MathContext(coordinatePrecision));
 
-      final PlanarLayout<IdCoordinateVertex> voronoiLayout =
-              PlanarGraphs.delaunayToVoronoi(delaunayGraph, delaunayLayout, voronoiGraph, boundary, voronoiVertexFactory);
-      assert (voronoiLayout.getCoordinate(voronoiVertexFactory.get(0)) != null);
+       final PlanarLayoutStore<IdCoordinateVertex> voronoiLayout = new MapPlanarLayout<>();
 
-      for (IdCoordinateVertex voronoiVertex : voronoiGraph.vertexSet()) {
-         voronoiVertex.setCoordinate(voronoiLayout.getCoordinate(voronoiVertex));
-      }
+       PlanarGraphs.delaunayToVoronoi(delaunayGraph, delaunayLayout, voronoiGraph, voronoiLayout, boundary, voronoiVertexFactory);
+       assert (voronoiLayout.getCoordinate(voronoiVertexFactory.get(0)) != null);
 
-      // Output voronoi to file
-      writeGraphToFile(voronoiGraph, "voronoi-graph-" + (voronoiGraph.faceSet().size() - 1) + ".xml");
+       voronoiGraph.vertexSet().stream().forEach((voronoiVertex) -> {
+           voronoiVertex.setCoordinate(voronoiLayout.getCoordinate(voronoiVertex));
+       });
 
-      // Show layout using drawing pad and planar face traversal
-      // TODO Move code into graph toolbox, create assertions for Delaunay tests
-      /*
-      DrawingPad pad = new DrawingPad(720, 600, 20, 20, "Unit test - Voronoi Large");
-      pad.getViewport().setRect(new Rectangle.Double(-1200, -1200, 2400, 2400));
-      Container graphComponents = new Container();
-      graphComponents.add(new JPlanarGraphView<V, E>(delaunayGraph, delaunayLayout, Color.lightGray));
-      graphComponents.add(new JPlanarGraphView<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>>(voronoiGraph, voronoiLayout, Color.black));
-      graphComponents.add(new JComponent() {
-
-         {
-            Envelope envelope = boundary.getEnvelopeInternal();
-            setSize((int) envelope.getWidth(), (int) envelope.getHeight());
-         }
-
-         @Override
-         public void paint(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setClip(null);
-            for (int i = 0; i < boundary.getNumPoints() - 1; ++i) {
-               g2d.setColor(Color.blue);
-               Coordinate start = boundary.getCoordinateN(i);
-               Coordinate end = boundary.getCoordinateN(i + 1);
-               Shape line = new Line2D.Double(start.x, start.y, end.x, end.y);
-               g2d.setStroke(new BasicStroke(3f));
-               g2d.draw(line);
-               double radius = 10.;
-               Shape circle = new Ellipse2D.Double(start.x - radius, start.y - radius, radius * 2, radius * 2);
-               g2d.fill(circle);
-            }
-         }
-      });
-      pad.getViewport().setView(graphComponents);
-      PlanarGraphLabelProvider<V, E> delaunayLabels = new PlanarGraphLabelProvider<V, E>(delaunayGraph, delaunayLayout, 40, 40);
-      for (JComponent component : delaunayLabels.getVertexLabels(pad.getViewport())) {
-         pad.getLabelPane().add(component);
-      }
-
-      PlanarGraphLabelProvider<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>> voronoiLabels = new PlanarGraphLabelProvider<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>>(voronoiGraph, voronoiLayout, 40, 40);
-      for (JComponent component : voronoiLabels.getVertexLabels(pad.getViewport())) {
-         pad.getLabelPane().add(component);
-      }
-
-      pad.showAndWait();
-      */
+       if (Boolean.parseBoolean(System.getProperty("visualTests"))) {
+           JGraph jGraph = JGraphAdaptor.getDisplayGraph(voronoiGraph, voronoiLayout);
+           JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));
+           window.showAndWait();
+       }
    }
 
    @Test
