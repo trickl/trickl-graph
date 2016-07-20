@@ -27,13 +27,14 @@ import java.util.Map;
 /**
  *
  * @author tgee
+ * @param <V>
  */
-public class MapPlanarLayout<V> implements PlanarLayout<V> {
+public class MapPlanarLayout<V> implements PlanarLayoutStore<V> {
    
    final private Map<V, Coordinate> vertexCoordinateMap;
    
    public MapPlanarLayout() {
-      this(new HashMap<V, Coordinate>());
+      this(new HashMap<>());
    }
    
    public MapPlanarLayout(Map<V, Coordinate> vertexCoordinateMap) {
@@ -44,4 +45,9 @@ public class MapPlanarLayout<V> implements PlanarLayout<V> {
    public Coordinate getCoordinate(V vertex) {
       return vertexCoordinateMap.get(vertex);
    }   
+
+    @Override
+    public void setCoordinate(V vertex, Coordinate coord) {
+        vertexCoordinateMap.put(vertex, coord);
+    }
 }
