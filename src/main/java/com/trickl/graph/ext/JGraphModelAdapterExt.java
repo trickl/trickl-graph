@@ -8,6 +8,7 @@ import com.jgraph.components.labels.CellConstants;
 import com.jgraph.components.labels.MultiLineVertexRenderer;
 import com.trickl.graph.edges.DirectedEdge;
 import com.trickl.graph.planar.AbstractPlanarFaceTraversalVisitor;
+import com.trickl.graph.planar.BreadthFirstPlanarFaceTraversal;
 import com.trickl.graph.planar.CanonicalPlanarFaceTraversal;
 import com.trickl.graph.planar.PlanarFaceTraversal;
 import com.trickl.graph.planar.PlanarGraph;
@@ -92,7 +93,7 @@ public class JGraphModelAdapterExt<V, E> extends JGraphModelAdapter {
       updateEdgeAttributes();      
             
       // Traverse all faces and add face cells
-      PlanarFaceTraversal<V, E> planarFaceTraversal = new CanonicalPlanarFaceTraversal<V, E>(graph);
+      PlanarFaceTraversal<V, E> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<V, E>(graph);
       planarFaceTraversal.traverse(new AbstractPlanarFaceTraversalVisitor<V, E>() {
 
          @Override
