@@ -124,7 +124,7 @@ public final class JGraphAdaptor {
       AffineTransform screenProjection = AffineTransform.getTranslateInstance(300, 300);
       screenProjection.scale(100, -100); // Flip y-axis            
       
-      Map<String, String> vertexAttributes = new HashMap<String, String>();
+      Map<String, String> vertexAttributes = new HashMap<>();
       vertexAttributes.put("shape", "circle");
       vertexAttributes.put("size", "15,15");     
       vertexAttributes.put("color", "#000000");
