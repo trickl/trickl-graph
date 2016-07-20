@@ -64,23 +64,23 @@ public final class PlanarGraphs {
       }
    }
 
-   static public <V1, E1, V2, E2> PlanarLayout<V2> delaunayToVoronoi(PlanarGraph<V1, E1> delaunay,
+   static public <V1, E1, V2, E2> void delaunayToVoronoi(PlanarGraph<V1, E1> delaunay,
                                                PlanarLayout<V1> delaunayLocations,
                                                PlanarGraph<V2, E2> voronoi,
+                                               PlanarLayoutStore<V2> voronoiLayout,
                                                LinearRing boundary,
                                                VertexFactory<V2> vertexFactory) {
       DelaunayVoronoiVisitor<V1, E1, V2, E2> delaunayVoronoiVisitor = new DelaunayVoronoiVisitor(
-              delaunay, delaunayLocations, voronoi, boundary, vertexFactory);
-      PlanarFaceTraversal<V1, E1> planarFaceTraversal = new CanonicalPlanarFaceTraversal<V1, E1>(delaunay);
+              delaunay, delaunayLocations, voronoi, voronoiLayout, boundary, vertexFactory);
+      PlanarFaceTraversal<V1, E1> planarFaceTraversal = new CanonicalPlanarFaceTraversal<>(delaunay);
       planarFaceTraversal.traverse(delaunayVoronoiVisitor);
-      return delaunayVoronoiVisitor;
    }
 
    static public <V1, E1, V2, E2> void dualGraph(PlanarGraph<V1, E1> graph,
                                        PlanarGraph<V2, E2> dualGraph,
                                        VertexFactory<V2> vertexFactory) {
       DualGraphVisitor<V1, E1, V2, E2> dualGraphVisitor = new DualGraphVisitor(graph, dualGraph, vertexFactory);
-      PlanarFaceTraversal<V1, E1> planarFaceTraversal = new CanonicalPlanarFaceTraversal<V1, E1>(graph);
+      PlanarFaceTraversal<V1, E1> planarFaceTraversal = new CanonicalPlanarFaceTraversal<>(graph);
       planarFaceTraversal.traverse(dualGraphVisitor);
    }
 
@@ -497,14 +497,17 @@ public final class PlanarGraphs {
       int segmentIndex = -1;
       for (int itr = 0; itr < boundaryVertices.size(); ++itr) {
          LineSegment boundarySegment = getLineSegment(itr, boundaryVertices, layout);
-         Coordinate intersection = getHalfLineIntersection(halfLine, boundarySegment);
+         Coordinate intersection = boundarySegment.lineIntersection(halfLine);         
          if (intersection != null) {
-            // Find the nearest boundary intersection (allows a concave boundary)
-            double distance = halfLine.p0.distance(intersection);
-            if (distance < minDistance) {
-               minDistance = distance;
-               segmentIndex = itr;
-            }
+             double boundaryProjectionFactor = boundarySegment.projectionFactor(intersection);
+             if (boundaryProjectionFactor >= 0 && boundaryProjectionFactor < 1) {
+                // Find the nearest boundary intersection (allows a concave boundary)
+                double distance = halfLine.p0.distance(intersection);
+                if (distance < minDistance) {
+                   minDistance = distance;
+                   segmentIndex = itr;
+                }
+             }
          }
       }
       
@@ -518,20 +521,5 @@ public final class PlanarGraphs {
       return new LineSegment(
               layout.getCoordinate(boundarySource),
               layout.getCoordinate(boundaryTarget));
-   }
-
-   // TODO: This has no graph dependency, it really belongs in a geometry package
-   static public Coordinate getHalfLineIntersection(LineSegment halfLine, LineSegment segment) {
-
-      // The half line can be extended forwards (factor must be positive)
-      double factor = Math.max(0, Math.max(halfLine.projectionFactor(segment.p0),
-              halfLine.projectionFactor(segment.p1)));
-
-      LineSegment extendedBisector =
-              new LineSegment(halfLine.p0, halfLine.pointAlong(factor));
-
-      // Check for intersection with this boundary segment
-      Coordinate boundaryIntersection = extendedBisector.intersection(segment);
-      return boundaryIntersection;
    }
 }
