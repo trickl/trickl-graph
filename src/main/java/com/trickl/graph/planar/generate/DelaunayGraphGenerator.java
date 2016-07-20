@@ -73,9 +73,6 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
    @Override
    public void generateGraph(PlanarGraph<V, E> graph, VertexFactory<V> vertexFactory,
            java.util.Map<java.lang.String, V> resultMap) {
-      if (!graph.vertexSet().isEmpty()) {
-          throw new IllegalArgumentException("Must supply an empty graph");
-      }
        
       if (coordinateToVertex.isEmpty()) {
          return;
