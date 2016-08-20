@@ -56,6 +56,7 @@ public class UndirectedIdEdge<V> extends UndirectedEdge<V>
       this.id = Integer.parseInt(idString);
    }
 
+   @XmlTransient
    public String getIdStringPrefix() {
       // XML ids need to be unique across the entire document, so a unique prefix per class
       // is required

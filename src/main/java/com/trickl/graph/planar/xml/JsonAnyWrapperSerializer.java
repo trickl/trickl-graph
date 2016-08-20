@@ -22,10 +22,10 @@ package com.trickl.graph.planar.xml;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class XmlAnyWrapperAdapter<V> extends XmlAdapter<XmlAnyWrapper<V>, V> {
+public class JsonAnyWrapperSerializer<V> extends XmlAdapter<XmlAnyWrapper<V>, V> {
 
    @Override
-   public V unmarshal(XmlAnyWrapper<V> xmlAnyWrapper) throws Exception {      
+   public V unmarshal(XmlAnyWrapper<V> xmlAnyWrapper) throws Exception {
       return xmlAnyWrapper.getValue();
    }
 
@@ -33,7 +33,6 @@ public class XmlAnyWrapperAdapter<V> extends XmlAdapter<XmlAnyWrapper<V>, V> {
    public XmlAnyWrapper<V> marshal(V value) throws Exception {
       XmlAnyWrapper<V> wrapper = new XmlAnyWrapper<V>();
       wrapper.setValue(value);
-      wrapper.setValueClass(value.getClass());
       return wrapper;
    }
  }

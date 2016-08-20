@@ -33,10 +33,10 @@
             <dcel-face adjacent-edge-id="dcel-0-2" is-boundary="false" data-id="id-face-1" id="dcel-f-1"/>
         </dcel-faces>
         <dcel-boundary-face-id>dcel-f-0</dcel-boundary-face-id>
-        <edge-factory>
+        <edge-factory class="com.trickl.graph.edges.UndirectedIdEdgeFactory">
             <undirected-id-edge-factory next-id="3"/>
         </edge-factory>
-        <face-factory>
+        <face-factory class="com.trickl.graph.planar.faces.IdFaceFactory">
             <id-face-factory next-id="2"/>
         </face-factory>
     </dcel>

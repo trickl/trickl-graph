@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LinearRing;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.jgrapht.Graphs;
 import org.jgrapht.VertexFactory;
 
@@ -39,32 +40,34 @@ public final class PlanarGraphs {
 
    static public <V, E> List<V> getBoundaryVertices(PlanarGraph<V, E> graph) {
       DirectedEdge<V> boundary = graph.getBoundary();
-      if (boundary == null) return new ArrayList<V>();
+      if (boundary == null) return new ArrayList<>();
       return PlanarGraphs.getVerticesOnFace(graph, boundary.getSource(), boundary.getTarget());
    }
 
    static public <V, E> void boundaryHops(PlanarGraph<V, E> graph, Map<V, Integer> hops) {
       Set<E> boundary = getBoundaryEdges(graph);
-      for (E edge : boundary) {
-         hops.put(graph.getEdgeSource(edge), 0);
-         hops.put(graph.getEdgeTarget(edge), 0);
-      }
+      boundary.stream().map((edge) -> {
+          hops.put(graph.getEdgeSource(edge), 0);
+           return edge;
+       }).forEach((edge) -> {
+           hops.put(graph.getEdgeTarget(edge), 0);
+       });
 
-      Queue<V> vertexQueue = new LinkedList<V>();
+      Queue<V> vertexQueue = new LinkedList<>();
       vertexQueue.addAll(hops.keySet());
 
       while (!vertexQueue.isEmpty()) {
          V vertex = vertexQueue.poll();
-         for (V neighbour : getConnectedVertices(graph, vertex)) {
-            if (!hops.containsKey(neighbour)) {
-               hops.put(neighbour, hops.get(vertex) + 1);
-               vertexQueue.add(neighbour);
-            }
-         }
+         getConnectedVertices(graph, vertex).stream().filter((neighbour) -> (!hops.containsKey(neighbour))).map((neighbour) -> {
+             hops.put(neighbour, hops.get(vertex) + 1);
+              return neighbour;
+          }).forEach((neighbour) -> {
+              vertexQueue.add(neighbour);
+          });
       }
    }
 
-   static public <V1, E1, V2, E2> void delaunayToVoronoi(PlanarGraph<V1, E1> delaunay,
+   static public <V1, E1, V2, E2> Map<V2, Set<DirectedEdge<V1>>> delaunayToVoronoi(PlanarGraph<V1, E1> delaunay,
                                                PlanarLayout<V1> delaunayLocations,
                                                PlanarGraph<V2, E2> voronoi,
                                                PlanarLayoutStore<V2> voronoiLayout,
@@ -74,14 +77,16 @@ public final class PlanarGraphs {
               delaunay, delaunayLocations, voronoi, voronoiLayout, boundary, vertexFactory);
       PlanarFaceTraversal<V1, E1> planarFaceTraversal = new CanonicalPlanarFaceTraversal<>(delaunay);
       planarFaceTraversal.traverse(delaunayVoronoiVisitor);
+      return delaunayVoronoiVisitor.getVertexToFaceMap();
    }
 
-   static public <V1, E1, V2, E2> void dualGraph(PlanarGraph<V1, E1> graph,
+   static public <V1, E1, V2, E2> Map<V2, Set<DirectedEdge<V1>>> dualGraph(PlanarGraph<V1, E1> graph,
                                        PlanarGraph<V2, E2> dualGraph,
                                        VertexFactory<V2> vertexFactory) {
       DualGraphVisitor<V1, E1, V2, E2> dualGraphVisitor = new DualGraphVisitor(graph, dualGraph, vertexFactory);
       PlanarFaceTraversal<V1, E1> planarFaceTraversal = new CanonicalPlanarFaceTraversal<>(graph);
       planarFaceTraversal.traverse(dualGraphVisitor);
+      return dualGraphVisitor.getVertexToFaceMap();
    }
 
    static public <V, E> void split(PlanarGraph<V, E> graph, E edge, V vertex) {
@@ -102,7 +107,7 @@ public final class PlanarGraphs {
       PlanarCopyGraphVisitor<V1, E1, V2, E2> copyGraphVisitor = new PlanarCopyGraphVisitor(
               source, target, vertexFactory, edgeFactory);
       copyGraphVisitor.setAggregationGroups(aggregateGroups);
-      BreadthFirstPlanarFaceTraversal<V1, E1> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<V1, E1>(source);
+      BreadthFirstPlanarFaceTraversal<V1, E1> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<>(source);
       planarFaceTraversal.traverse(copyGraphVisitor);
       return copyGraphVisitor.getVertexMap();
    }
@@ -126,7 +131,7 @@ public final class PlanarGraphs {
                                             V1 boundaryTarget,
                                             CopyVertexFactory<V2, V1> vertexFactory,
                                             CopyEdgeFactory<V2, E2, E1> edgeFactory) {
-      PlanarGraph<V1, E1> subgraphProxy = new PlanarSubGraph<V1, E1>(graph, vertices, boundarySource, boundaryTarget);
+      PlanarGraph<V1, E1> subgraphProxy = new PlanarSubGraph<>(graph, vertices, boundarySource, boundaryTarget);
       return copy(subgraphProxy, subgraph, vertexFactory, edgeFactory);
    }
 
@@ -137,8 +142,8 @@ public final class PlanarGraphs {
    static public <V, E> Set<E> getEdgesInsideBoundary(PlanarGraph<V, E> graph, List<V> boundary) {
 
       // Search for edges within the boundary
-      Stack<DirectedEdge<V>> edgeStack = new Stack<DirectedEdge<V>>();
-      List<E> boundaryEdges = new LinkedList<E>();
+      Stack<DirectedEdge<V>> edgeStack = new Stack<>();
+      List<E> boundaryEdges = new LinkedList<>();
 
       for (int i = 0; i < boundary.size(); ++i) {
          V boundaryCurrent = boundary.get(i);
@@ -152,14 +157,14 @@ public final class PlanarGraphs {
          edgeStack.add(new DirectedEdge(boundaryCurrent, boundaryNext));
       }
 
-      Set<E> edges = new HashSet<E>(boundaryEdges);
+      Set<E> edges = new HashSet<>(boundaryEdges);
 
       while (!edgeStack.isEmpty()) {
          DirectedEdge<V> edge = edgeStack.pop();
          V nextVertex = graph.getNextVertex(edge.getSource(), edge.getTarget());
          E nextEdge = graph.getEdge(nextVertex, edge.getTarget());
          if (!edges.contains(nextEdge)) {
-            edgeStack.add(new DirectedEdge<V>(nextVertex, edge.getTarget()));
+            edgeStack.add(new DirectedEdge<>(nextVertex, edge.getTarget()));
             edges.add(nextEdge);
          }
       }
@@ -181,13 +186,13 @@ public final class PlanarGraphs {
     */
    static public <V, E> void removeEdgesInsideBoundary(PlanarGraph<V, E> graph, List<V> boundary, EdgeVisitor<E> removeEdgeVisitor) {
 
-      for (E edge : getEdgesInsideBoundary(graph, boundary)) {
-         if (removeEdgeVisitor != null) {
-            removeEdgeVisitor.onEdge(edge);
-         }
-
-         graph.removeEdge(edge);
-      }
+       getEdgesInsideBoundary(graph, boundary).stream().map((edge) -> {
+           if (removeEdgeVisitor != null) {
+               removeEdgeVisitor.onEdge(edge);
+           } return edge;
+       }).forEach((edge) -> {
+           graph.removeEdge(edge);
+       });
    }
 
    static public <V, E> void triangulateFace(PlanarGraph<V, E> graph, V source, V target, EdgeVisitor<E> addEdgeVisitor) {
@@ -215,6 +220,13 @@ public final class PlanarGraphs {
          next = graph.getNextVertex(sourceNext, current);
       } 
    }
+   
+   static public <V, E> void fanTransform(PlanarGraph<V, E> graph, List<V> boundary,
+            EdgeVisitor<E> removeEdgeVisitor,
+            EdgeVisitor<E> addEdgeVisitor) {
+        PlanarGraphs.removeEdgesInsideBoundary(graph, boundary, removeEdgeVisitor);
+        PlanarGraphs.triangulateFace(graph, boundary.get(0), boundary.get(1), addEdgeVisitor);
+    }
 
    static public <V, E> List<V> getConnectedVertices(PlanarGraph<V, E> graph, V vertex) {
       return getConnectedVertices(graph, vertex, null);
@@ -241,8 +253,8 @@ public final class PlanarGraphs {
       }
 
       Set<E> edges = graph.edgesOf(vertex);
-      LinkedList<V> frontVertices = new LinkedList<V>();
-      LinkedList<V> backVertices = new LinkedList<V>();
+      LinkedList<V> frontVertices = new LinkedList<>();
+      LinkedList<V> backVertices = new LinkedList<>();
 
       // Note edge discovery order will be in outward face order, so
       // we need to work backwards
@@ -283,7 +295,7 @@ public final class PlanarGraphs {
          throw new NullPointerException();
       }
       
-      List<V> vertices = new LinkedList<V>();      
+      List<V> vertices = new LinkedList<>();      
       if (startVertex != null) {
          V boundaryNext = targetVertex;
          V boundaryCurrent = startVertex;
@@ -309,16 +321,14 @@ public final class PlanarGraphs {
    }
 
    static public <V, E> boolean isVertexBoundary(PlanarGraph<V, E> graph, V vertex) {
-      for (E edge : graph.edgesOf(vertex)) {
-         if (isEdgeBoundary(graph, edge)) {
-            return true;
-         }
-      }
+       if (graph.edgesOf(vertex).stream().anyMatch((edge) -> (isEdgeBoundary(graph, edge)))) {
+           return true;
+       }
       return false;
    }
 
    static public <V, E> Set<E> getBoundaryEdges(PlanarGraph<V, E> graph) {
-      Set<E> edges = new LinkedHashSet<E>();
+      Set<E> edges = new LinkedHashSet<>();
       V priorVertex = null;
       V firstVertex = null;
       for (V vertex : getBoundaryVertices(graph)) {
@@ -338,12 +348,10 @@ public final class PlanarGraphs {
    }
 
    static public <V, E> Set<E> getBoundaryEdges(PlanarGraph<V, E> graph, V vertex) {
-      Set<E> edges = new HashSet<E>();
-      for (E edge : graph.edgesOf(vertex)) {
-         if (isEdgeBoundary(graph, edge)) {
-            edges.add(edge);
-         }
-      }
+      Set<E> edges = new HashSet<>();
+      graph.edgesOf(vertex).stream().filter((edge) -> (isEdgeBoundary(graph, edge))).forEach((edge) -> {
+          edges.add(edge);
+       });
       return edges;
    }
 
@@ -376,22 +384,26 @@ public final class PlanarGraphs {
    }
 
    static public <V, E> List<V> getInnerBoundary(PlanarGraph<V, E> graph, List<V> outerBoundary) {
-      List<V> innterBoundary = new LinkedList<V>();
+      List<V> innerBoundary = new LinkedList<>();
       Collections.reverse(outerBoundary);
       for (int i = 0; i < outerBoundary.size(); ++i)
       {
          V prevOuterVertex = outerBoundary.get(i);
          V outerVertex = outerBoundary.get((i + 1) % outerBoundary.size());
          V nextOuterVertex = outerBoundary.get((i + 2) % outerBoundary.size());
-         V nextInnerVertex = innterBoundary.isEmpty()
+         V nextInnerVertex = innerBoundary.isEmpty()
                              ? prevOuterVertex
-                             : innterBoundary.get(innterBoundary.size() - 1);
+                             : innerBoundary.get(innerBoundary.size() - 1);
          List<V> perimeter = PlanarGraphs.getConnectedVertices(graph, outerVertex, nextInnerVertex, nextOuterVertex);
          if (!perimeter.isEmpty()) {
-            innterBoundary.addAll(perimeter.subList(1, perimeter.size()));
+            innerBoundary.addAll(perimeter.subList(1, perimeter.size()));
          }
       }
-      return innterBoundary.isEmpty() ? innterBoundary : innterBoundary.subList(1, innterBoundary.size());
+      return innerBoundary.isEmpty() ? innerBoundary : innerBoundary.subList(1, innerBoundary.size());
+   }
+     
+   static public <V, E, F> F getFace(PlanarFaceGraph<V, E, F> graph, DirectedEdge<V> edge) {
+       return graph.getFace(edge.getSource(), edge.getTarget());
    }
 
    static public <V, E> boolean isBoundaryConvex(PlanarGraph<V, E> graph, PlanarLayout<V> layout) {
@@ -522,4 +534,17 @@ public final class PlanarGraphs {
               layout.getCoordinate(boundarySource),
               layout.getCoordinate(boundaryTarget));
    }
+
+    static public <V, E> List<V> getInnermostVertices(PlanarGraph<V, E> graph) {
+        Map<V, Integer> boundaryHops = new HashMap<>();
+        PlanarGraphs.boundaryHops(graph, boundaryHops);
+        int maxHops = Collections.max(boundaryHops.values());
+        
+        List<V> innermostVertices = boundaryHops.entrySet().stream()
+           .filter(entry -> entry.getValue() == maxHops)
+           .map(entry -> entry.getKey())
+           .collect(Collectors.toList());
+        
+        return innermostVertices;
+    }
 }

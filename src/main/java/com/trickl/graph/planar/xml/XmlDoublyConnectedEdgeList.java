@@ -24,8 +24,10 @@ import com.trickl.graph.planar.DcelFace;
 import com.trickl.graph.planar.DcelHalfEdge;
 import com.trickl.graph.planar.DcelVertex;
 import com.trickl.graph.planar.FaceFactory;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -104,12 +106,14 @@ public class XmlDoublyConnectedEdgeList<V, E, F> {
       return dcelBoundaryFace;
    }
 
-   @XmlJavaTypeAdapter(value=XmlAnyWrapperAdapter.class)
+   // Jackson does not support XmlAnyElement in 2.8     
+   @XmlJavaTypeAdapter(value=XmlAnyWrapperAdapter.class)   
    @XmlElement(name="edge-factory")
    public EdgeFactory<V, E> getEdgeFactory() {
       return edgeFactory;
    }
 
+   // Jackson does not support XmlAnyElement in 2.8     
    @XmlJavaTypeAdapter(value=XmlAnyWrapperAdapter.class)
    @XmlElement(name="face-factory")
    public FaceFactory<V, F> getFaceFactory() {

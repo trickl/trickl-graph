@@ -25,6 +25,7 @@ import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name="dcel-half-edge")
@@ -48,10 +49,13 @@ public class DcelHalfEdge<V, E, F> implements Serializable {
 
    @XmlID
    @XmlAttribute(name="id")
-   public String getIdString() {
+   public String getId() {
       return "dcel-"
               + (origin.getVertex() == null ? "null" : origin.getVertex().toString()) + "-"
               + (next.origin.getVertex() == null ? "null" : next.origin.getVertex().toString());
+   }
+   
+   protected void setId(String id) {       
    }
 
    @XmlIDREF
@@ -120,6 +124,7 @@ public class DcelHalfEdge<V, E, F> implements Serializable {
       setOrigin(null);
    }
 
+   @XmlTransient
    public DcelHalfEdge<V, E, F> getPrev() {
       for (DcelHalfEdge<V, E, F> halfEdge : origin.outHalfEdges()) {
          if (halfEdge.twin.next.equals(this)) {
@@ -129,6 +134,7 @@ public class DcelHalfEdge<V, E, F> implements Serializable {
       return null;
    }
 
+   @XmlTransient
    public DcelHalfEdge<V, E, F> getPrevInternal() {
       for (DcelHalfEdge<V, E, F> halfEdge : prevEdges()) {
          if (!halfEdge.isEdgeBoundary()) {
@@ -138,6 +144,7 @@ public class DcelHalfEdge<V, E, F> implements Serializable {
       return null;
    }
 
+   @XmlTransient
    public DcelHalfEdge<V, E, F> getNextInternal() {
       for (DcelHalfEdge<V, E, F> halfEdge : edges()) {
          if (!halfEdge.isEdgeBoundary()) {
@@ -201,10 +208,12 @@ public class DcelHalfEdge<V, E, F> implements Serializable {
       };
    }
 
+   @XmlTransient
    public boolean isBoundary() {
       return face.isBoundary();
    }
 
+   @XmlTransient
    public boolean isEdgeBoundary() {
       return isBoundary() || twin.isBoundary();
    }
@@ -270,8 +279,8 @@ public class DcelHalfEdge<V, E, F> implements Serializable {
    @Override
    public String toString() {
       return "E(" + ((edge == null) ? "NULL" : edge.toString()) + ") T("
-              + ((twin == null) ? "NULL" : twin.getIdString()) + ") N("
-              + ((next == null) ? "NULL" : next.getIdString()) + ") O("
+              + ((twin == null) ? "NULL" : twin.getId()) + ") N("
+              + ((next == null) ? "NULL" : next.getId()) + ") O("
               + ((origin == null) ? "NULL" : origin.getIdString()) + ") F("
               + ((face == null) ? "NULL" : face.getIdString()) + ")";
    }

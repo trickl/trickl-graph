@@ -30,7 +30,7 @@ import org.jgrapht.EdgeFactory;
 
 public class XmlDoublyConnectedEdgeListAdapter<V, E, F> extends XmlAdapter<XmlDoublyConnectedEdgeList<V, E, F>, DoublyConnectedEdgeList<V, E, F>> {
 
-   /**
+     /**
     * This function is called before the IDResolver finishes resolving. At this point,
     * only idrefs that reference ids earlier in the document are resolved. The other
     * idrefs will be resolved after this method.
@@ -40,9 +40,23 @@ public class XmlDoublyConnectedEdgeListAdapter<V, E, F> extends XmlAdapter<XmlDo
     */
    @Override
    public DoublyConnectedEdgeList<V, E, F> unmarshal(XmlDoublyConnectedEdgeList<V, E, F> xmlDcel) throws Exception {
-      EdgeFactory<V, E> edgeFactory = xmlDcel.getEdgeFactory();
+       EdgeFactory<V, E> edgeFactory = xmlDcel.getEdgeFactory();
       FaceFactory<V, F> faceFactory = xmlDcel.getFaceFactory();
-      DoublyConnectedEdgeList<V, E, F> dcel = new DoublyConnectedEdgeList<V, E, F>(edgeFactory, faceFactory);
+      DoublyConnectedEdgeList<V, E, F> dcel = new DoublyConnectedEdgeList<>(edgeFactory, faceFactory);
+      return unmarshal(xmlDcel, dcel);
+   }
+   
+   
+   /**
+    * This function is called before the IDResolver finishes resolving. At this point,
+    * only idrefs that reference ids earlier in the document are resolved. The other
+    * idrefs will be resolved after this method.
+    * @param xmlDcel
+    * @param dcel
+    * @return
+    * @throws Exception
+    */
+   public DoublyConnectedEdgeList<V, E, F> unmarshal(XmlDoublyConnectedEdgeList<V, E, F> xmlDcel, DoublyConnectedEdgeList<V, E, F> dcel) throws Exception {
       
       for (DcelVertex<V, E, F> vertex : xmlDcel.getDcelVertices()) {
          dcel.getVertexMap().put(vertex.getVertex(), vertex);

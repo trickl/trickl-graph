@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "dcel-vertex")
@@ -51,6 +52,9 @@ public class DcelVertex<V, E, F> implements Serializable {
    @XmlAttribute(name="id")
    public String getIdString() {
       return "dcel-" + (vertex == null ? "null" : vertex.toString());
+   }
+   
+   protected void setId(String id) {       
    }
 
    @XmlIDREF
@@ -81,6 +85,7 @@ public class DcelVertex<V, E, F> implements Serializable {
       setLeaving(null);
    }
 
+   @XmlTransient
    public DcelHalfEdge<V, E, F> getNextBoundaryEdge() {
       for (DcelHalfEdge<V, E, F> halfEdge : outHalfEdges()) {
          if (halfEdge.isEdgeBoundary()) {
@@ -90,6 +95,7 @@ public class DcelVertex<V, E, F> implements Serializable {
       return null;
    }
 
+   @XmlTransient
    public DcelHalfEdge<V, E, F> getPrevBoundaryEdge() {
       for (DcelHalfEdge<V, E, F> halfEdge : outHalfEdges()) {
          if (halfEdge.isEdgeBoundary()) {
@@ -99,6 +105,7 @@ public class DcelVertex<V, E, F> implements Serializable {
       return null;
    }
 
+   @XmlTransient
    public boolean isBoundary() {
       for (DcelHalfEdge<V, E, F> halfEdge : outHalfEdges()) {
          if (halfEdge.isBoundary()) {
@@ -108,6 +115,7 @@ public class DcelVertex<V, E, F> implements Serializable {
       return false;
    }
 
+   @XmlTransient
    public int getEdgeCount() {
       int count = 0;
       for (DcelHalfEdge<V, E, F> halfEdge : outHalfEdges()) {
@@ -127,6 +135,7 @@ public class DcelVertex<V, E, F> implements Serializable {
       return null;
    }
 
+   @XmlTransient
    public Set<E> getEdges() {
       final Set<E> edges = new LinkedHashSet<E>(getEdgeCount());
 
@@ -140,6 +149,7 @@ public class DcelVertex<V, E, F> implements Serializable {
       return edges;
    }
 
+   @XmlTransient
    public List<V> getConnectedVertices() {
       return getConnectedVertices(getLeaving());
    }
@@ -160,7 +170,7 @@ public class DcelVertex<V, E, F> implements Serializable {
 
       return vertices;
    }
-
+   
    Iterable<DcelHalfEdge<V, E, F>> outHalfEdges() {
       return outHalfEdges(getLeaving());
    }
@@ -340,7 +350,7 @@ public class DcelVertex<V, E, F> implements Serializable {
    @Override
    public String toString() {
       return "V(" + ((vertex == null) ? "NULL" : vertex.toString()) + ") E("
-              + ((leaving == null) ? "NULL" : leaving.getIdString()) + ")";
+              + ((leaving == null) ? "NULL" : leaving.getId()) + ")";
    }
 
    @Override

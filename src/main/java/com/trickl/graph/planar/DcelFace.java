@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name="dcel-face")
@@ -52,6 +53,9 @@ public class DcelFace<V, E, F> implements Serializable {
    @XmlAttribute(name="id")
    public String getIdString() {
       return "dcel-f-" + (face == null ? "null" : face.toString());
+   }
+   
+   protected void setId(String id) {       
    }
 
    @XmlIDREF
@@ -96,6 +100,7 @@ public class DcelFace<V, E, F> implements Serializable {
       return null;
    }
 
+   @XmlTransient
    public Set<V> getVertices() {
       final Set<V> vertices = new LinkedHashSet<V>(getEdgeCount());
 
@@ -109,6 +114,7 @@ public class DcelFace<V, E, F> implements Serializable {
       return vertices;
    }
 
+   @XmlTransient
    public Set<E> getEdges() {
       final Set<E> edges = new LinkedHashSet<E>(getEdgeCount());
 
@@ -122,6 +128,7 @@ public class DcelFace<V, E, F> implements Serializable {
       return edges;
    }
 
+   @XmlTransient
    public int getEdgeCount() {
       int count = 0;
       for (DcelHalfEdge<V, E, F> halfEdge : adjacent.edges()) {
@@ -138,7 +145,7 @@ public class DcelFace<V, E, F> implements Serializable {
    @Override
    public String toString() {
       return "F(" + ((face == null) ? "NULL" : face.toString()) + ") E("
-              + ((adjacent == null ? "NULL" : adjacent.getIdString())) + ") B("
+              + ((adjacent == null ? "NULL" : adjacent.getId())) + ") B("
               + Boolean.toString(isBoundary) + ")";
    }
 

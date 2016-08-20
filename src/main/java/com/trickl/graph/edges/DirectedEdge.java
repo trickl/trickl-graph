@@ -24,6 +24,7 @@ import java.beans.Transient;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * A simple edge class that stores both vertices at either ends of the edge
@@ -44,7 +45,7 @@ public class DirectedEdge<V> implements Serializable {
       this.target = target;
    }
    
-   @Transient
+   @XmlTransient
    public DirectedEdge<V> getTwin() {
        return new DirectedEdge<>(target, source);
    }

@@ -28,7 +28,6 @@ import com.trickl.graph.ext.JComponentWindow;
 import static com.trickl.graph.planar.PlanarAssert.assertEmbeddingEquals;
 import com.trickl.graph.planar.faces.IdFace;
 import com.trickl.graph.planar.faces.IdFaceFactory;
-import com.trickl.graph.planar.faces.ThrowableFaceFactory;
 import com.trickl.graph.planar.generate.DelaunayGraphGenerator;
 import com.trickl.graph.planar.generate.PlanarCircleGraphGenerator;
 import com.trickl.graph.planar.xml.XmlDcelDocument;
@@ -49,9 +48,9 @@ import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import static org.hamcrest.CoreMatchers.is;
 import org.jgraph.JGraph;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -526,7 +525,7 @@ public class PlanarGraphsTest {
    @Test
    public void testTriangulateFace() {
       System.out.println("triangulateFace");
-      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
 
       IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
 
@@ -556,7 +555,7 @@ public class PlanarGraphsTest {
    @Test
    public void testTriangulateFaceCaseTwo() {
       System.out.println("triangulateFace");
-      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory(), Object.class);
+      PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
 
       IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
 
@@ -585,6 +584,20 @@ public class PlanarGraphsTest {
       assertEmbeddingEquals(graph, 4, "3,0,5");
       assertEmbeddingEquals(graph, 5, "4,0");
       assertEquals(10, graph.edgeSet().size());
+   }
+   
+   @Test
+   public void testInnermostVertices() {
+       System.out.println("innermostVertices");
+       PlanarGraph<Integer, Integer> graph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory(), Object.class);
+
+        IntegerVertexFactory vertexFactory = new IntegerVertexFactory();
+        PlanarCircleGraphGenerator generator =
+                new PlanarCircleGraphGenerator<>(19);
+        generator.generateGraph(graph, vertexFactory, null);
+        
+        List<Integer> innermostVertices = PlanarGraphs.getInnermostVertices(graph);
+        assertThat(innermostVertices, is(Arrays.asList(0)));        
    }
 
    private <V, E> void addTriangularFace(PlanarGraph<V, E> graph, V firstVertex, V secondVertex, V thirdVertex) {

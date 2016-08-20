@@ -35,7 +35,7 @@ public class DoublyConnectedEdgeList<V, E, F>
         implements PlanarFaceGraph<V, E, F>,
         UndirectedGraph<V, E>,
         Serializable {
-
+    
    private EdgeFactory<V, E> edgeFactory;
    private FaceFactory<V, F> faceFactory;
    private F boundaryFace;
