@@ -4,9 +4,9 @@
   }, {
     "id" : "id-vertex-1"
   }, {
-    "id" : "id-vertex-3"
-  }, {
     "id" : "id-vertex-2"
+  }, {
+    "id" : "id-vertex-3"
   } ],
   "edge" : [ {
     "id" : "id-edge-0",
@@ -14,16 +14,12 @@
     "target-vertex-id" : "id-vertex-1"
   }, {
     "id" : "id-edge-1",
-    "source-vertex-id" : "id-vertex-1",
-    "target-vertex-id" : "id-vertex-3"
+    "source-vertex-id" : "id-vertex-0",
+    "target-vertex-id" : "id-vertex-2"
   }, {
     "id" : "id-edge-2",
-    "source-vertex-id" : "id-vertex-3",
-    "target-vertex-id" : "id-vertex-0"
-  }, {
-    "id" : "id-edge-3",
     "source-vertex-id" : "id-vertex-1",
-    "target-vertex-id" : "id-vertex-2"
+    "target-vertex-id" : "id-vertex-3"
   }, {
     "id" : "id-edge-4",
     "source-vertex-id" : "id-vertex-2",
@@ -33,94 +29,78 @@
     "id" : "id-face-0"
   }, {
     "id" : "id-face-1"
-  }, {
-    "id" : "id-face-2"
   } ],
   "dcel-vertex" : [ {
     "id" : "dcel-0",
-    "leaving-half-edge-id" : "dcel-0-3",
+    "leaving-half-edge-id" : "dcel-0-2",
     "data-id" : "id-vertex-0"
   }, {
     "id" : "dcel-1",
-    "leaving-half-edge-id" : "dcel-1-2",
+    "leaving-half-edge-id" : "dcel-1-3",
     "data-id" : "id-vertex-1"
-  }, {
-    "id" : "dcel-3",
-    "leaving-half-edge-id" : "dcel-3-2",
-    "data-id" : "id-vertex-3"
   }, {
     "id" : "dcel-2",
     "leaving-half-edge-id" : "dcel-2-3",
     "data-id" : "id-vertex-2"
+  }, {
+    "id" : "dcel-3",
+    "leaving-half-edge-id" : "dcel-3-2",
+    "data-id" : "id-vertex-3"
   } ],
   "dcel-half-edge" : [ {
     "id" : "dcel-0-1",
     "twin-half-edge-id" : "dcel-1-0",
     "origin-vertex-id" : "dcel-0",
     "next-half-edge-id" : "dcel-1-3",
-    "face-id" : "dcel-f-1",
+    "face-id" : "dcel-f-0",
     "data-id" : "id-edge-0"
   }, {
     "id" : "dcel-1-0",
     "twin-half-edge-id" : "dcel-0-1",
     "origin-vertex-id" : "dcel-1",
-    "next-half-edge-id" : "dcel-0-3",
-    "face-id" : "dcel-f-0",
+    "next-half-edge-id" : "dcel-0-2",
+    "face-id" : "dcel-f-1",
     "data-id" : "id-edge-0"
+  }, {
+    "id" : "dcel-0-2",
+    "twin-half-edge-id" : "dcel-2-0",
+    "origin-vertex-id" : "dcel-0",
+    "next-half-edge-id" : "dcel-2-3",
+    "face-id" : "dcel-f-1",
+    "data-id" : "id-edge-1"
+  }, {
+    "id" : "dcel-2-0",
+    "twin-half-edge-id" : "dcel-0-2",
+    "origin-vertex-id" : "dcel-2",
+    "next-half-edge-id" : "dcel-0-1",
+    "face-id" : "dcel-f-0",
+    "data-id" : "id-edge-1"
   }, {
     "id" : "dcel-1-3",
     "twin-half-edge-id" : "dcel-3-1",
     "origin-vertex-id" : "dcel-1",
-    "next-half-edge-id" : "dcel-3-0",
-    "face-id" : "dcel-f-1",
-    "data-id" : "id-edge-1"
-  }, {
-    "id" : "dcel-3-1",
-    "twin-half-edge-id" : "dcel-1-3",
-    "origin-vertex-id" : "dcel-3",
-    "next-half-edge-id" : "dcel-1-2",
-    "face-id" : "dcel-f-2",
-    "data-id" : "id-edge-1"
-  }, {
-    "id" : "dcel-3-0",
-    "twin-half-edge-id" : "dcel-0-3",
-    "origin-vertex-id" : "dcel-3",
-    "next-half-edge-id" : "dcel-0-1",
-    "face-id" : "dcel-f-1",
-    "data-id" : "id-edge-2"
-  }, {
-    "id" : "dcel-0-3",
-    "twin-half-edge-id" : "dcel-3-0",
-    "origin-vertex-id" : "dcel-0",
     "next-half-edge-id" : "dcel-3-2",
     "face-id" : "dcel-f-0",
     "data-id" : "id-edge-2"
   }, {
-    "id" : "dcel-1-2",
-    "twin-half-edge-id" : "dcel-2-1",
-    "origin-vertex-id" : "dcel-1",
-    "next-half-edge-id" : "dcel-2-3",
-    "face-id" : "dcel-f-2",
-    "data-id" : "id-edge-3"
-  }, {
-    "id" : "dcel-2-1",
-    "twin-half-edge-id" : "dcel-1-2",
-    "origin-vertex-id" : "dcel-2",
+    "id" : "dcel-3-1",
+    "twin-half-edge-id" : "dcel-1-3",
+    "origin-vertex-id" : "dcel-3",
     "next-half-edge-id" : "dcel-1-0",
-    "face-id" : "dcel-f-0",
-    "data-id" : "id-edge-3"
+    "face-id" : "dcel-f-1",
+    "data-id" : "id-edge-2"
   }, {
     "id" : "dcel-2-3",
     "twin-half-edge-id" : "dcel-3-2",
     "origin-vertex-id" : "dcel-2",
     "next-half-edge-id" : "dcel-3-1",
-    "face-id" : "dcel-f-2",
+    "face-id" : "dcel-f-1",
     "data-id" : "id-edge-4"
   }, {
     "id" : "dcel-3-2",
     "twin-half-edge-id" : "dcel-2-3",
     "origin-vertex-id" : "dcel-3",
-    "next-half-edge-id" : "dcel-2-1",
+    "next-half-edge-id" : "dcel-2-0",
     "face-id" : "dcel-f-0",
     "data-id" : "id-edge-4"
   } ],
@@ -131,25 +111,20 @@
     "is-boundary" : true
   }, {
     "id" : "dcel-f-1",
-    "adjacent-edge-id" : "dcel-1-3",
+    "adjacent-edge-id" : "dcel-0-2",
     "data-id" : "id-face-1",
-    "is-boundary" : false
-  }, {
-    "id" : "dcel-f-2",
-    "adjacent-edge-id" : "dcel-1-2",
-    "data-id" : "id-face-2",
     "is-boundary" : false
   } ],
   "dcel-boundary-face-id" : "dcel-f-0",
   "edge-factory" : {
     "value" : {
-      "next-id" : 5
+      "next-id" : 8
     },
     "class" : "com.trickl.graph.edges.UndirectedIdEdgeFactory"
   },
   "face-factory" : {
     "value" : {
-      "next-id" : 3
+      "next-id" : 2
     },
     "class" : "com.trickl.graph.planar.faces.IdFaceFactory"
   }
