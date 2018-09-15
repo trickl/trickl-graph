@@ -22,10 +22,18 @@ package com.trickl.graph.planar.generate;
 
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
+import com.trickl.graph.CopyEdgeFactory;
+import com.trickl.graph.CopyVertexFactory;
 import com.trickl.graph.edges.DirectedEdge;
+import com.trickl.graph.edges.UndirectedIdEdge;
+import com.trickl.graph.edges.UndirectedIdEdgeFactory;
+import com.trickl.graph.planar.BreadthFirstPlanarFaceTraversal;
+import com.trickl.graph.planar.DoublyConnectedEdgeList;
+import com.trickl.graph.planar.PlanarCopyGraphVisitor;
 import com.trickl.graph.planar.PlanarGraph;
 import com.trickl.graph.planar.PlanarGraphs;
 import com.trickl.graph.planar.PlanarLayout;
+import com.trickl.graph.vertices.IdVertex;
 import com.trickl.random.RandomEngineShuffler;
 import com.trickl.random.Shuffler;
 import com.vividsolutions.jts.algorithm.Angle;
@@ -37,7 +45,7 @@ import org.jgrapht.VertexFactory;
 
 /**
 * A delaunay generator loosely based off a description published  by Dani Lischinski of Cornell University 
-* This is a randomized incremental algorithm that uses a directed search for point location O(n^3/2) 
+* This is a randomised incremental algorithm that uses a directed search for point location O(n^3/2) 
 * Faster algorithms rely on a more efficient search O(log(n)) that uses a tree structure, this algorithm sacrifices 
 * that speed for simplicity
 * @author tgee
@@ -45,28 +53,44 @@ import org.jgrapht.VertexFactory;
 public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, V>, PlanarLayout<V> {
 
    private RandomEngine randomEngine = new MersenneTwister();
-   private Map<Coordinate, V> coordinateToVertex;
-   private Map<V, Coordinate> vertexToCoordinate;
-   private DirectedEdge<V> lastSearchFace;
+   private final List<V> vertices;
+   private final Map<Integer, Coordinate> indexToCoordinate;
+   private final Map<V, Integer> vertexToIndex;
+   private final Map<Coordinate, Integer> coordinateToIndex;
+   private DirectedEdge<Integer> lastSearchFace;
    
-   public DelaunayGraphGenerator(Set<V> vertices, PlanarLayout<V> layout) {
+   public DelaunayGraphGenerator(Set<V> vertices, PlanarLayout<V> layout) {            
+      this.indexToCoordinate = new HashMap<>();
+      this.coordinateToIndex = new HashMap<>();
+      this.vertexToIndex = new HashMap<>();
+      this.vertices = new ArrayList<>(vertices);      
       
-      this.vertexToCoordinate = new HashMap<V, Coordinate>();
-      this.coordinateToVertex = new HashMap<Coordinate, V>();
-      for (V vertex : vertices) {
-         vertexToCoordinate.put(vertex, layout.getCoordinate(vertex));
-         coordinateToVertex.put(layout.getCoordinate(vertex), vertex);
+      for (int index = 0; index < vertices.size(); index++) {
+         V vertex = this.vertices.get(index);
+         Coordinate coordinate = layout.getCoordinate(vertex);
+                     
+         vertexToIndex.put(vertex, index);
+         indexToCoordinate.put(index, coordinate);
+         coordinateToIndex.put(coordinate, index);
       }
    }
 
    public DelaunayGraphGenerator(Collection<Coordinate> sites, VertexFactory<V> vertexFactory) {
-      this.vertexToCoordinate = new HashMap<V, Coordinate>();
-      this.coordinateToVertex = new HashMap<Coordinate, V>();
-
-      for (Coordinate site : sites) {
+      this.indexToCoordinate = new HashMap<>();
+      this.coordinateToIndex = new HashMap<>();
+      this.vertexToIndex = new HashMap<>();      
+      this.vertices = new ArrayList<>(sites.size());
+      
+      ArrayList<Coordinate> siteList = new ArrayList<>(sites);
+            
+      for (int index = 0; index < sites.size(); index++) {      
          V vertex = vertexFactory.createVertex();
-         coordinateToVertex.put(site, vertex);
-         vertexToCoordinate.put(vertex, site);
+         Coordinate coordinate = siteList.get(index);
+                  
+         vertices.add(vertex);         
+         vertexToIndex.put(vertex, index);
+         indexToCoordinate.put(index, coordinate);
+         coordinateToIndex.put(coordinate, index);
       }
    }
 
@@ -74,39 +98,61 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
    public void generateGraph(PlanarGraph<V, E> graph, VertexFactory<V> vertexFactory,
            java.util.Map<java.lang.String, V> resultMap) {
        
-      if (coordinateToVertex.isEmpty()) {
+      PlanarGraph<Integer,UndirectedIdEdge<Integer>> source = 
+          new DoublyConnectedEdgeList<>(
+          new UndirectedIdEdgeFactory<>(), Object.class);
+          
+      if (coordinateToIndex.isEmpty()) {
          return;
       }
-
-      List<V> shuffledVertices = new ArrayList<V>(coordinateToVertex.values());
+      
+      List<Integer> shuffledVertices = new ArrayList<>(coordinateToIndex.values());
       Shuffler shuffler = new RandomEngineShuffler(randomEngine);
       shuffler.shuffle(shuffledVertices);
 
       // First contain all points in a boundary
-      createBounds(graph, vertexFactory);
+      createBounds(source);
 
-      for (V vertex : shuffledVertices) {
-         Coordinate site = vertexToCoordinate.get(vertex);
-         addSite(graph, site, vertex);
+      for (Integer vertex : shuffledVertices) {
+         Coordinate site = indexToCoordinate.get(vertex);
+         addSite(source, site, vertex);
       }
 
       // Finally remove the boundary
-      removeBounds(graph);
+      removeBounds(source);
+      
+      PlanarCopyGraphVisitor<Integer, UndirectedIdEdge<Integer>, V, E> copyGraphVisitor 
+          = new PlanarCopyGraphVisitor(source, graph, 
+          new CopyVertexFactory<V, Integer>() {
+          @Override
+          public V createVertex(Integer index) {
+              return vertices.get(index);
+          }
+      },        
+                  new CopyEdgeFactory<V, E, UndirectedIdEdge>() {
+          @Override
+          public E createEdge(V sourceVertex, V targetVertex, UndirectedIdEdge edge) {
+              return graph.getEdgeFactory().createEdge(sourceVertex, targetVertex);
+          }
+      });
+      
+      BreadthFirstPlanarFaceTraversal<Integer, UndirectedIdEdge<Integer>> planarFaceTraversal = new BreadthFirstPlanarFaceTraversal<>(source);
+      planarFaceTraversal.traverse(copyGraphVisitor);
    }
 
    @Override
    public Coordinate getCoordinate(V vertex) {
-      return vertexToCoordinate.get(vertex);
+      return indexToCoordinate.get(vertexToIndex.get(vertex));
    }
 
    public V getVertex(Coordinate coordinate) {
-      return coordinateToVertex.get(coordinate);
+      return vertices.get(coordinateToIndex.get(coordinate));
    }
 
-   private void createBounds(PlanarGraph<V, E> graph, VertexFactory<V> vertexFactory) {
+   private void createBounds(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph) {
       Envelope bounds = new Envelope();
-      for (V vertex : coordinateToVertex.values()) {
-         Coordinate site = vertexToCoordinate.get(vertex);
+      for (Integer vertex : coordinateToIndex.values()) {
+         Coordinate site = indexToCoordinate.get(vertex);
          bounds.expandToInclude(site);
       }
 
@@ -118,17 +164,17 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
               ? (bounds.getWidth() == 0 ? bounds.getWidth() : 1)
               : bounds.getHeight());
 
-      V a = vertexFactory.createVertex();
+      int a = vertices.size();
       graph.addVertex(a);
-      vertexToCoordinate.put(a, new Coordinate(bounds.centre().x - triangleHalfWidth, bounds.getMaxY() - triangleHalfHeight));
+      indexToCoordinate.put(a, new Coordinate(bounds.centre().x - triangleHalfWidth, bounds.getMaxY() - triangleHalfHeight));
 
-      V b = vertexFactory.createVertex();
+      int b = a + 1;
       graph.addVertex(b);
-      vertexToCoordinate.put(b, new Coordinate(bounds.centre().x + triangleHalfWidth, bounds.getMaxY() - triangleHalfHeight));
+      indexToCoordinate.put(b, new Coordinate(bounds.centre().x + triangleHalfWidth, bounds.getMaxY() - triangleHalfHeight));
 
-      V c = vertexFactory.createVertex();
+      int c = b + 1;
       graph.addVertex(b);
-      vertexToCoordinate.put(c, new Coordinate(bounds.centre().x, bounds.getMaxY() + triangleHalfHeight));
+      indexToCoordinate.put(c, new Coordinate(bounds.centre().x, bounds.getMaxY() + triangleHalfHeight));
 
       // The boundary face is defined anticlockwise, which is the convention for this algorithm
       graph.addEdge(a, b);
@@ -136,40 +182,40 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       graph.addEdge(c, a, b, null);
    }
 
-   private void removeBounds(PlanarGraph<V, E> graph) {      
-      for (V vertex : PlanarGraphs.getBoundaryVertices(graph)) {
+   private void removeBounds(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph) {      
+      for (Integer vertex : PlanarGraphs.getBoundaryVertices(graph)) {
          graph.removeVertex(vertex);
-         vertexToCoordinate.remove(vertex);
+         indexToCoordinate.remove(vertex);
       }
    }
 
-   private void addSite(PlanarGraph<V, E> graph, Coordinate p, V vertex) {
+   private void addSite(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph, Coordinate p, Integer vertex) {
       
       // More efficient to set the start edge to the last found edge, effectively randomizing it
-      DirectedEdge<V> start = lastSearchFace;
+      DirectedEdge<Integer> start = lastSearchFace;
       if (start == null) {
          start = graph.getBoundary().getTwin();
       } 
        
       // Locate the edge that this site is next to
-      DirectedEdge<V> face = locateInsideBoundary(graph, p, start);      
+      DirectedEdge<Integer> face = locateInsideBoundary(graph, p, start);      
       lastSearchFace = face;
 
-      V first = face.getSource();
-      V second = face.getTarget();
-      V third = graph.getNextVertex(face.getSource(), face.getTarget());
+      Integer first = face.getSource();
+      Integer second = face.getTarget();
+      Integer third = graph.getNextVertex(face.getSource(), face.getTarget());
 
       // Degenerate cases
-      if (p.equals(vertexToCoordinate.get(first))
-              || p.equals(vertexToCoordinate.get(second))
-              || p.equals(vertexToCoordinate.get(third))) {
+      if (p.equals(indexToCoordinate.get(first))
+              || p.equals(indexToCoordinate.get(second))
+              || p.equals(indexToCoordinate.get(third))) {
          // Point is already in the structure
          return;
       }
 
       // Connect the new point to the DCEL
       graph.addVertex(vertex);
-      vertexToCoordinate.put(vertex, p);
+      indexToCoordinate.put(vertex, p);
 
       insertVertexInsideFace(graph, face, vertex);
 
@@ -180,9 +226,9 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
    }
 
    // See https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-728.pdf
-   private DirectedEdge<V> locateInsideBoundary(PlanarGraph<V, E> graph, Coordinate x, DirectedEdge<V> start) {
+   private DirectedEdge<Integer> locateInsideBoundary(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph, Coordinate x, DirectedEdge<Integer> start) {
       // Validate that the supplied point is inside the boundary, otherwise we may not terminate
-      for (E boundaryEdge : PlanarGraphs.getBoundaryEdges(graph)) {
+      for (UndirectedIdEdge<Integer> boundaryEdge : PlanarGraphs.getBoundaryEdges(graph)) {
           if (isRightOf(x, new DirectedEdge(graph.getEdgeSource(boundaryEdge), graph.getEdgeTarget(boundaryEdge)))) {
              throw new IllegalArgumentException("Search Coordinate must be inside or on boundary.");
           }
@@ -191,7 +237,7 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       // Loop until p is left of every edge in the triangle
       int iterations = 0;
       int maxIterations = graph.edgeSet().size();
-      DirectedEdge<V> edge = start;
+      DirectedEdge<Integer> edge = start;
             
       if (isRightOf(x, edge)) {
          edge = edge.getTwin();
@@ -200,17 +246,14 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       while (true) {        
          if (iterations++ > maxIterations) {
              // Should not happen, if it does the boundary conditions and tolerances may be inconsistent.
-             //throw new RuntimeException("Search overflow, geometric conditions not met.");
-             System.out.println("BADNESS");
+             throw new RuntimeException("Search overflow, geometric conditions not met.");
          }
          
-         V origVertex = edge.getSource();
-         V destVertex = edge.getTarget();
-         Coordinate origCoord = vertexToCoordinate.get(origVertex);
-         Coordinate destCoord = vertexToCoordinate.get(destVertex);
-         
-               
-         
+         Integer origVertex = edge.getSource();
+         Integer destVertex = edge.getTarget();
+         Coordinate origCoord = indexToCoordinate.get(origVertex);
+         Coordinate destCoord = indexToCoordinate.get(destVertex);
+                                 
          // Keep p to the left of our edge walk
          if (x.equals2D(origCoord) || x.equals2D(destCoord)) {
             break;
@@ -218,13 +261,13 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
          else {
              int whichOp = 0;
              
-             V nextVertex = graph.getPrevVertex(origVertex, destVertex);
-            DirectedEdge<V> next = new DirectedEdge<>(origVertex, nextVertex);
+            Integer nextVertex = graph.getPrevVertex(origVertex, destVertex);
+            DirectedEdge<Integer> next = new DirectedEdge<>(origVertex, nextVertex);
             if (!isRightOf(x, next)) {
               whichOp += 1;
             }
             
-            DirectedEdge<V> prev = new DirectedEdge<>(nextVertex, destVertex);
+            DirectedEdge<Integer> prev = new DirectedEdge<>(nextVertex, destVertex);
             if (!isRightOf(x, prev)) {
                 whichOp += 2;
             }
@@ -246,33 +289,33 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       return edge;
    }
    
-   private boolean isRightOf(Coordinate x, DirectedEdge<V> edge) {
-      Coordinate source = vertexToCoordinate.get(edge.getSource());
-      Coordinate target = vertexToCoordinate.get(edge.getTarget());
+   private boolean isRightOf(Coordinate x, DirectedEdge<Integer> edge) {
+      Coordinate source = indexToCoordinate.get(edge.getSource());
+      Coordinate target = indexToCoordinate.get(edge.getTarget());
       
       // Note we flip source and target as orientationIndex == 1, when isLeftOf(...) is true.
       LineSegment line = new LineSegment(target, source);
       return line.orientationIndex(x) == 1;
    }
    
-   private double distance(Coordinate x, DirectedEdge<V> edge) {       
-      Coordinate source = vertexToCoordinate.get(edge.getSource());
-      Coordinate target = vertexToCoordinate.get(edge.getTarget());
+   private double distance(Coordinate x, DirectedEdge<Integer> edge) {       
+      Coordinate source = indexToCoordinate.get(edge.getSource());
+      Coordinate target = indexToCoordinate.get(edge.getTarget());
       
       LineSegment line = new LineSegment(source, target);
       return line.distance(x);
    }
 
-   private void insertVertexInsideFace(PlanarGraph<V, E> graph, DirectedEdge<V> face, V vertex) {            
-      V current = face.getSource();
-      V next = face.getTarget();
+   private void insertVertexInsideFace(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph, DirectedEdge<Integer> face, Integer vertex) {            
+      Integer current = face.getSource();
+      Integer next = face.getTarget();
       
       if (graph.isBoundary(current, next)) {
           throw new IllegalArgumentException("Cannot insert vertex into the boundary face");
       }
 
       do {
-         V nextNext = graph.getNextVertex(current, next);
+         Integer nextNext = graph.getNextVertex(current, next);
          graph.addEdge(next, vertex, current, null);
 
          current = next;
@@ -280,10 +323,10 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       } while (!current.equals(face.getSource()));
    }
 
-   private void enforceDelaunayCondition(PlanarGraph<V, E> graph, V source, V target) {
+   private void enforceDelaunayCondition(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph, Integer source, Integer target) {
       // Check that the delaunay condition holds      
-      V targetNext = graph.getNextVertex(source, target);
-      V sourceNext = graph.getNextVertex(target, source);
+      Integer targetNext = graph.getNextVertex(source, target);
+      Integer sourceNext = graph.getNextVertex(target, source);
 
       // Boundary vertices are treated as if they are infinitely far away
       // so they never break the circumcircle condition
@@ -298,12 +341,12 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
    }
 
    // Check if fourth point is within the circumcircle defined by the first three
-   private boolean isWithinCircumcircle(PlanarGraph<V, E> graph, V first,
-           V second,
-           V third,
-           V fourth) {
+   private boolean isWithinCircumcircle(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph, Integer first,
+           Integer second,
+           Integer third,
+           Integer fourth) {
       // Treat the boundary as if infinitely far away
-      Coordinate p = vertexToCoordinate.get(fourth);
+      Coordinate p = indexToCoordinate.get(fourth);
       if (PlanarGraphs.isVertexBoundary(graph, first)) {
          return isRightOf(p, new DirectedEdge(third, second));
       } else if (PlanarGraphs.isVertexBoundary(graph, second)) {
@@ -314,9 +357,9 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
          return false;
       }
 
-      Coordinate a = vertexToCoordinate.get(first);
-      Coordinate b = vertexToCoordinate.get(second);
-      Coordinate c = vertexToCoordinate.get(third);
+      Coordinate a = indexToCoordinate.get(first);
+      Coordinate b = indexToCoordinate.get(second);
+      Coordinate c = indexToCoordinate.get(third);
 
       boolean within = (a.x * a.x + a.y * a.y) * getDblOrientedTriangleArea(b, c, p)
               - (b.x * b.x + b.y * b.y) * getDblOrientedTriangleArea(a, c, p)
@@ -332,9 +375,9 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
       return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
    }
 
-   private void flipTransform(PlanarGraph<V, E> graph, V source, V target) {
-      V targetNext = graph.getNextVertex(source, target);
-      V sourceNext = graph.getNextVertex(target, source);
+   private void flipTransform(PlanarGraph<Integer, UndirectedIdEdge<Integer>> graph, Integer source, Integer target) {
+      Integer targetNext = graph.getNextVertex(source, target);
+      Integer sourceNext = graph.getNextVertex(target, source);
 
       // Take care to keep lastSearchFace valid
       if ((lastSearchFace.getSource().equals(source)
@@ -342,7 +385,7 @@ public class DelaunayGraphGenerator<V, E> implements PlanarGraphGenerator<V, E, 
               || (lastSearchFace.getSource().equals(target)
               && lastSearchFace.getTarget().equals(source))) {
 
-         lastSearchFace = new DirectedEdge<V>(target, targetNext);
+         lastSearchFace = new DirectedEdge<Integer>(target, targetNext);
       }
 
       graph.removeEdge(source, target);

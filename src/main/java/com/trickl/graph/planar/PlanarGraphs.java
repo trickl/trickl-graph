@@ -67,7 +67,7 @@ public final class PlanarGraphs {
       }
    }
 
-   static public <V1, E1, V2, E2> Map<V2, Set<DirectedEdge<V1>>> delaunayToVoronoi(PlanarGraph<V1, E1> delaunay,
+   static public <V1, E1, V2, E2> Map<V1, Set<DirectedEdge<V2>>> delaunayToVoronoi(PlanarGraph<V1, E1> delaunay,
                                                PlanarLayout<V1> delaunayLocations,
                                                PlanarGraph<V2, E2> voronoi,
                                                PlanarLayoutStore<V2> voronoiLayout,
@@ -80,7 +80,7 @@ public final class PlanarGraphs {
       return delaunayVoronoiVisitor.getVertexToFaceMap();
    }
 
-   static public <V1, E1, V2, E2> Map<V2, Set<DirectedEdge<V1>>> dualGraph(PlanarGraph<V1, E1> graph,
+   static public <V1, E1, V2, E2> Map<V1, Set<DirectedEdge<V2>>> dualGraph(PlanarGraph<V1, E1> graph,
                                        PlanarGraph<V2, E2> dualGraph,
                                        VertexFactory<V2> vertexFactory) {
       DualGraphVisitor<V1, E1, V2, E2> dualGraphVisitor = new DualGraphVisitor(graph, dualGraph, vertexFactory);
@@ -401,9 +401,9 @@ public final class PlanarGraphs {
       }
       return innerBoundary.isEmpty() ? innerBoundary : innerBoundary.subList(1, innerBoundary.size());
    }
-     
-   static public <V, E, F> F getFace(PlanarFaceGraph<V, E, F> graph, DirectedEdge<V> edge) {
-       return graph.getFace(edge.getSource(), edge.getTarget());
+   
+   private <V, E, F> Set<DirectedEdge<F>> getAdjacentFaces(PlanarFaceGraph<V, E, F> graph, F face) {
+       return null;
    }
 
    static public <V, E> boolean isBoundaryConvex(PlanarGraph<V, E> graph, PlanarLayout<V> layout) {
@@ -546,5 +546,26 @@ public final class PlanarGraphs {
            .collect(Collectors.toList());
         
         return innermostVertices;
+    }
+    
+     
+    public static <T> PlanarLayoutStore scaleByFactor(double factor, Set<T> items, PlanarLayoutStore layoutStore) {
+        for (T item : items) {
+            Coordinate coord = layoutStore.getCoordinate(item);
+            if (coord != null) {
+                layoutStore.setCoordinate(item, new Coordinate(coord.x * factor, coord.y * factor)); 
+            }
+        }
+        return layoutStore;
+    }
+        
+    public static <T> PlanarLayoutStore translate(double x, double y, Set<T> items, PlanarLayoutStore layoutStore) {
+        for (T item : items) {
+            Coordinate coord = layoutStore.getCoordinate(item);
+            if (coord != null) {
+                layoutStore.setCoordinate(item, new Coordinate(coord.x + x, coord.y + y)); 
+            }
+        }
+        return layoutStore;
     }
 }

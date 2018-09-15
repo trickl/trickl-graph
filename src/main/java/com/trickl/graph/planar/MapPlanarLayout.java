@@ -23,6 +23,7 @@ package com.trickl.graph.planar;
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -39,6 +40,13 @@ public class MapPlanarLayout<V> implements PlanarLayoutStore<V> {
    
    public MapPlanarLayout(Map<V, Coordinate> vertexCoordinateMap) {
       this.vertexCoordinateMap = vertexCoordinateMap;
+   }
+   
+   public MapPlanarLayout(Set<V> items, PlanarLayout<V> layout) {
+      this();
+      for (V item: items) {
+          vertexCoordinateMap.put(item, layout.getCoordinate(item));
+      }      
    }
 
    @Override

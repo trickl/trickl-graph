@@ -27,6 +27,7 @@ import com.trickl.graph.vertices.IntegerVertexFactory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -34,51 +35,48 @@ import java.util.Set;
  * @author tgee
  */
 public class DualGraphFaceLabeller<V, E> implements Labeller<DirectedEdge<V>> {
-   
-   private Map<Integer, Set<DirectedEdge<V>>> labelFaces = new HashMap<Integer, Set<DirectedEdge<V>>>();
-   private Map<DirectedEdge<V>, Integer> faceLabels = new HashMap<DirectedEdge<V>, Integer>();
-      
-   public DualGraphFaceLabeller(PlanarGraph<V, E> graph) {
-      generateLabels(graph);
-   }
 
-   @Override
-   public int getLabelCount() {      
-      return labelFaces.size();
-   }
+    private Map<Integer, Set<DirectedEdge<V>>> labelFaces = new HashMap<Integer, Set<DirectedEdge<V>>>();
+    private Map<DirectedEdge<V>, Integer> faceLabels = new HashMap<DirectedEdge<V>, Integer>();
 
-   @Override
-   public int getLabel(DirectedEdge<V> face) {      
-      return faceLabels.get(face);
-   }
+    public DualGraphFaceLabeller(PlanarGraph<V, E> graph) {
+        generateLabels(graph);
+    }
 
-   @Override
-   public Set<DirectedEdge<V>> getMembers(int label) {      
-      return labelFaces.get(label);
-   }   
-   
-   private void generateLabels(PlanarGraph<V, E> graph) {      
-      DoublyConnectedEdgeList<Integer, Integer, Object> dualGraph = new DoublyConnectedEdgeList<Integer, Integer, Object>(new IntegerEdgeFactory<Integer>(), Object.class);
-      
-      DualGraphVisitor<V, E, Integer, Integer> dualGraphVisitor = new DualGraphVisitor(graph, dualGraph, new IntegerVertexFactory());
-      PlanarFaceTraversal<V, E> planarFaceTraversal = new CanonicalPlanarFaceTraversal<V, E>(graph);
-      planarFaceTraversal.traverse(dualGraphVisitor);
-      
-      Labeller<Integer> dualVertexLabeller = new SixColorVertexLabeller(dualGraph);
-      
-      Map<Integer, Set<DirectedEdge<V>>> vertexToFaceMap = dualGraphVisitor.getVertexToFaceMap();
-      labelFaces.clear();
-      faceLabels.clear();
-      for (Integer dualVertex : dualGraph.vertexSet()) {
-         int label = dualVertexLabeller.getLabel(dualVertex);         
-         if (!labelFaces.containsKey(label)) {
-            labelFaces.put(label, new HashSet<DirectedEdge<V>>());
-         }
-         
-         for (DirectedEdge<V> edge : vertexToFaceMap.get(dualVertex)) {
-            labelFaces.get(label).add(edge);
-            faceLabels.put(edge, label);
-         }
-      }
-   }
+    @Override
+    public int getLabelCount() {
+        return labelFaces.size();
+    }
+
+    @Override
+    public int getLabel(DirectedEdge<V> face) {
+        return faceLabels.get(face);
+    }
+
+    @Override
+    public Set<DirectedEdge<V>> getMembers(int label) {
+        return labelFaces.get(label);
+    }
+
+    private void generateLabels(PlanarGraph<V, E> graph) {
+        DoublyConnectedEdgeList<Integer, Integer, Object> dualGraph = new DoublyConnectedEdgeList<>(new IntegerEdgeFactory<>(), Object.class);
+
+        DualGraphVisitor<V, E, Integer, Integer> dualGraphVisitor = new DualGraphVisitor(graph, dualGraph, new IntegerVertexFactory());
+        PlanarFaceTraversal<V, E> planarFaceTraversal = new CanonicalPlanarFaceTraversal<>(graph);
+        planarFaceTraversal.traverse(dualGraphVisitor);
+
+        Labeller<Integer> dualVertexLabeller = new SixColorVertexLabeller(dualGraph);
+
+        labelFaces.clear();
+        faceLabels.clear();
+        dualGraphVisitor.getFaceToVertexMap().entrySet().stream().forEach((faceToVertex) -> {
+            int label = dualVertexLabeller.getLabel(faceToVertex.getValue());
+            faceLabels.put(faceToVertex.getKey(), label);
+
+            if (!labelFaces.containsKey(label)) {
+                labelFaces.put(label, new HashSet<>());
+            }
+            labelFaces.get(label).add(faceToVertex.getKey());
+        });
+    }
 }

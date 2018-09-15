@@ -21,6 +21,7 @@
 package com.trickl.graph.planar;
 
 import com.trickl.graph.EdgeVisitor;
+import com.trickl.graph.edges.DirectedEdge;
 import com.trickl.graph.edges.IntegerEdgeFactory;
 import com.trickl.graph.edges.UndirectedIdEdge;
 import com.trickl.graph.edges.UndirectedIdEdgeFactory;
@@ -430,7 +431,8 @@ public class PlanarGraphsTest {
       runDelaunayVoronoi(delaunayGraph, delaunayLayout, boundary);
    }
 */    
-   private <V, E> void runDelaunayVoronoi(PlanarGraph<V, E> delaunayGraph, PlanarLayout<V> delaunayLayout, final LinearRing boundary) throws Exception {
+   private <V, E> Map<V, Set<DirectedEdge<IdCoordinateVertex>>>
+         runDelaunayVoronoi(PlanarGraph<V, E> delaunayGraph, PlanarLayout<V> delaunayLayout, final LinearRing boundary) throws Exception {
       final DoublyConnectedEdgeList<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>, IdFace> voronoiGraph
                = new DoublyConnectedEdgeList<>(new UndirectedIdEdgeFactory<>(), new IdFaceFactory());
 
@@ -439,7 +441,8 @@ public class PlanarGraphsTest {
 
        final PlanarLayoutStore<IdCoordinateVertex> voronoiLayout = new MapPlanarLayout<>();
 
-       PlanarGraphs.delaunayToVoronoi(delaunayGraph, delaunayLayout, voronoiGraph, voronoiLayout, boundary, voronoiVertexFactory);
+       Map<V, Set<DirectedEdge<IdCoordinateVertex>>> vertexToFaceMap =
+               PlanarGraphs.delaunayToVoronoi(delaunayGraph, delaunayLayout, voronoiGraph, voronoiLayout, boundary, voronoiVertexFactory);
        assert (voronoiLayout.getCoordinate(voronoiVertexFactory.get(0)) != null);
 
        voronoiGraph.vertexSet().stream().forEach((voronoiVertex) -> {
@@ -451,6 +454,8 @@ public class PlanarGraphsTest {
            JComponentWindow window = new JComponentWindow(new JScrollPane(jGraph));
            window.showAndWait();
        }
+       
+       return vertexToFaceMap;
    }
 
    @Test

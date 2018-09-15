@@ -536,7 +536,11 @@ public class DoublyConnectedEdgeList<V, E, F>
       if (dcelFace == null) {
          return false;
       }
-      faceMap.remove(oldFace);
+      if (faceMap.get(newFace) != null) {
+          throw new IllegalArgumentException("Cannot replace existing face");
+      }
+      
+      faceMap.remove(oldFace);            
       faceMap.put(newFace, dcelFace);
       dcelFace.setFace(newFace);
 

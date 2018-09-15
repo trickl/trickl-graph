@@ -62,7 +62,7 @@ public class DelaunayGraphGeneratorTest {
       DelaunayGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator 
               = new DelaunayGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(sites, vertexFactory);
       generator.setRandomEngine(new MersenneTwister(12345));
-      generator.generateGraph(graph, vertexFactory, null);
+      generator.generateGraph(graph, null, null);
       
       assertEquals(5, graph.edgeSet().size());
       assertTrue(graph.containsEdge(generator.getVertex(B), generator.getVertex(D)));
@@ -102,7 +102,7 @@ public class DelaunayGraphGeneratorTest {
       DelaunayGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>> generator
               = new DelaunayGraphGenerator<IdVertex, UndirectedIdEdge<IdVertex>>(sites, vertexFactory);
       generator.setRandomEngine(new MersenneTwister(12345));
-      generator.generateGraph(graph, vertexFactory, null);
+      generator.generateGraph(graph, null, null);
 
       assertEquals(11, graph.edgeSet().size());
       assertTrue(graph.containsEdge(generator.getVertex(A), generator.getVertex(B)));
@@ -151,7 +151,7 @@ public class DelaunayGraphGeneratorTest {
       
       PlanarGraph<IdCoordinateVertex, UndirectedIdEdge<IdCoordinateVertex>> graph = new DoublyConnectedEdgeList<>(new UndirectedIdEdgeFactory<>(), Object.class);
       generator.setRandomEngine(new MersenneTwister(12345));
-      generator.generateGraph(graph, vertexFactory, null);
+      generator.generateGraph(graph, null, null);
 
       assertEquals(5, graph.edgeSet().size());
       assertTrue(graph.containsEdge(B, D));

@@ -23,9 +23,14 @@ package com.trickl.graph.planar;
 import com.trickl.graph.edges.DirectedEdge;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jgrapht.EdgeFactory;
+import org.jgrapht.Graphs;
 import org.jgrapht.VertexFactory;
 
 public class DualGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversalVisitor<V1, E1> {
@@ -117,17 +122,36 @@ public class DualGraphVisitor<V1, E1, V2, E2> extends AbstractPlanarFaceTraversa
 
    public Map<DirectedEdge<V1>, V2> getFaceToVertexMap() {
       return faceToVertexMap;
-   }
-   
-   public Map<V2, Set<DirectedEdge<V1>>> getVertexToFaceMap() {
-      Set<V2> dualVertices = dualGraph.vertexSet();
-      Map<V2, Set<DirectedEdge<V1>>> vertexToFaceMap = new HashMap<>(dualVertices.size());
-      dualVertices.stream().forEach((dualVertex) -> {
-          vertexToFaceMap.put(dualVertex, new HashSet<>());
-       });
-      faceToVertexMap.entrySet().stream().forEach((faceToVertexEntry) -> {
-          vertexToFaceMap.get(faceToVertexEntry.getValue()).add(faceToVertexEntry.getKey());
-       });
-      return vertexToFaceMap;
-   }
+    }
+
+    public Map<V1, Set<DirectedEdge<V2>>> getVertexToFaceMap() {
+        Set<V1> inputVertices = inputGraph.vertexSet();
+
+        Map<V1, Set<DirectedEdge<V2>>> vertexToFaceMap = new HashMap<>(inputVertices.size());
+
+        for (V1 sourceVertex : inputVertices) {
+            Iterator<E1> sourceEdgeItr = inputGraph.edgesOf(sourceVertex).iterator();
+            while (sourceEdgeItr.hasNext()) {
+                E1 sourceEdge = sourceEdgeItr.next();
+                V1 targetVertex = Graphs.getOppositeVertex(inputGraph, sourceEdge, sourceVertex);
+                DirectedEdge<V1> sourceDirectedEdge = new DirectedEdge(targetVertex, sourceVertex);
+                V2 dualSource = faceToVertexMap.get(sourceDirectedEdge);                
+                if (dualSource != null) {
+                    V2 dualTarget = faceToVertexMap.get(sourceDirectedEdge.getTwin());
+                    List<V2> dualVertices = PlanarGraphs.getVerticesOnFace(dualGraph, dualSource, dualTarget);
+
+                    Set<DirectedEdge<V2>> dualFace = new LinkedHashSet<>();
+                    for (int i = 0; i < dualVertices.size(); ++i) {
+                        dualFace.add(new DirectedEdge(dualVertices.get(i),
+                                dualVertices.get((i + 1) % dualVertices.size())));
+                    }
+
+                    vertexToFaceMap.put(sourceVertex, dualFace);
+                    break;
+                }
+            }
+        }
+
+        return vertexToFaceMap;
+    }
 }

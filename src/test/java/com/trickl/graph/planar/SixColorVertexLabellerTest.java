@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import javax.swing.JScrollPane;
 import junit.framework.Assert;
 import org.jgraph.JGraph;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**

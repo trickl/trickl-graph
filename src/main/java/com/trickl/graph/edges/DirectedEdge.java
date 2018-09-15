@@ -69,6 +69,18 @@ public class DirectedEdge<V> implements Serializable {
    public void setTarget(V target) {
       this.target = target;
    }
+   
+   public static <T> T getOpposite(DirectedEdge<T> edge, T value) {
+        T source = edge.getSource();
+        T target = edge.getTarget();
+        if (value.equals(source)) {
+            return target;
+        } else if (value.equals(target)) {
+            return source;
+        } else {
+            throw new IllegalArgumentException("no such vertex");
+        }
+   }
 
    @Override
    public int hashCode() {
