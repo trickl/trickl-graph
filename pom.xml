@@ -5,10 +5,10 @@
     This is a Java library that provides several graph algorithms, including many specialized for planar graphs.
   </description>
   <parent>
-     <groupId>com.trickl</groupId>
-     <artifactId>parent</artifactId>
-     <version>0.1-SNAPSHOT</version>
-     <relativePath>../parent/pom.xml</relativePath>
+    <groupId>com.trickl</groupId>
+    <artifactId>microservices-parent</artifactId>
+    <version>1.76</version>
+    <relativePath/>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.trickl</groupId>
@@ -31,6 +31,8 @@
     <connection>scm:git://github.com/trickl/trickl-graph.git</connection>
   </scm>
   <properties>
+    <!-- Library predates the shared Checkstyle rules -->
+    <checkstyle.skip>true</checkstyle.skip>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
@@ -130,5 +132,30 @@
       <version>${gson.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <!-- Runs the JUnit 4 tests on the JUnit Platform -->
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- A library, not a Spring Boot application -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>false</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
